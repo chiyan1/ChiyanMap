@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # LeviLamina Mod Template
 
 Mod Template for LeviLamina
@@ -24,3 +25,6 @@ PRs accepted.
 ## License
 
 CC0-1.0 © LeviMC(LiteLDev)
+=======
+一个基于LeviLamina的Minecraft基岩版地图模组。
+>>>>>>> c51cc41c87265272b820e782d781e4436a87414a
