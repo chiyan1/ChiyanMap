@@ -37,14 +37,11 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace DX11Hook {
-<<<<<<< HEAD
     
     // 【极致平滑引擎】供全局调用的亚像素平滑坐标
     inline float g_smoothPX = 0.0f;
     inline float g_smoothPZ = 0.0f;
 
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
     inline void DbgLog(const char* msg, HRESULT hr = 0) {
         std::ofstream out("MapMod_Debug.txt", std::ios::app);
         if (hr != 0) {
@@ -81,13 +78,10 @@ namespace DX11Hook {
     inline std::unordered_map<uint64_t, ID3D11Texture2D*> g_regionTextures;
     inline std::unordered_map<uint64_t, ID3D11ShaderResourceView*> g_regionSRVs;
 
-<<<<<<< HEAD
     // 记录上一次真实推送到 DX11 纹理的坐标中心
     inline float g_textureCenterX = 0.0f;
     inline float g_textureCenterZ = 0.0f;
 
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
     // ==========================================
     // [另辟蹊径] Windows Raw Input 硬件级欺骗器
     // ==========================================
@@ -257,14 +251,11 @@ namespace DX11Hook {
     inline void UpdateMapTexture() {
         if (!g_mapDataUpdated.load() || !g_pd3dDeviceContext || !g_mapTexture) return;
 
-<<<<<<< HEAD
         // 【同步机制】必须使用互斥锁读取数组，同时抓取此时的坐标中心
         std::lock_guard<std::mutex> lock(g_mapDataMutex);
         g_textureCenterX = g_lastRenderX;
         g_textureCenterZ = g_lastRenderZ;
 
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
         for (int x = 0; x < MAP_DATA_SIZE; x++) {
             for (int z = 0; z < MAP_DATA_SIZE; z++) {
                 int index = (z * MAP_DATA_SIZE + x) * 4;
@@ -363,7 +354,6 @@ namespace DX11Hook {
         g_pd3dDeviceContext->PSSetSamplers(0, 1, &pLinearSampler);
     }
 
-<<<<<<< HEAD
     // ==========================================
     // 【极致平滑引擎】更新核心航位推测坐标
     // ==========================================
@@ -423,8 +413,6 @@ namespace DX11Hook {
     // ==========================================
     // [小地图 UI 渲染引擎]
     // ==========================================
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
     inline void RenderImGuiXaeroMap() {
         if (!MapRenderState::showMiniMap) return; 
         if (!g_mapTextureView) return;
@@ -434,7 +422,6 @@ namespace DX11Hook {
         
         float IM_MAP_R = 135.0f; 
         float IM_MAP_MARGIN = 20.0f;
-<<<<<<< HEAD
         // 强制向下取整，防止 ImGui 渲染到亚像素网格导致 DX11 采样边缘发毛
         float cx = std::floor(ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R);
         float cy = std::floor(IM_MAP_MARGIN + IM_MAP_R);
@@ -445,20 +432,6 @@ namespace DX11Hook {
         // 【极致防撕裂核心】UV 偏移只以最新的同步 Texture 中心为基准运算！
         float dx = pX - g_textureCenterX;
         float dz = pZ - g_textureCenterZ;
-=======
-        float cx = ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R;
-        float cy = IM_MAP_MARGIN + IM_MAP_R;
-
-        auto now = std::chrono::steady_clock::now();
-        float alpha = std::chrono::duration_cast<std::chrono::duration<float>>(now - g_lastPhysicsTime).count() / 0.05f;
-        alpha = std::clamp(alpha, 0.0f, 1.0f);
-
-        float pX = g_prevPhysicsPos.x + (g_currPhysicsPos.x - g_prevPhysicsPos.x) * alpha;
-        float pZ = g_prevPhysicsPos.z + (g_currPhysicsPos.z - g_prevPhysicsPos.z) * alpha;
-
-        float dx = pX - g_lastRenderX;
-        float dz = pZ - g_lastRenderZ;
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 
         float ZOOM_RADIUS = 50.0f; 
         float u = 0.5f + (dx / MAP_DATA_SIZE);
@@ -515,10 +488,7 @@ namespace DX11Hook {
 
         float scale = IM_MAP_R / ZOOM_RADIUS; 
         for (const auto& ent : s_cachedEntities) {
-<<<<<<< HEAD
             // 让实体也跟随绝对平滑的坐标系移动
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
             float edx = ent.x - pX;
             float edz = ent.z - pZ;
             float ex = cx + edx * scale;
@@ -738,17 +708,10 @@ namespace DX11Hook {
         float cx = io.DisplaySize.x * 0.5f;
         float cy = io.DisplaySize.y * 0.5f;
         
-<<<<<<< HEAD
         float minWx = g_smoothPX - (cx + MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
         float maxWx = g_smoothPX + (cx - MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
         float minWz = g_smoothPZ - (cy + MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
         float maxWz = g_smoothPZ + (cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
-=======
-        float minWx = g_playerX - (cx + MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
-        float maxWx = g_playerX + (cx - MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
-        float minWz = g_playerZ - (cy + MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
-        float maxWz = g_playerZ + (cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 
         int startRx = (int)std::floor(minWx / 256.0f);
         int endRx   = (int)std::floor(maxWx / 256.0f);
@@ -765,17 +728,10 @@ namespace DX11Hook {
                     UpdateRegionTexture(hash, texturesCreatedThisFrame);
 
                     if (g_regionSRVs.find(hash) != g_regionSRVs.end()) {
-<<<<<<< HEAD
                         float sx_min = std::floor(cx + (rx * 256.0f - g_smoothPX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX);
                         float sy_min = std::floor(cy + (rz * 256.0f - g_smoothPZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ);
                         float sx_max = std::floor(cx + ((rx + 1) * 256.0f - g_smoothPX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX);
                         float sy_max = std::floor(cy + ((rz + 1) * 256.0f - g_smoothPZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ);
-=======
-                        float sx_min = std::floor(cx + (rx * 256.0f - g_playerX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX);
-                        float sy_min = std::floor(cy + (rz * 256.0f - g_playerZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ);
-                        float sx_max = std::floor(cx + ((rx + 1) * 256.0f - g_playerX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX);
-                        float sy_max = std::floor(cy + ((rz + 1) * 256.0f - g_playerZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ);
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                         
                         draw_list->AddImage((void*)g_regionSRVs[hash], ImVec2(sx_min, sy_min), ImVec2(sx_max, sy_max));
                     }
@@ -809,13 +765,8 @@ namespace DX11Hook {
             for (const auto& wp : WaypointManager::g_waypoints) {
                 if (!wp.enabled) continue;
                 
-<<<<<<< HEAD
                 float wx = cx + (wp.x - g_smoothPX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX;
                 float wz = cy + (wp.z - g_smoothPZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ;
-=======
-                float wx = cx + (wp.x - g_playerX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX;
-                float wz = cy + (wp.z - g_playerZ) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetZ;
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 
                 if (wx > -50.0f && wx < io.DisplaySize.x + 50.0f && wz > -50.0f && wz < io.DisplaySize.y + 50.0f) {
                     DrawWaypointIcon(draw_list, ImVec2(wx, wz), mce::Color(wp.r, wp.g, wp.b, 1.0f), wp.name, false);
@@ -829,13 +780,8 @@ namespace DX11Hook {
             }
         }
 
-<<<<<<< HEAD
         float hoverWx = g_smoothPX + (io.MousePos.x - cx - MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
         float hoverWz = g_smoothPZ + (io.MousePos.y - cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
-=======
-        float hoverWx = g_playerX + (io.MousePos.x - cx - MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
-        float hoverWz = g_playerZ + (io.MousePos.y - cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 
         char infoBuf[256];
         snprintf(infoBuf, sizeof(infoBuf), "赤焰全局大地图 | 缩放: %.1fx", MapRenderState::bigMapZoom);
@@ -897,23 +843,14 @@ namespace DX11Hook {
             int bx = (int)std::floor(rcWorldX);
             int bz = (int)std::floor(rcWorldZ);
             
-<<<<<<< HEAD
             // 【完成需求2】全屏大地图添加地标时，瞬间获取真正的底层地形表面高度
             int by = 320; 
-=======
-            // 【核心2修复】动态探测大地图指定坐标的地表高度 (Y轴精准计算，未加载才给320)
-            int by = 320; // 默认防窒息高度
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
             if (g_clientInstance) {
                 BlockSource* region = g_clientInstance->getRegion();
                 if (region) {
                     short topY = region->getAboveTopSolidBlock(bx, bz, true, true);
                     if (topY > -60 && topY < 319) {
-<<<<<<< HEAD
                         by = (int)topY + 1; // 地形如果已经加载过，立刻抓取地表最高点！
-=======
-                        by = (int)topY + 1; // 提取出真实地表
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                     }
                 }
             }
@@ -941,11 +878,7 @@ namespace DX11Hook {
             
             if (ImGui::Selectable("U 创建路径点")) {
                 MapRenderState::addWaypointX = bx;
-<<<<<<< HEAD
                 MapRenderState::addWaypointY = by; // 传入正确探测到的地面高度
-=======
-                MapRenderState::addWaypointY = by; // 传入真实计算出的表面高度
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 MapRenderState::addWaypointZ = bz;
                 MapRenderState::triggerAddWaypoint = true;
                 MapRenderState::showWaypointUI = true;
@@ -953,11 +886,7 @@ namespace DX11Hook {
             
             if (ImGui::Selectable("传送到此地")) {
                 MapRenderState::tpTargetX = (float)bx + 0.5f;
-<<<<<<< HEAD
                 MapRenderState::tpTargetY = (float)by; 
-=======
-                MapRenderState::tpTargetY = (float)by; // 传送至真实安全高度
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 MapRenderState::tpTargetZ = (float)bz + 0.5f;
                 MapRenderState::triggerTeleport.store(true);
                 MapRenderState::showBigMap = false; 
@@ -1109,11 +1038,7 @@ namespace DX11Hook {
                         toggled = true;
                     }
                     
-<<<<<<< HEAD
                     // 【完成需求1】主列表中追加独立设计的重命名按钮
-=======
-                    // 【核心1修复】主列表中追加独立设计的重命名按钮
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                     ImGui::SameLine(winWidth - 195);
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.6f, 0.2f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.7f, 0.3f, 1.0f));
@@ -1275,11 +1200,8 @@ namespace DX11Hook {
                 ImGui_ImplDX11_NewFrame(); ImGui_ImplWin32_NewFrame(); ImGui::NewFrame();
                 ImGui::GetIO().MouseDrawCursor = MapRenderState::IsUIActive();
 
-<<<<<<< HEAD
                 UpdateSmoothCamera(); // 更新底层的无极平滑推测坐标！
 
-=======
->>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 if (MapRenderState::showBigMap) {
                     RenderImGuiBigMap();
                 } else {
