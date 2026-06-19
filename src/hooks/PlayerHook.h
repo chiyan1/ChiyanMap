@@ -10,6 +10,10 @@
 #include <ll/api/memory/Hook.h>
 #include <mc/client/game/ClientInstance.h>
 #include <mc/client/player/LocalPlayer.h>
+<<<<<<< HEAD
+=======
+// 【新增】补全核心实体与底层玩家类的宏解析依赖，防止编译时类型断链
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 #include <mc/world/actor/player/Player.h>
 #include <mc/deps/core/math/Color.h>
 #include <mc/world/level/BlockSource.h>
@@ -46,9 +50,12 @@ extern std::chrono::steady_clock::time_point g_lastPhysicsTime;
 extern int g_playerBlockX;
 extern int g_playerBlockZ;
 
+<<<<<<< HEAD
 // 数据并发锁，消灭画面撕裂
 inline std::mutex g_mapDataMutex;
 
+=======
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 // ==========================================
 // 生物群系中文翻译字典引擎
 // ==========================================
@@ -104,7 +111,11 @@ inline std::string TranslateBiomeName(const std::string& rawName) {
 }
 
 // ==========================================
+<<<<<<< HEAD
 // 真彩自然光色彩引擎
+=======
+// 真彩自然光色彩引擎 (精确校准的生物群系色调)
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 // ==========================================
 inline void getBiomeTints(std::string const& biomeName, mce::Color& grass, mce::Color& foliage, mce::Color& water) {
     grass   = mce::Color(0.32f, 0.45f, 0.22f, 1.0f);
@@ -283,8 +294,13 @@ LL_TYPE_INSTANCE_HOOK(
                     targetY = 320.0f;
                     needsSafeFall = true;
                 }
+<<<<<<< HEAD
             } else if (std::abs(targetY - 320.0f) < 0.1f) {
                 // 【完成需求3】仅当精确传送到高空 Y=320 时，才触发无敌抗性护体
+=======
+            } else if (targetY >= 319.0f) {
+                // 【精细化抗性控制】仅当目标高度被明确指定为高空 320（或未加载区域触发的 320 兜底）时，才启用抗性
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 needsSafeFall = true;
             }
 
@@ -326,6 +342,10 @@ LL_TYPE_INSTANCE_HOOK(
                     std::this_thread::sleep_for(std::chrono::milliseconds(250)); 
                 };
 
+<<<<<<< HEAD
+=======
+                // 如果目标真的是 320 高空，加抗性防摔死
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                 if (needsSafeFall) {
                     char cmd1[128];
                     snprintf(cmd1, sizeof(cmd1), "/effect @s resistance 30 255 true");
@@ -535,6 +555,7 @@ LL_TYPE_INSTANCE_HOOK(
 
                     if (currentRow > MAP_DATA_RADIUS) {
                         isScanning = false;
+<<<<<<< HEAD
                         {
                             std::lock_guard<std::mutex> lock(g_mapDataMutex);
                             std::memcpy(g_mapHeights, g_mapHeightsBack, sizeof(g_mapHeights));
@@ -544,6 +565,16 @@ LL_TYPE_INSTANCE_HOOK(
                             g_mapDataUpdated.store(true); 
                         }
                         MapCacheManager::UpdateFromScan(currentScanX, currentScanZ, g_mapColorsBack, g_mapHeightsBack);
+=======
+                        std::memcpy(g_mapHeights, g_mapHeightsBack, sizeof(g_mapHeights));
+                        std::memcpy(g_mapColors, g_mapColorsBack, sizeof(g_mapColors));
+                        
+                        g_lastRenderX = currentScanX;
+                        g_lastRenderZ = currentScanZ;
+                        g_mapDataUpdated.store(true); 
+                        
+                        MapCacheManager::UpdateFromScan(currentScanX, currentScanZ, g_mapColors, g_mapHeights);
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
                     }
                 }
             } catch (...) {}
@@ -586,7 +617,11 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 // ==========================================
+<<<<<<< HEAD
 // [大地图模式] 视角与交互底层物理锁死模块
+=======
+// [大地图模式] 视角与交互底层物理锁死模块 (已恢复多行宏规范，完美规避 MSVC 展开崩溃)
+>>>>>>> 105e0409ab3453b315df8abfe4881022fc9a8948
 // ==========================================
 
 LL_TYPE_INSTANCE_HOOK(
