@@ -33,7 +33,7 @@ jobs:
           xmake f -a x64 -m release -p windows --target_type=${{ matrix.target_type }} -y
 
       - run: |
-          xmake -w -y
+          xmake -w -j 2 -y
 
       - uses: actions/upload-artifact@v7
         with:
