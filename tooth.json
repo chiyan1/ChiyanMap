@@ -14,40 +14,6 @@
   },
   "variants": [
     {
-      "label": "",
-      "platform": "win-x64",
-      "dependencies": {
-        "github.com/LiteLDev/LeviLamina": "1.8.*"
-      },
-      "assets": [
-        {
-          "type": "zip",
-          "urls": [
-            "https://{{tooth}}/releases/download/v{{version}}/levilamina-mod-template-server-windows-x64.zip"
-          ],
-          "placements": [
-            {
-              "type": "dir",
-              "src": "my-mod/",
-              "dest": "plugins/my-mod/"
-            }
-          ]
-        }
-      ],
-      "preserve_files": [],
-      "remove_files": [],
-      "scripts": {
-        "pre_install": [],
-        "install": [],
-        "post_install": [],
-        "pre_pack": [],
-        "post_pack": [],
-        "pre_uninstall": [],
-        "uninstall": [],
-        "post_uninstall": []
-      }
-    },
-    {
       "label": "client",
       "platform": "win-x64",
       "dependencies": {
