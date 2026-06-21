@@ -2,9 +2,10 @@ name: Auto Release
 
 on:
   push:
-    # 监听以 'v' 开头的 tag 推送，例如 v1.0.0
     tags:
-      - 'v*'
+      - v* # 匹配类似 v1.0 
+      - v*.*.* # 明确匹配类似 v0.1.1 的语义化版本号
+  workflow_dispatch: # 【新增】允许你在 Actions 网页端手动点击运行
 
 jobs:
   build:
@@ -57,24 +58,21 @@ jobs:
 
       - name: Package Release Archive
         run: |
-          # 复制重要文件到产物目录中
           cp CHANGELOG.md LICENSE README.md artifact/ 2>/dev/null || true
           cd artifact
-          # 打包为 ZIP 压缩包
           zip -r ../${{ github.event.repository.name }}-client-windows-x64.zip *
 
       - name: Extract Release Notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v2
-        continue-on-error: true # 容错，防止没有CHANGELOG导致流程中断
+        continue-on-error: true
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }} # 使用触发工作流的 Tag 作为版本号
+          tag_name: ${{ github.ref_name }} 
           name: Release ${{ github.ref_name }}
-          # 如果提取 CHANGELOG 失败，则提供默认描述
           body: ${{ steps.extract-release-notes.outputs.release_notes || '系统自动发布的客户端版本。' }}
           files: ${{ github.event.repository.name }}-client-windows-x64.zip
-          draft: false      # 直接发布而非保存为草稿
+          draft: false
           prerelease: false
