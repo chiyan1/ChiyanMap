@@ -27,9 +27,8 @@ jobs:
       - name: Update xmake repository
         run: xmake repo -u
 
-      - name: Configure xmake
-        # 直接固定 target_type=client，移除多端编译机制
-        run: xmake f -a x64 -m release -p windows --target_type=client -y
+      - name: Configure xmake (Client Only)
+        run: xmake f -a x64 -m release -p windows -y
 
       - name: Build
         run: xmake
@@ -37,14 +36,14 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-${{ github.sha }}-client-windows-x64
+          name: build-artifact
           path: bin/
 
   release:
     name: Create Release
     needs: build
     permissions:
-      contents: write # 授予自动创建 Release 的权限
+      contents: write # 授予自动创建 Release 的写权限
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -53,7 +52,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}-${{ github.sha }}-client-windows-x64
+          name: build-artifact
           path: artifact
 
       - name: Package Release Archive
@@ -74,7 +73,8 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }} # 使用触发工作流的 Tag 作为版本号
           name: Release ${{ github.ref_name }}
+          # 如果提取 CHANGELOG 失败，则提供默认描述
           body: ${{ steps.extract-release-notes.outputs.release_notes || '系统自动发布的客户端版本。' }}
           files: ${{ github.event.repository.name }}-client-windows-x64.zip
-          draft: false      # 设为 false 则直接发布；若设为 true 则是草稿
-          prerelease: false # 如果是预览版，可以改为 true
+          draft: false      # 直接发布而非保存为草稿
+          prerelease: false
