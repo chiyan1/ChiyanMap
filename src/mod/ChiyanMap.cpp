@@ -3,6 +3,7 @@
 #include "state/MapRenderState.h"
 #include "state/MapCacheManager.h"
 #include "state/WaypointManager.h"
+#include "state/LanguageManager.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <chrono>
 #include <atomic>
@@ -46,6 +47,7 @@ ChiyanMap& ChiyanMap::getInstance() {
 
 bool ChiyanMap::load() {
     registerAllHooks();
+    LanguageManager::Init(); // 初始化语言及配置
     MapCacheManager::Init();
     WaypointManager::Init(); // 初始化地标 JSON 引擎
     return true;

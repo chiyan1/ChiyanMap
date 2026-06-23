@@ -26,9 +26,11 @@
 #include <chrono>
 #include <cstdio>
 #include <algorithm>
+#include <filesystem>
 #include "hooks/PlayerHook.h"
 #include "state/MapCacheManager.h"
 #include "state/WaypointManager.h"
+#include "state/LanguageManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "d3d11.lib")
@@ -194,10 +196,6 @@ namespace DX11Hook {
         if (g_imguiInitialized && g_hasPlayer) {
             ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
             
-            if (uMsg == WM_KILLFOCUS || (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE)) {
-                MapRenderState::showBigMap = false;
-                MapRenderState::showWaypointUI = false;
-            }
             if (uMsg == WM_KEYDOWN && wParam == 0x4D) {
                 CURSORINFO ci = {}; ci.cbSize = sizeof(CURSORINFO);
                 if (GetCursorInfo(&ci)) {
@@ -233,6 +231,51 @@ namespace DX11Hook {
             }
         }
         return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+    }
+
+    inline void InitImGuiFonts(ImGuiIO& io) {
+        io.Fonts->Clear();
+
+        ImFontConfig config;
+        config.OversampleH = 1;
+        config.OversampleV = 1;
+
+        std::string baseFont = "c:\\Windows\\Fonts\\segoeui.ttf";
+        if (!std::filesystem::exists(baseFont)) baseFont = "c:\\Windows\\Fonts\\arial.ttf";
+
+        if (std::filesystem::exists(baseFont)) {
+            io.Fonts->AddFontFromFileTTF(baseFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesCyrillic());
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(baseFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesVietnamese());
+        } else {
+            io.Fonts->AddFontDefault();
+            config.MergeMode = true;
+        }
+
+        std::string cnHan = "c:\\Windows\\Fonts\\msyh.ttc";
+        if (std::filesystem::exists(cnHan)) {
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(cnHan.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesChineseFull());
+        }
+
+        std::string jpFont = "c:\\Windows\\Fonts\\meiryo.ttc";
+        if (!std::filesystem::exists(jpFont)) jpFont = "c:\\Windows\\Fonts\\msgothic.ttc";
+        if (std::filesystem::exists(jpFont)) {
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(jpFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesJapanese());
+        }
+
+        std::string koFont = "c:\\Windows\\Fonts\\malgun.ttf";
+        if (std::filesystem::exists(koFont)) {
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(koFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesKorean());
+        }
+
+        std::string thFont = "c:\\Windows\\Fonts\\leelawdb.ttf";
+        if (std::filesystem::exists(thFont)) {
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(thFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesThai());
+        }
     }
 
     inline void InitMapTexture() {
@@ -483,10 +526,10 @@ namespace DX11Hook {
         draw_list->AddText(ImVec2(biomePos.x + 1, biomePos.y + 1), IM_COL32(0,0,0,200), biomeStr.c_str());
         draw_list->AddText(biomePos, IM_COL32(220, 220, 220, 255), biomeStr.c_str());
 
-        draw_list->AddText(ImVec2(cx - 8, cy - IM_MAP_R - 20), IM_COL32(220, 220, 255, 255), "北");
-        draw_list->AddText(ImVec2(cx - 8, cy + IM_MAP_R - 2), IM_COL32(220, 220, 255, 255), "南");
-        draw_list->AddText(ImVec2(cx + IM_MAP_R + 4, cy - 9), IM_COL32(220, 220, 255, 255), "东");
-        draw_list->AddText(ImVec2(cx - IM_MAP_R - 20, cy - 9), IM_COL32(220, 220, 255, 255), "西");
+        draw_list->AddText(ImVec2(cx - 8, cy - IM_MAP_R - 20), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_N"));
+        draw_list->AddText(ImVec2(cx - 8, cy + IM_MAP_R - 2), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_S"));
+        draw_list->AddText(ImVec2(cx + IM_MAP_R + 4, cy - 9), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_E"));
+        draw_list->AddText(ImVec2(cx - IM_MAP_R - 20, cy - 9), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_W"));
 
         static std::vector<RadarEntity> s_cachedEntities;
         if (g_radarUpdated.load()) {
@@ -639,10 +682,10 @@ namespace DX11Hook {
                     initialized = true;
                 }
                 
-                ImGui::InputText("新名称", renameBuf, sizeof(renameBuf));
+                ImGui::InputText(LanguageManager::GetText("WP_NAME"), renameBuf, sizeof(renameBuf));
                 ImGui::Spacing();
                 
-                if (ImGui::Button("保存", ImVec2(120, 0))) {
+                if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
                     {
                         std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
                         for(auto& w : WaypointManager::g_waypoints) {
@@ -657,7 +700,7 @@ namespace DX11Hook {
                     initialized = false;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("取消", ImVec2(120, 0))) {
+                if (ImGui::Button(LanguageManager::GetText("WP_CANCEL"), ImVec2(120, 0))) {
                     ImGui::CloseCurrentPopup();
                     initialized = false;
                 }
@@ -676,13 +719,35 @@ namespace DX11Hook {
         }
 
         ImGuiIO& io = ImGui::GetIO();
+
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | 
+                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | 
+                                        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | 
+                                        ImGuiWindowFlags_NoBackground;
         
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsPopupOpen("BigMapContextMenu") && !ImGui::IsPopupOpen("WaypointContextMenu") && !ImGui::IsPopupOpen("重命名路径点##ModalBigMap") && !ImGui::IsPopupOpen("新建路径点##Popup")) {
+        ImGui::Begin("BigMapCanvas", nullptr, window_flags);
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+        bool isHoveringCanvas = ImGui::IsWindowHovered();
+
+        static bool s_isDraggingMap = false;
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && isHoveringCanvas) {
+            s_isDraggingMap = true;
+        }
+        if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+            s_isDraggingMap = false;
+        }
+
+        if (s_isDraggingMap) {
             MapRenderState::bigMapOffsetX += io.MouseDelta.x;
             MapRenderState::bigMapOffsetZ += io.MouseDelta.y;
         }
 
-        if (io.MouseWheel != 0.0f) {
+        if (io.MouseWheel != 0.0f && isHoveringCanvas) {
             float oldZoom = MapRenderState::bigMapZoom;
             float zoomSpeed = 0.15f * oldZoom;
             MapRenderState::bigMapZoom += io.MouseWheel * zoomSpeed;
@@ -698,18 +763,6 @@ namespace DX11Hook {
             MapRenderState::bigMapOffsetX -= dx * (k - 1.0f);
             MapRenderState::bigMapOffsetZ -= dy * (k - 1.0f);
         }
-
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | 
-                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | 
-                                        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | 
-                                        ImGuiWindowFlags_NoBackground;
-        
-        ImGui::Begin("BigMapCanvas", nullptr, window_flags);
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
         draw_list->AddRectFilled(ImVec2(0, 0), io.DisplaySize, IM_COL32(20, 20, 20, 255));
 
@@ -748,7 +801,7 @@ namespace DX11Hook {
             
             draw_list->AddCallback(LinearSamplerCallback, nullptr);
         } else {
-            const char* netherMsg = "【 下界磁场干扰过强，无法绘制地图 】";
+            const char* netherMsg = LanguageManager::GetText("NETHER_WARNING");
             ImVec2 ts = ImGui::CalcTextSize(netherMsg);
             draw_list->AddText(ImVec2(cx - ts.x / 2, cy - ts.y / 2 - 50.0f), IM_COL32(255, 80, 80, 200), netherMsg);
         }
@@ -792,45 +845,88 @@ namespace DX11Hook {
         float hoverWz = g_smoothPZ + (io.MousePos.y - cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
 
         char infoBuf[256];
-        snprintf(infoBuf, sizeof(infoBuf), "赤焰全局大地图 | 缩放: %.1fx", MapRenderState::bigMapZoom);
+        snprintf(infoBuf, sizeof(infoBuf), LanguageManager::GetText("BIGMAP_TITLE"), MapRenderState::bigMapZoom);
         draw_list->AddText(ImVec2(20, 20), IM_COL32(255, 200, 50, 255), infoBuf);
-        draw_list->AddText(ImVec2(20, 45), IM_COL32(200, 200, 200, 255), "[拖拽] 平移    [滚轮] 缩放    [Esc] 关闭地图");
+        draw_list->AddText(ImVec2(20, 45), IM_COL32(200, 200, 200, 255), LanguageManager::GetText("BIGMAP_HELP"));
         
-        snprintf(infoBuf, sizeof(infoBuf), "光标位置: X: %d  Z: %d", (int)std::floor(hoverWx), (int)std::floor(hoverWz));
+        snprintf(infoBuf, sizeof(infoBuf), LanguageManager::GetText("CURSOR_POS"), (int)std::floor(hoverWx), (int)std::floor(hoverWz));
         ImVec2 textSize = ImGui::CalcTextSize(infoBuf);
         draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - textSize.x / 2 - 15, io.DisplaySize.y - 45), 
                                  ImVec2(io.DisplaySize.x / 2 + textSize.x / 2 + 15, io.DisplaySize.y - 10), 
                                  IM_COL32(0, 0, 0, 180), 5.0f);
         draw_list->AddText(ImVec2(io.DisplaySize.x / 2 - textSize.x / 2, io.DisplaySize.y - 35), IM_COL32(255, 255, 255, 255), infoBuf);
 
-        std::string biomeDisplay = "生物群系: " + MapRenderState::currentBiomeName;
-        ImVec2 biomeTextSize = ImGui::CalcTextSize(biomeDisplay.c_str());
+        char biomeBuf[512];
+        snprintf(biomeBuf, sizeof(biomeBuf), LanguageManager::GetText("BIOME_LABEL"), MapRenderState::currentBiomeName.c_str());
+        ImVec2 biomeTextSize = ImGui::CalcTextSize(biomeBuf);
         draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2 - 20, 15), 
                                  ImVec2(io.DisplaySize.x / 2 + biomeTextSize.x / 2 + 20, 50), 
                                  IM_COL32(0, 0, 0, 180), 5.0f);
-        draw_list->AddText(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2, 25), IM_COL32(180, 255, 180, 255), biomeDisplay.c_str());
+        draw_list->AddText(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2, 25), IM_COL32(180, 255, 180, 255), biomeBuf);
 
         ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - 240, 20));
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.6f));
-        ImGui::BeginChild("MapSidebar", ImVec2(220, 250), true, ImGuiWindowFlags_NoScrollbar);
+        ImGui::BeginChild("MapSidebar", ImVec2(220, 150), true, ImGuiWindowFlags_NoScrollbar);
         
-        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "[ 玩家状态 ]");
+        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_PLAYER_STATUS"));
         ImGui::Separator();
-        ImGui::Text("玩家 X: %d", g_playerBlockX);
-        ImGui::Text("玩家 Y: %d", (int)g_playerY);
-        ImGui::Text("玩家 Z: %d", g_playerBlockZ);
+        ImGui::Text(LanguageManager::GetText("PLAYER_POS_X"), g_playerBlockX);
+        ImGui::Text(LanguageManager::GetText("PLAYER_POS_Y"), (int)g_playerY);
+        ImGui::Text(LanguageManager::GetText("PLAYER_POS_Z"), g_playerBlockZ);
         
         ImGui::Spacing(); ImGui::Spacing();
-        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "[ 操作面板 ]");
-        ImGui::Separator();
         
-        ImGui::Checkbox("显示右上角小地图", &MapRenderState::showMiniMap);
-        ImGui::Checkbox("使用方形小地图", &MapRenderState::isSquareMap);
-        ImGui::Spacing();
-        
-        if (ImGui::Button("视角回中至玩家", ImVec2(-1, 35))) {
+        // 并排摆放 [视角回中] 主按钮与 [⚙] 齿轮设置按钮
+        float availWidth = ImGui::GetContentRegionAvail().x;
+        if (ImGui::Button(LanguageManager::GetText("CENTER_CAMERA"), ImVec2(availWidth - 42.0f, 35.0f))) {
             MapRenderState::bigMapOffsetX = 0.0f;
             MapRenderState::bigMapOffsetZ = 0.0f;
+        }
+        ImGui::SameLine();
+        
+        if (ImGui::Button("\xe2\x9a\x99", ImVec2(35.0f, 35.0f))) {
+            ImGui::OpenPopup("SettingsPopup");
+        }
+        
+        ImGui::SetNextWindowSize(ImVec2(220, 160));
+        if (ImGui::BeginPopup("SettingsPopup")) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_OPS"));
+            ImGui::Separator();
+            
+            if (ImGui::Checkbox(LanguageManager::GetText("SHOW_MINIMAP"), &MapRenderState::showMiniMap)) {
+                LanguageManager::SaveConfig();
+            }
+            if (ImGui::Checkbox(LanguageManager::GetText("SQUARE_MINIMAP"), &MapRenderState::isSquareMap)) {
+                LanguageManager::SaveConfig();
+            }
+            ImGui::Spacing();
+
+            std::string previewName = LanguageManager::g_currentLanguage;
+            for (const auto& p : LanguageManager::g_availableLanguages) {
+                if (p.first == LanguageManager::g_currentLanguage) {
+                    previewName = p.second;
+                    break;
+                }
+            }
+            
+            ImGui::PushItemWidth(-1);
+            if (ImGui::BeginCombo("##LangSelectCombo", previewName.c_str())) {
+                for (const auto& p : LanguageManager::g_availableLanguages) {
+                    bool isSelected = (LanguageManager::g_currentLanguage == p.first);
+                    if (ImGui::Selectable(p.second.c_str(), isSelected)) {
+                        LanguageManager::g_currentLanguage = p.first;
+                        LanguageManager::LoadLanguage(p.first);
+                        LanguageManager::SaveConfig();
+                    }
+                    if (isSelected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::PopItemWidth();
+            
+            ImGui::EndPopup();
         }
         
         ImGui::EndChild();
@@ -863,36 +959,36 @@ namespace DX11Hook {
                 }
             }
 
-            ImVec2 titleSize = ImGui::CalcTextSize("选择操作");
+            ImVec2 titleSize = ImGui::CalcTextSize(LanguageManager::GetText("CONTEXT_TITLE"));
             ImGui::SetCursorPosX((ImGui::GetWindowWidth() - titleSize.x) * 0.5f);
-            ImGui::Text("选择操作");
+            ImGui::Text("%s", LanguageManager::GetText("CONTEXT_TITLE"));
             ImGui::Separator();
 
-            char chunkBuf[64]; snprintf(chunkBuf, sizeof(chunkBuf), "区块: (%d; %d)", bx >> 4, bz >> 4);
+            char chunkBuf[64]; snprintf(chunkBuf, sizeof(chunkBuf), LanguageManager::GetText("CHUNK_POS"), bx >> 4, bz >> 4);
             ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(chunkBuf).x) * 0.5f);
             ImGui::TextDisabled("%s", chunkBuf);
 
-            char blockBuf[64]; snprintf(blockBuf, sizeof(blockBuf), "X: %d, Y: %d, Z: %d", bx, by, bz);
+            char blockBuf[64]; snprintf(blockBuf, sizeof(blockBuf), LanguageManager::GetText("BLOCK_POS"), bx, by, bz);
             ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(blockBuf).x) * 0.5f);
             ImGui::TextDisabled("%s", blockBuf);
             ImGui::Separator();
 
-            if (ImGui::Selectable("[XP] 复制坐标")) {
+            if (ImGui::Selectable(LanguageManager::GetText("COPY_COORDS"))) {
                 char buf[128]; snprintf(buf, sizeof(buf), "%d %d %d", bx, by, bz);
                 ImGui::SetClipboardText(buf);
             }
             
             ImGui::Separator();
             
-            if (ImGui::Selectable("U 创建路径点")) {
+            if (ImGui::Selectable(LanguageManager::GetText("CREATE_WAYPOINT"))) {
                 MapRenderState::addWaypointX = bx;
-                MapRenderState::addWaypointY = by; // 传入正确探测到的地面高度
+                MapRenderState::addWaypointY = by;
                 MapRenderState::addWaypointZ = bz;
                 MapRenderState::triggerAddWaypoint = true;
                 MapRenderState::showWaypointUI = true;
             }
             
-            if (ImGui::Selectable("传送到此地")) {
+            if (ImGui::Selectable(LanguageManager::GetText("TELEPORT_HERE"))) {
                 MapRenderState::tpTargetX = (float)bx + 0.5f;
                 MapRenderState::tpTargetY = (float)by; 
                 MapRenderState::tpTargetZ = (float)bz + 0.5f;
@@ -902,7 +998,7 @@ namespace DX11Hook {
             
             ImGui::Separator();
             
-            if (ImGui::Selectable("U 打开路径点菜单")) {
+            if (ImGui::Selectable(LanguageManager::GetText("OPEN_WP_MENU"))) {
                 MapRenderState::showWaypointUI = true;
             }
 
@@ -945,7 +1041,7 @@ namespace DX11Hook {
                 ImGui::TextDisabled("%s", coordBuf);
                 ImGui::Separator();
                 
-                if (ImGui::Selectable("传送到此路径点")) {
+                if (ImGui::Selectable(LanguageManager::GetText("TELEPORT_WP"))) {
                     MapRenderState::tpTargetX = (float)targetWp.x + 0.5f;
                     MapRenderState::tpTargetY = (float)targetWp.y; 
                     MapRenderState::tpTargetZ = (float)targetWp.z + 0.5f;
@@ -953,7 +1049,7 @@ namespace DX11Hook {
                     MapRenderState::showBigMap = false;
                 }
                 
-                if (ImGui::Selectable("重命名路径点")) {
+                if (ImGui::Selectable(LanguageManager::GetText("RENAME_WP"))) {
                     bigMapRenameId = selectedWpId;
                     bigMapTriggerRename = true;
                 }
@@ -961,7 +1057,7 @@ namespace DX11Hook {
                 ImGui::Separator();
                 
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-                if (ImGui::Selectable("删除此路径点")) {
+                if (ImGui::Selectable(LanguageManager::GetText("DELETE_WP"))) {
                     WaypointManager::RemoveWaypoint(selectedWpId);
                 }
                 ImGui::PopStyleColor();
@@ -973,7 +1069,7 @@ namespace DX11Hook {
         ImGui::PopStyleColor(2);
 
         // 调用大地图右键地标重命名弹窗模块
-        RenderRenameModal("重命名路径点##ModalBigMap", bigMapRenameId, bigMapTriggerRename);
+        RenderRenameModal((std::string(LanguageManager::GetText("RENAME_WP")) + "##ModalBigMap").c_str(), bigMapRenameId, bigMapTriggerRename);
 
         ImGui::End();
         ImGui::PopStyleVar(2);
@@ -987,17 +1083,17 @@ namespace DX11Hook {
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2 - 375, ImGui::GetIO().DisplaySize.y / 2 - 240), ImGuiCond_FirstUseEver);
         
         ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
-        if (ImGui::Begin("路径点管理器 (按 'U' 或 'Esc' 关闭)##WP", &MapRenderState::showWaypointUI, winFlags)) {
+        if (ImGui::Begin(LanguageManager::GetText("WP_MANAGER_TITLE"), &MapRenderState::showWaypointUI, winFlags)) {
             
             static bool showAddPopup = false;
             static char searchBuf[128] = "";
             
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - 150);
-            ImGui::InputTextWithHint("##WPSearch", "在此输入名称以搜索路径点...", searchBuf, sizeof(searchBuf));
+            ImGui::InputTextWithHint("##WPSearch", LanguageManager::GetText("SEARCH_HINT"), searchBuf, sizeof(searchBuf));
             ImGui::PopItemWidth();
             
             ImGui::SameLine();
-            if (ImGui::Button(" + 新建路径点", ImVec2(140, 0))) {
+            if (ImGui::Button(LanguageManager::GetText("NEW_WP_BUTTON"), ImVec2(140, 0))) {
                 showAddPopup = true;
             }
             ImGui::Separator();
@@ -1041,17 +1137,16 @@ namespace DX11Hook {
                     
                     ImGui::SameLine(winWidth - 270);
                     bool enabled = wp.enabled;
-                    if (ImGui::Checkbox("显示", &enabled)) {
+                    if (ImGui::Checkbox(LanguageManager::GetText("WP_LIST_SHOW"), &enabled)) {
                         wp.enabled = enabled;
                         toggled = true;
                     }
                     
-                    // 【完成需求1】主列表中追加独立设计的重命名按钮
                     ImGui::SameLine(winWidth - 195);
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.6f, 0.2f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.7f, 0.3f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.5f, 0.1f, 1.0f));
-                    if (ImGui::Button("重命名", ImVec2(55, 0))) {
+                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_RENAME"), ImVec2(55, 0))) {
                         uiRenameId = wp.id;
                         uiTriggerRename = true;
                     }
@@ -1061,7 +1156,7 @@ namespace DX11Hook {
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.8f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.7f, 0.9f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.5f, 0.7f, 1.0f));
-                    if (ImGui::Button("传送", ImVec2(45, 0))) {
+                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_TELEPORT"), ImVec2(45, 0))) {
                         MapRenderState::tpTargetX = (float)wp.x + 0.5f;
                         MapRenderState::tpTargetY = (float)wp.y; 
                         MapRenderState::tpTargetZ = (float)wp.z + 0.5f;
@@ -1074,7 +1169,7 @@ namespace DX11Hook {
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
-                    if (ImGui::Button("删除", ImVec2(45, 0))) {
+                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_DELETE"), ImVec2(45, 0))) {
                         toDelete = wp.id;
                     }
                     ImGui::PopStyleColor(3);
@@ -1099,22 +1194,22 @@ namespace DX11Hook {
             ImGui::EndChild();
 
             // 调用 UI 列表专属重命名弹窗模块
-            RenderRenameModal("重命名路径点##ModalUI", uiRenameId, uiTriggerRename);
+            RenderRenameModal((std::string(LanguageManager::GetText("RENAME_WP")) + "##ModalUI").c_str(), uiRenameId, uiTriggerRename);
 
             if (MapRenderState::triggerAddWaypoint) {
                 showAddPopup = true;
                 MapRenderState::triggerAddWaypoint = false;
             }
 
-            if (showAddPopup) ImGui::OpenPopup("新建路径点##Popup");
+            if (showAddPopup) ImGui::OpenPopup(LanguageManager::GetText("NEW_WP_TITLE"));
             
-            if (ImGui::BeginPopupModal("新建路径点##Popup", &showAddPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
-                static char nameBuf[64] = "新地标";
+            if (ImGui::BeginPopupModal(LanguageManager::GetText("NEW_WP_TITLE"), &showAddPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
+                static char nameBuf[64] = "";
                 static int pos[3] = {0, 0, 0};
                 static float col[3] = {1.0f, 0.3f, 0.3f};
                 
                 if (ImGui::IsWindowAppearing()) {
-                    snprintf(nameBuf, sizeof(nameBuf), "新地标"); 
+                    snprintf(nameBuf, sizeof(nameBuf), "%s", LanguageManager::GetText("WP_DEFAULT_NAME")); 
                     pos[0] = (MapRenderState::addWaypointX != -999999) ? MapRenderState::addWaypointX : g_playerBlockX;
                     pos[1] = (MapRenderState::addWaypointY != -999999) ? MapRenderState::addWaypointY : (int)g_playerY;
                     pos[2] = (MapRenderState::addWaypointZ != -999999) ? MapRenderState::addWaypointZ : g_playerBlockZ;
@@ -1124,18 +1219,18 @@ namespace DX11Hook {
                     MapRenderState::addWaypointZ = -999999;
                 }
 
-                ImGui::InputText("名称", nameBuf, 64);
+                ImGui::InputText(LanguageManager::GetText("WP_NAME"), nameBuf, 64);
                 ImGui::InputInt3("X / Y / Z", pos);
-                ImGui::ColorEdit3("颜色", col);
+                ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col);
                 
                 ImGui::Spacing();
-                if (ImGui::Button("保存", ImVec2(120, 0))) {
+                if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
                     WaypointManager::AddWaypoint(nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2]);
                     showAddPopup = false;
                     ImGui::CloseCurrentPopup();
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("取消", ImVec2(120, 0))) {
+                if (ImGui::Button(LanguageManager::GetText("WP_CANCEL"), ImVec2(120, 0))) {
                     showAddPopup = false;
                     ImGui::CloseCurrentPopup();
                 }
@@ -1155,7 +1250,7 @@ namespace DX11Hook {
                     g_clientInstance->isShowingProgressScreen() ||
                     g_clientInstance->isShowingWorldProgressScreen() ||
                     g_clientInstance->isShowingDeathScreen() ||
-                    g_clientInstance->isShowingPauseScreen()) {
+                    (g_clientInstance->isShowingPauseScreen() && !MapRenderState::IsUIActive())) {
                     isRendering = false;
                     return;
                 }
@@ -1192,8 +1287,8 @@ namespace DX11Hook {
                 oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
                 ImGui::CreateContext();
                 ImGuiIO& io = ImGui::GetIO();
-                io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\msyh.ttc", 20.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
 
+                InitImGuiFonts(io);
                 ImGui_ImplWin32_Init(g_hWnd);
                 ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
                 

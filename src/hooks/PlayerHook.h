@@ -32,6 +32,7 @@
 #include <mc/world/phys/HitResult.h>
 #include "state/MapRenderState.h"
 #include "state/MapCacheManager.h"
+#include "state/LanguageManager.h"
 
 extern float g_playerX;
 extern float g_playerY;
@@ -53,6 +54,15 @@ inline std::mutex g_mapDataMutex;
 // 生物群系中文翻译字典引擎
 // ==========================================
 inline std::string TranslateBiomeName(const std::string& rawName) {
+    if (LanguageManager::g_currentLanguage != "zh_CN" && LanguageManager::g_currentLanguage != "zh_TW") {
+        std::string formattedName = rawName;
+        for (size_t i = 0; i < formattedName.length(); ++i) {
+            if (formattedName[i] == '_') formattedName[i] = ' ';
+            if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
+        }
+        return formattedName;
+    }
+
     std::string lower = rawName;
     for (char& c : lower) if (c >= 'A' && c <= 'Z') c += 32;
     
@@ -113,55 +123,117 @@ inline void getBiomeTints(std::string const& biomeName, mce::Color& grass, mce::
 
     if (biomeName.empty()) return;
 
-    if (biomeName.find("desert") != std::string::npos || biomeName.find("mesa") != std::string::npos || biomeName.find("badlands") != std::string::npos) {
+    std::string lower = biomeName;
+    for (char& c : lower) if (c >= 'A' && c <= 'Z') c += 32;
+
+    if (lower.find("cherry") != std::string::npos) {
+        grass   = mce::Color(0.44f, 0.56f, 0.26f, 1.0f);
+        foliage = mce::Color(0.90f, 0.65f, 0.75f, 1.0f);
+    }
+    else if (lower.find("desert") != std::string::npos || lower.find("mesa") != std::string::npos || lower.find("badlands") != std::string::npos) {
         grass   = mce::Color(0.45f, 0.42f, 0.20f, 1.0f);
         foliage = mce::Color(0.35f, 0.38f, 0.18f, 1.0f);
         water   = mce::Color(0.15f, 0.45f, 0.45f, 1.0f);
     } 
-    else if (biomeName.find("savanna") != std::string::npos) {
+    else if (lower.find("savanna") != std::string::npos) {
         grass   = mce::Color(0.42f, 0.42f, 0.18f, 1.0f);
         foliage = mce::Color(0.32f, 0.35f, 0.15f, 1.0f);
     } 
-    else if (biomeName.find("jungle") != std::string::npos || biomeName.find("bamboo") != std::string::npos) {
+    else if (lower.find("jungle") != std::string::npos || lower.find("bamboo") != std::string::npos) {
         grass   = mce::Color(0.32f, 0.50f, 0.18f, 1.0f);
         foliage = mce::Color(0.22f, 0.45f, 0.15f, 1.0f);
     } 
-    else if (biomeName.find("swamp") != std::string::npos || biomeName.find("mangrove") != std::string::npos) {
+    else if (lower.find("swamp") != std::string::npos || lower.find("mangrove") != std::string::npos) {
         grass   = mce::Color(0.22f, 0.28f, 0.16f, 1.0f);
         foliage = mce::Color(0.18f, 0.25f, 0.15f, 1.0f);
         water   = mce::Color(0.15f, 0.25f, 0.22f, 1.0f);
     } 
-    else if (biomeName.find("taiga") != std::string::npos || biomeName.find("snow") != std::string::npos || biomeName.find("ice") != std::string::npos || biomeName.find("frozen") != std::string::npos) {
+    else if (lower.find("taiga") != std::string::npos || lower.find("snow") != std::string::npos || lower.find("ice") != std::string::npos || lower.find("frozen") != std::string::npos) {
         grass   = mce::Color(0.26f, 0.38f, 0.30f, 1.0f);
         foliage = mce::Color(0.15f, 0.28f, 0.25f, 1.0f);
     } 
-    else if (biomeName.find("birch") != std::string::npos) {
+    else if (lower.find("birch") != std::string::npos) {
         grass   = mce::Color(0.36f, 0.48f, 0.25f, 1.0f);
         foliage = mce::Color(0.25f, 0.42f, 0.20f, 1.0f);
     }
-    else if (biomeName.find("dark_forest") != std::string::npos || biomeName.find("roofed_forest") != std::string::npos) {
+    else if (lower.find("dark_forest") != std::string::npos || lower.find("roofed_forest") != std::string::npos) {
         grass   = mce::Color(0.20f, 0.30f, 0.12f, 1.0f);
         foliage = mce::Color(0.15f, 0.25f, 0.10f, 1.0f);
     }
-    else if (biomeName.find("meadow") != std::string::npos || biomeName.find("grove") != std::string::npos) {
+    else if (lower.find("meadow") != std::string::npos || lower.find("grove") != std::string::npos) {
         grass   = mce::Color(0.28f, 0.42f, 0.28f, 1.0f);
         foliage = mce::Color(0.18f, 0.32f, 0.20f, 1.0f);
-    }
-    else if (biomeName.find("cherry") != std::string::npos) {
-        grass   = mce::Color(0.35f, 0.52f, 0.28f, 1.0f);
-        foliage = mce::Color(0.25f, 0.45f, 0.20f, 1.0f);
     }
 }
 
 inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mce::Color foliageCol, mce::Color waterCol) {
-    if (name == "minecraft:air" || name == "air" || name.find("barrier") != std::string::npos || name.find("light_block") != std::string::npos) return mce::Color(0.0f,  0.0f,  0.0f,  0.0f);
+    if (name == "minecraft:air" || name == "air" || name.find("barrier") != std::string::npos ||
+        name.find("light_block") != std::string::npos || name.find("structure_void") != std::string::npos ||
+        name.find("placeholder") != std::string::npos || name.find("unknown") != std::string::npos ||
+        name.find("info_update") != std::string::npos) {
+        return mce::Color(0.0f, 0.0f, 0.0f, 0.0f);
+    }
     if (name.find("glass") != std::string::npos) return mce::Color(0.8f, 0.9f, 0.9f, 0.3f);
     if (name.find("path") != std::string::npos || name.find("farmland") != std::string::npos) return mce::Color(0.55f, 0.40f, 0.20f, 1.0f);
     if (name.find("bamboo") != std::string::npos) return mce::Color(0.40f, 0.70f, 0.20f, 1.0f);
 
     if (name.find("water") != std::string::npos) return waterCol;
-    if (name.find("grass") != std::string::npos || name.find("fern") != std::string::npos || name.find("moss") != std::string::npos || name.find("shrub") != std::string::npos || name.find("plant") != std::string::npos || name.find("vine") != std::string::npos || name.find("lily") != std::string::npos) return grassCol;
+    if (name.find("pink_petals") != std::string::npos) return mce::Color(0.95f, 0.68f, 0.78f, 1.0f);
+
+    if (name.find("peony") != std::string::npos || name.find("pink_tulip") != std::string::npos) return mce::Color(0.90f, 0.55f, 0.70f, 1.0f);
+    if (name.find("dandelion") != std::string::npos || name.find("sunflower") != std::string::npos || name.find("yellow_flower") != std::string::npos) return mce::Color(0.95f, 0.85f, 0.20f, 1.0f);
+    if (name.find("rose") != std::string::npos || name.find("poppy") != std::string::npos || name.find("red_flower") != std::string::npos || name.find("red_tulip") != std::string::npos) return mce::Color(0.85f, 0.15f, 0.15f, 1.0f);
+    if (name.find("orchid") != std::string::npos || name.find("cornflower") != std::string::npos) return mce::Color(0.20f, 0.40f, 0.85f, 1.0f);
+    if (name.find("allium") != std::string::npos || name.find("lilac") != std::string::npos) return mce::Color(0.70f, 0.30f, 0.70f, 1.0f);
+    if (name.find("daisy") != std::string::npos || name.find("bluet") != std::string::npos || name.find("valley") != std::string::npos || name.find("white_tulip") != std::string::npos) return mce::Color(0.95f, 0.95f, 0.95f, 1.0f);
+    if (name.find("flower") != std::string::npos || name.find("bloom") != std::string::npos || name.find("blossom") != std::string::npos) return mce::Color(0.92f, 0.85f, 0.25f, 1.0f);
+
+    if (name.find("white_") != std::string::npos) return mce::Color(0.95f, 0.95f, 0.95f, 1.0f);
+    if (name.find("orange_") != std::string::npos) return mce::Color(0.85f, 0.50f, 0.20f, 1.0f);
+    if (name.find("magenta_") != std::string::npos) return mce::Color(0.75f, 0.35f, 0.75f, 1.0f);
+    if (name.find("light_blue_") != std::string::npos) return mce::Color(0.40f, 0.65f, 0.90f, 1.0f);
+    if (name.find("yellow_") != std::string::npos) return mce::Color(0.90f, 0.85f, 0.20f, 1.0f);
+    if (name.find("lime_") != std::string::npos) return mce::Color(0.45f, 0.85f, 0.20f, 1.0f);
+    if (name.find("pink_") != std::string::npos) return mce::Color(0.90f, 0.55f, 0.70f, 1.0f);
+    if (name.find("gray_") != std::string::npos) return mce::Color(0.40f, 0.40f, 0.40f, 1.0f);
+    if (name.find("light_gray_") != std::string::npos || name.find("silver_") != std::string::npos) return mce::Color(0.65f, 0.65f, 0.65f, 1.0f);
+    if (name.find("cyan_") != std::string::npos) return mce::Color(0.20f, 0.60f, 0.60f, 1.0f);
+    if (name.find("purple_") != std::string::npos) return mce::Color(0.50f, 0.25f, 0.60f, 1.0f);
+    if (name.find("blue_") != std::string::npos) return mce::Color(0.20f, 0.30f, 0.70f, 1.0f);
+    if (name.find("brown_") != std::string::npos) return mce::Color(0.45f, 0.30f, 0.15f, 1.0f);
+    if (name.find("green_") != std::string::npos) return mce::Color(0.30f, 0.50f, 0.20f, 1.0f);
+    if (name.find("red_") != std::string::npos) return mce::Color(0.75f, 0.20f, 0.20f, 1.0f);
+    if (name.find("black_") != std::string::npos) return mce::Color(0.15f, 0.15f, 0.15f, 1.0f);
+
+    if (name.find("double_plant") != std::string::npos) return mce::Color(0.55f, 0.75f, 0.25f, 1.0f);
+
+    if (name.find("lily_pad") != std::string::npos || name.find("waterlily") != std::string::npos) return mce::Color(0.25f, 0.55f, 0.20f, 1.0f);
+
+    if (name.find("mushroom") != std::string::npos || name.find("fungus") != std::string::npos || name.find("fungi") != std::string::npos) {
+        if (name.find("red") != std::string::npos || name.find("crimson") != std::string::npos) return mce::Color(0.85f, 0.20f, 0.20f, 1.0f);
+        if (name.find("brown") != std::string::npos) return mce::Color(0.65f, 0.45f, 0.25f, 1.0f);
+        if (name.find("warped") != std::string::npos) return mce::Color(0.15f, 0.55f, 0.50f, 1.0f);
+        return mce::Color(0.80f, 0.70f, 0.60f, 1.0f);
+    }
+
+    if (name.find("wart") != std::string::npos) return mce::Color(0.65f, 0.10f, 0.10f, 1.0f);
+    if (name.find("chorus") != std::string::npos) return mce::Color(0.60f, 0.40f, 0.60f, 1.0f);
+
+    if (name.find("grass") != std::string::npos || name.find("fern") != std::string::npos || name.find("moss") != std::string::npos ||
+        name.find("shrub") != std::string::npos || name.find("plant") != std::string::npos || name.find("vine") != std::string::npos ||
+        name.find("sapling") != std::string::npos || name.find("propagule") != std::string::npos || name.find("sugar_cane") != std::string::npos ||
+        name.find("wheat") != std::string::npos || name.find("carrot") != std::string::npos || name.find("potato") != std::string::npos ||
+        name.find("beetroot") != std::string::npos || name.find("crop") != std::string::npos || name.find("stem") != std::string::npos ||
+        name.find("bush") != std::string::npos || name.find("seagrass") != std::string::npos || name.find("kelp") != std::string::npos ||
+        name.find("lichen") != std::string::npos || name.find("seed") != std::string::npos) {
+        return grassCol;
+    }
     if (name.find("dirt") != std::string::npos || name.find("podzol") != std::string::npos) return mce::Color(0.45f, 0.30f, 0.15f, 1.0f);
+
+    if (name.find("pumpkin") != std::string::npos || name.find("melon") != std::string::npos) {
+        if (name.find("melon") != std::string::npos) return mce::Color(0.50f, 0.65f, 0.15f, 1.0f);
+        return mce::Color(0.90f, 0.45f, 0.05f, 1.0f);
+    }
 
     if (name.find("red_sand") != std::string::npos) return mce::Color(0.75f, 0.40f, 0.15f, 1.0f);
 
@@ -172,6 +244,9 @@ inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mc
     if (name.find("lodestone") != std::string::npos) return mce::Color(0.55f, 0.55f, 0.55f, 1.0f);
     if (name.find("end_portal") != std::string::npos) return mce::Color(0.10f, 0.25f, 0.25f, 1.0f);
 
+    if (name.find("netherrack") != std::string::npos) return mce::Color(0.45f, 0.12f, 0.12f, 1.0f);
+    if (name.find("magma") != std::string::npos) return mce::Color(0.60f, 0.20f, 0.08f, 1.0f);
+    if (name.find("lava") != std::string::npos) return mce::Color(0.95f, 0.30f, 0.0f, 1.0f);
     if (name.find("nether_brick") != std::string::npos) return mce::Color(0.25f, 0.10f, 0.15f, 1.0f);
     if (name.find("blackstone") != std::string::npos) return mce::Color(0.15f, 0.15f, 0.18f, 1.0f);
     if (name.find("basalt") != std::string::npos) return mce::Color(0.30f, 0.30f, 0.32f, 1.0f);
@@ -181,9 +256,16 @@ inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mc
     if (name.find("quartz_ore") != std::string::npos) return mce::Color(0.65f, 0.55f, 0.55f, 1.0f);
     if (name.find("nether_gold_ore") != std::string::npos) return mce::Color(0.65f, 0.35f, 0.15f, 1.0f);
 
-    if (name.find("leaves") != std::string::npos || name.find("azalea") != std::string::npos) {
-        if (name.find("cherry_leaves") != std::string::npos) return mce::Color(0.90f, 0.70f, 0.75f, 1.0f);
-        if (name.find("mangrove_leaves") != std::string::npos) return mce::Color(0.15f, 0.30f, 0.10f, 1.0f);
+    if (name.find("fallen") != std::string::npos || name.find("dead") != std::string::npos ||
+        name.find("litter") != std::string::npos || name.find("brown") != std::string::npos) {
+        if (name.find("leaf") != std::string::npos || name.find("leaves") != std::string::npos) {
+            return mce::Color(0.55f, 0.38f, 0.20f, 1.0f);
+        }
+    }
+
+    if (name.find("leaf") != std::string::npos || name.find("leaves") != std::string::npos || name.find("azalea") != std::string::npos) {
+        if (name.find("cherry") != std::string::npos) return mce::Color(0.90f, 0.65f, 0.75f, 1.0f);
+        if (name.find("mangrove") != std::string::npos) return mce::Color(0.15f, 0.30f, 0.10f, 1.0f);
         return foliageCol;
     }
 
@@ -398,15 +480,18 @@ LL_TYPE_INSTANCE_HOOK(
                 auto const& biome = regionPtr->getBiome(BlockPos(g_playerBlockX, (int)g_playerY, g_playerBlockZ));
                 {
                     std::string rawName = biome.mHash->getString();
-                    std::string chineseName = TranslateBiomeName(rawName);
+                    std::string translatedName = TranslateBiomeName(rawName);
                     
-                    std::string formattedName = rawName;
-                    for (size_t i = 0; i < formattedName.length(); ++i) {
-                        if (formattedName[i] == '_') formattedName[i] = ' ';
-                        if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
+                    if (LanguageManager::g_currentLanguage == "zh_CN" || LanguageManager::g_currentLanguage == "zh_TW") {
+                        std::string formattedName = rawName;
+                        for (size_t i = 0; i < formattedName.length(); ++i) {
+                            if (formattedName[i] == '_') formattedName[i] = ' ';
+                            if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
+                        }
+                        MapRenderState::currentBiomeName = formattedName + " (" + translatedName + ")";
+                    } else {
+                        MapRenderState::currentBiomeName = translatedName;
                     }
-                    
-                    MapRenderState::currentBiomeName = formattedName + " (" + chineseName + ")";
                 }
             }
         } catch (...) {}
@@ -517,10 +602,23 @@ LL_TYPE_INSTANCE_HOOK(
 
                                 {
                                     Block const& blockAbove = region.getBlock(BlockPos(targetX, topY, targetZ));
-                                    if (blockAbove.getTypeName().find("snow") != std::string::npos) {
+                                    std::string aboveName = blockAbove.getTypeName();
+
+                                    if (aboveName == "minecraft:air" || aboveName == "air" ||
+                                        aboveName.find("barrier") != std::string::npos ||
+                                        aboveName.find("light_block") != std::string::npos ||
+                                        aboveName.find("structure_void") != std::string::npos ||
+                                        aboveName.find("placeholder") != std::string::npos ||
+                                        aboveName.find("unknown") != std::string::npos ||
+                                        aboveName.find("info_update") != std::string::npos) {
+                                    }
+                                    else if (aboveName.find("snow") != std::string::npos) {
                                         g_mapColorsBack[arrX][arrZ] = mce::Color(0.95f, 0.98f, 1.0f, 1.0f);
                                         s_lastBlockName = "";
                                         continue;
+                                    }
+                                    else {
+                                        blockName = aboveName;
                                     }
                                 }
 
