@@ -416,8 +416,11 @@ LL_TYPE_INSTANCE_HOOK(
         if (currentUIState != lastUIState) {
             lastUIState = currentUIState;
             HWND hwnd = FindWindowW(L"Minecraft", NULL);
+            if (!hwnd) hwnd = GetForegroundWindow();
+            
             if (currentUIState) {
                 this->releaseMouse();
+                ClipCursor(NULL);
                 if (hwnd) {
                     RECT rect; GetWindowRect(hwnd, &rect);
                     SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
@@ -427,6 +430,30 @@ LL_TYPE_INSTANCE_HOOK(
                 if (hwnd) {
                     RECT rect; GetWindowRect(hwnd, &rect);
                     SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+                }
+            }
+        }
+
+        HWND hwnd = FindWindowW(L"Minecraft", NULL);
+        if (!hwnd) hwnd = GetForegroundWindow();
+        
+        if (hwnd && GetForegroundWindow() == hwnd) {
+            if (!MapRenderState::IsUIActive()) {
+                CURSORINFO ci = {};
+                ci.cbSize = sizeof(CURSORINFO);
+                if (GetCursorInfo(&ci)) {
+                    if (ci.flags == 0) {
+                        RECT clientRect;
+                        GetClientRect(hwnd, &clientRect);
+                        POINT ptTopLeft = { clientRect.left, clientRect.top };
+                        POINT ptBottomRight = { clientRect.right, clientRect.bottom };
+                        ClientToScreen(hwnd, &ptTopLeft);
+                        ClientToScreen(hwnd, &ptBottomRight);
+                        RECT screenRect = { ptTopLeft.x, ptTopLeft.y, ptBottomRight.x, ptBottomRight.y };
+                        ClipCursor(&screenRect);
+                    } else {
+                        ClipCursor(NULL);
+                    }
                 }
             }
         }
