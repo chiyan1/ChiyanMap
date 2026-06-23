@@ -22,9 +22,11 @@
 #include <atomic>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 #include <fstream>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <algorithm>
 #include <filesystem>
 #include "hooks/PlayerHook.h"
@@ -217,6 +219,30 @@ namespace DX11Hook {
                 return 1;
             }
 
+            if (uMsg == WM_KEYDOWN && wParam == 0x4E) {
+                CURSORINFO ci = {}; ci.cbSize = sizeof(CURSORINFO);
+                if (GetCursorInfo(&ci)) {
+                    if (ci.flags == CURSOR_SHOWING && !MapRenderState::IsUIActive()) {
+                        return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    }
+                }
+                MapRenderState::showMiniMap = !MapRenderState::showMiniMap;
+                LanguageManager::SaveConfig();
+                return 1;
+            }
+
+            if (uMsg == WM_KEYDOWN && wParam == 0x59) {
+                CURSORINFO ci = {}; ci.cbSize = sizeof(CURSORINFO);
+                if (GetCursorInfo(&ci)) {
+                    if (ci.flags == CURSOR_SHOWING && !MapRenderState::IsUIActive()) {
+                        return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    }
+                }
+                MapRenderState::isSquareMap = !MapRenderState::isSquareMap;
+                LanguageManager::SaveConfig();
+                return 1;
+            }
+
             if (MapRenderState::IsUIActive()) {
                 ClipCursor(NULL);
                 if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE) {
@@ -276,6 +302,13 @@ namespace DX11Hook {
             config.MergeMode = true;
             io.Fonts->AddFontFromFileTTF(thFont.c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesThai());
         }
+
+        std::string symbolFont = "c:\\Windows\\Fonts\\seguisym.ttf";
+        if (std::filesystem::exists(symbolFont)) {
+            static const ImWchar symbolRanges[] = { 0x2600, 0x26FF, 0 };
+            config.MergeMode = true;
+            io.Fonts->AddFontFromFileTTF(symbolFont.c_str(), 18.0f, &config, symbolRanges);
+        }
     }
 
     inline void InitMapTexture() {
@@ -299,47 +332,67 @@ namespace DX11Hook {
         }
     }
 
+    inline std::atomic<bool> g_textureBaking{false};
+    inline std::atomic<bool> g_textureReadyToUpload{false};
+
     inline void UpdateMapTexture() {
-        if (!g_mapDataUpdated.load() || !g_pd3dDeviceContext || !g_mapTexture) return;
+        if (!g_pd3dDeviceContext || !g_mapTexture) return;
 
-        // 【同步机制】必须使用互斥锁读取数组，同时抓取此时的坐标中心
-        std::lock_guard<std::mutex> lock(g_mapDataMutex);
-        g_textureCenterX = g_lastRenderX;
-        g_textureCenterZ = g_lastRenderZ;
+        if (g_mapDataUpdated.load() && !g_textureBaking.load()) {
+            g_textureBaking.store(true);
+            g_mapDataUpdated.store(false);
 
-        for (int x = 0; x < MAP_DATA_SIZE; x++) {
-            for (int z = 0; z < MAP_DATA_SIZE; z++) {
-                int index = (z * MAP_DATA_SIZE + x) * 4;
-                mce::Color col = g_mapColors[x][z];
-
-                if (col.a > 0.01f) {
-                    float currentY = g_mapHeights[x][z];
-
-                    float northY = currentY;
-                    if (z > 0 && g_mapColors[x][z - 1].a > 0.01f) {
-                        float h = g_mapHeights[x][z - 1];
-                        if (std::abs(currentY - h) < 64.0f) northY = h;
-                    }
-                    float westY = currentY;
-                    if (x > 0 && g_mapColors[x - 1][z].a > 0.01f) {
-                        float h = g_mapHeights[x - 1][z];
-                        if (std::abs(currentY - h) < 64.0f) westY = h;
-                    }
-
-                    float diff = (currentY - northY) * 0.15f + (currentY - westY) * 0.15f;
-                    float shade = std::clamp(1.0f + diff, 0.65f, 1.25f);
-
-                    g_textureData[index]     = (uint8_t)(std::clamp(col.r * shade, 0.0f, 1.0f) * 255.0f);
-                    g_textureData[index + 1] = (uint8_t)(std::clamp(col.g * shade, 0.0f, 1.0f) * 255.0f);
-                    g_textureData[index + 2] = (uint8_t)(std::clamp(col.b * shade, 0.0f, 1.0f) * 255.0f);
-                    g_textureData[index + 3] = (uint8_t)(col.a * 255.0f);
-                } else {
-                    g_textureData[index] = 0; g_textureData[index+1] = 0; g_textureData[index+2] = 0; g_textureData[index+3] = 0;
+            std::thread([]() {
+                static mce::Color localColors[MAP_DATA_SIZE][MAP_DATA_SIZE];
+                static float localHeights[MAP_DATA_SIZE][MAP_DATA_SIZE];
+                float centerX, centerZ;
+                {
+                    std::lock_guard<std::mutex> lock(g_mapDataMutex);
+                    std::memcpy(localColors, g_mapColors, sizeof(localColors));
+                    std::memcpy(localHeights, g_mapHeights, sizeof(localHeights));
+                    centerX = g_lastRenderX;
+                    centerZ = g_lastRenderZ;
                 }
-            }
+
+                static uint8_t bakedData[MAP_DATA_SIZE * MAP_DATA_SIZE * 4];
+                for (int x = 0; x < MAP_DATA_SIZE; x++) {
+                    for (int z = 0; z < MAP_DATA_SIZE; z++) {
+                        int index = (z * MAP_DATA_SIZE + x) * 4;
+                        mce::Color col = localColors[x][z];
+
+                        if (col.a > 0.01f) {
+                            float currentY = localHeights[x][z];
+                            float northY = currentY, westY = currentY;
+                            if (z > 0 && localColors[x][z - 1].a > 0.01f && std::abs(currentY - localHeights[x][z - 1]) < 64.0f) northY = localHeights[x][z - 1];
+                            if (x > 0 && localColors[x - 1][z].a > 0.01f && std::abs(currentY - localHeights[x - 1][z]) < 64.0f) westY = localHeights[x - 1][z];
+
+                            float shade = std::clamp(1.0f + (currentY - northY) * 0.15f + (currentY - westY) * 0.15f, 0.65f, 1.25f);
+                            bakedData[index]     = (uint8_t)(std::clamp(col.r * shade, 0.0f, 1.0f) * 255.0f);
+                            bakedData[index + 1] = (uint8_t)(std::clamp(col.g * shade, 0.0f, 1.0f) * 255.0f);
+                            bakedData[index + 2] = (uint8_t)(std::clamp(col.b * shade, 0.0f, 1.0f) * 255.0f);
+                            bakedData[index + 3] = (uint8_t)(col.a * 255.0f);
+                        } else {
+                            bakedData[index] = bakedData[index+1] = bakedData[index+2] = bakedData[index+3] = 0;
+                        }
+                    }
+                }
+
+                {
+                    std::lock_guard<std::mutex> lock(g_mapDataMutex);
+                    std::memcpy(g_textureData, bakedData, sizeof(bakedData));
+                    g_textureCenterX = centerX;
+                    g_textureCenterZ = centerZ;
+                    g_textureReadyToUpload.store(true);
+                }
+                g_textureBaking.store(false);
+            }).detach();
         }
-        g_pd3dDeviceContext->UpdateSubresource(g_mapTexture, 0, NULL, g_textureData, MAP_DATA_SIZE * 4, 0);
-        g_mapDataUpdated.store(false);
+
+        if (g_textureReadyToUpload.load()) {
+            std::lock_guard<std::mutex> lock(g_mapDataMutex);
+            g_pd3dDeviceContext->UpdateSubresource(g_mapTexture, 0, NULL, g_textureData, MAP_DATA_SIZE * 4, 0);
+            g_textureReadyToUpload.store(false);
+        }
     }
 
     inline void DrawWaypointIcon(ImDrawList* draw_list, ImVec2 center, mce::Color color, const std::string& name, bool isEdge = false) {
@@ -781,6 +834,26 @@ namespace DX11Hook {
 
         int texturesCreatedThisFrame = 0;
         if (MapRenderState::currentDimensionId != 1) {
+            static int s_vramGcTimer = 0;
+            if (++s_vramGcTimer > 300) {
+                s_vramGcTimer = 0;
+                std::vector<uint64_t> keysToErase;
+                for (auto& p : g_regionSRVs) {
+                    int rx = (int)(p.first >> 32);
+                    int rz = (int)(p.first & 0xFFFFFFFF);
+                    if (rx < startRx - 5 || rx > endRx + 5 || rz < startRz - 5 || rz > endRz + 5) {
+                        keysToErase.push_back(p.first);
+                    }
+                }
+                for (uint64_t k : keysToErase) {
+                    if (g_regionSRVs[k]) g_regionSRVs[k]->Release();
+                    g_regionSRVs.erase(k);
+                    if (g_regionTextures[k]) g_regionTextures[k]->Release();
+                    g_regionTextures.erase(k);
+                    MapCacheManager::MarkTextureDirty(k);
+                }
+            }
+
             draw_list->AddCallback(PointSamplerCallback, nullptr);
             
             for (int rx = startRx; rx <= endRx; rx++) {

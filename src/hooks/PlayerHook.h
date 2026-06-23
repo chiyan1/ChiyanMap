@@ -5,6 +5,7 @@
 #include <atomic>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <cstring>
 #include <windows.h>
 #include <ll/api/memory/Hook.h>
@@ -547,13 +548,14 @@ LL_TYPE_INSTANCE_HOOK(
         static int currentScanZ  = -99999;
         static bool isScanning   = false;
         static int  currentRow   = -MAP_DATA_RADIUS;
+        static int  currentCol   = -MAP_DATA_RADIUS;
         static int  ticksSinceScan = 0; 
 
         int px = g_playerBlockX;
         int pz = g_playerBlockZ;
         ticksSinceScan++;
 
-        if (!isScanning && (px != currentScanX || pz != currentScanZ || ticksSinceScan > 60)) {
+        if (!isScanning && (std::abs(px - currentScanX) >= 16 || std::abs(pz - currentScanZ) >= 16 || ticksSinceScan > 100)) {
             currentScanX  = px;
             currentScanZ  = pz;
             ticksSinceScan = 0;
@@ -563,6 +565,7 @@ LL_TYPE_INSTANCE_HOOK(
             } else {
                 isScanning = true;
                 currentRow = -MAP_DATA_RADIUS;
+                currentCol = -MAP_DATA_RADIUS;
             }
         }
 
@@ -580,12 +583,19 @@ LL_TYPE_INSTANCE_HOOK(
                     static std::string s_biomeName = "";
                     static mce::Color s_cachedGrass(0,0,0,0), s_cachedFoliage(0,0,0,0), s_cachedWater(0,0,0,0);
 
-                    while (rowsThisFrame < 15 && currentRow <= MAP_DATA_RADIUS) {
+                    auto scanStartTime = std::chrono::high_resolution_clock::now();
+                    bool timeBudgetExceeded = false;
+
+                    static std::hash<std::string> hasher;
+
+                    while (currentRow <= MAP_DATA_RADIUS && !timeBudgetExceeded) {
                         int dx = currentRow;
-                        for (int dz = -MAP_DATA_RADIUS; dz <= MAP_DATA_RADIUS; dz++) {
+                        int arrX = dx + MAP_DATA_RADIUS;
+
+                        while (currentCol <= MAP_DATA_RADIUS) {
+                            int dz = currentCol;
                             int targetX = currentScanX + dx;
                             int targetZ = currentScanZ + dz;
-                            int arrX    = dx + MAP_DATA_RADIUS;
                             int arrZ    = dz + MAP_DATA_RADIUS;
 
                             short topY = region.getAboveTopSolidBlock(targetX, targetZ, true, true);
@@ -597,10 +607,7 @@ LL_TYPE_INSTANCE_HOOK(
 
                                 if (blockName.find("snow") != std::string::npos) {
                                     g_mapColorsBack[arrX][arrZ] = mce::Color(0.95f, 0.98f, 1.0f, 1.0f);
-                                    continue;
-                                }
-
-                                {
+                                } else {
                                     Block const& blockAbove = region.getBlock(BlockPos(targetX, topY, targetZ));
                                     std::string aboveName = blockAbove.getTypeName();
 
@@ -611,51 +618,66 @@ LL_TYPE_INSTANCE_HOOK(
                                         aboveName.find("placeholder") != std::string::npos ||
                                         aboveName.find("unknown") != std::string::npos ||
                                         aboveName.find("info_update") != std::string::npos) {
-                                    }
-                                    else if (aboveName.find("snow") != std::string::npos) {
+                                    } else if (aboveName.find("snow") != std::string::npos) {
                                         g_mapColorsBack[arrX][arrZ] = mce::Color(0.95f, 0.98f, 1.0f, 1.0f);
-                                        s_lastBlockName = "";
-                                        continue;
-                                    }
-                                    else {
+                                        blockName = "";
+                                    } else {
                                         blockName = aboveName;
                                     }
-                                }
 
-                                int cellX = targetX >> 2;
-                                int cellZ = targetZ >> 2;
-                                bool tintChanged = false;
-
-                                if (cellX != s_biomeCellX || cellZ != s_biomeCellZ) {
-                                    s_biomeCellX = cellX; s_biomeCellZ = cellZ;
-                                    try {
-                                        auto const& biome = region.getBiome(BlockPos(targetX, topY - 1, targetZ));
-                                        std::string newBiomeName = biome.mHash->getString();
-                                        if (s_biomeName != newBiomeName) {
-                                            s_biomeName = newBiomeName;
-                                            getBiomeTints(s_biomeName, s_cachedGrass, s_cachedFoliage, s_cachedWater);
-                                            tintChanged = true; 
+                                    if (!blockName.empty()) {
+                                        int cellX = targetX >> 2;
+                                        int cellZ = targetZ >> 2;
+                                        if (cellX != s_biomeCellX || cellZ != s_biomeCellZ) {
+                                            s_biomeCellX = cellX; s_biomeCellZ = cellZ;
+                                            try {
+                                                auto const& biome = region.getBiome(BlockPos(targetX, topY - 1, targetZ));
+                                                std::string newBiomeName = biome.mHash->getString();
+                                                if (s_biomeName != newBiomeName) {
+                                                    s_biomeName = newBiomeName;
+                                                    getBiomeTints(s_biomeName, s_cachedGrass, s_cachedFoliage, s_cachedWater);
+                                                }
+                                            } catch (...) {
+                                                if (!s_biomeName.empty()) { s_biomeName = ""; }
+                                            }
                                         }
-                                    } catch (...) { 
-                                        if (!s_biomeName.empty()) { s_biomeName = ""; tintChanged = true; }
+
+                                        static std::unordered_map<size_t, mce::Color> s_globalColorCache;
+                                        if (s_globalColorCache.size() > 20000) s_globalColorCache.clear();
+
+                                        size_t cacheKey = hasher(blockName) ^ (hasher(s_biomeName) << 1);
+                                        auto it = s_globalColorCache.find(cacheKey);
+
+                                        if (it != s_globalColorCache.end()) {
+                                            g_mapColorsBack[arrX][arrZ] = it->second;
+                                        } else {
+                                            mce::Color calculatedColor = getBlockColor(blockName, s_cachedGrass, s_cachedFoliage, s_cachedWater);
+                                            s_globalColorCache[cacheKey] = calculatedColor;
+                                            g_mapColorsBack[arrX][arrZ] = calculatedColor;
+                                        }
                                     }
                                 }
-
-                                if (!tintChanged && blockName == s_lastBlockName) {
-                                    g_mapColorsBack[arrX][arrZ] = s_lastBlockColor;
-                                    continue;
-                                }
-                                
-                                s_lastBlockName = blockName;
-                                s_lastBlockColor = getBlockColor(blockName, s_cachedGrass, s_cachedFoliage, s_cachedWater);
-                                g_mapColorsBack[arrX][arrZ] = s_lastBlockColor;
                             } else {
                                 g_mapColorsBack[arrX][arrZ] = mce::Color(0.0f, 0.0f, 0.0f, 0.0f);
-                                s_lastBlockName = "";
+                            }
+
+                            currentCol++;
+
+                            if ((currentCol & 63) == 0) {
+                                auto now = std::chrono::high_resolution_clock::now();
+                                if (std::chrono::duration_cast<std::chrono::microseconds>(now - scanStartTime).count() > 250) {
+                                    timeBudgetExceeded = true;
+                                    break;
+                                }
                             }
                         }
-                        currentRow++;
-                        rowsThisFrame++;
+
+                        if (timeBudgetExceeded) break;
+
+                        if (currentCol > MAP_DATA_RADIUS) {
+                            currentCol = -MAP_DATA_RADIUS;
+                            currentRow++;
+                        }
                     }
 
                     if (currentRow > MAP_DATA_RADIUS) {
@@ -666,16 +688,30 @@ LL_TYPE_INSTANCE_HOOK(
                             std::memcpy(g_mapColors, g_mapColorsBack, sizeof(g_mapColors));
                             g_lastRenderX = currentScanX;
                             g_lastRenderZ = currentScanZ;
-                            g_mapDataUpdated.store(true); 
+                            g_mapDataUpdated.store(true);
                         }
-                        MapCacheManager::UpdateFromScan(currentScanX, currentScanZ, g_mapColorsBack, g_mapHeightsBack);
+
+                        using ColorGrid = mce::Color[MAP_DATA_SIZE][MAP_DATA_SIZE];
+                        using HeightGrid = float[MAP_DATA_SIZE][MAP_DATA_SIZE];
+                        auto asyncColors = new ColorGrid;
+                        auto asyncHeights = new HeightGrid;
+                        std::memcpy(asyncColors, g_mapColorsBack, sizeof(g_mapColorsBack));
+                        std::memcpy(asyncHeights, g_mapHeightsBack, sizeof(g_mapHeightsBack));
+                        int asyncX = currentScanX;
+                        int asyncZ = currentScanZ;
+
+                        std::thread([asyncX, asyncZ, asyncColors, asyncHeights]() {
+                            MapCacheManager::UpdateFromScan(asyncX, asyncZ, asyncColors, asyncHeights);
+                            delete[] asyncColors;
+                            delete[] asyncHeights;
+                        }).detach();
                     }
                 }
             } catch (...) {}
         }
 
         static int entityDelay = 0;
-        if (++entityDelay >= 2) {
+        if (++entityDelay >= 60) {
             entityDelay = 0;
             std::vector<RadarEntity> tempEntities;
             auto& level = player->getLevel();
