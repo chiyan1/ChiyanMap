@@ -428,10 +428,12 @@ namespace DX11Hook {
         draw_list->AddPolyline(pts, 4, outline, ImDrawFlags_Closed, 1.5f);
         
         if (!isEdge && !name.empty()) {
-            ImVec2 textSize = ImGui::CalcTextSize(name.c_str());
+            ImFont* font = ImGui::GetFont();
+            float fontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
+            ImVec2 textSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, name.c_str());
             ImVec2 textPos(center.x - textSize.x / 2.0f, center.y + size + 3.0f);
-            draw_list->AddText(ImVec2(textPos.x + 1, textPos.y + 1), IM_COL32(0, 0, 0, 200), name.c_str()); 
-            draw_list->AddText(textPos, IM_COL32(255, 255, 255, 255), name.c_str()); 
+            draw_list->AddText(font, fontSize, ImVec2(textPos.x + 1, textPos.y + 1), IM_COL32(0, 0, 0, 200), name.c_str(), NULL, 0.0f, NULL); 
+            draw_list->AddText(font, fontSize, textPos, IM_COL32(255, 255, 255, 255), name.c_str(), NULL, 0.0f, NULL); 
         }
     }
 
@@ -541,7 +543,8 @@ namespace DX11Hook {
 
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
         
-        float IM_MAP_R = 135.0f; 
+        // 乘以小地图大小缩放因子，动态调整地图尺寸
+        float IM_MAP_R = std::floor(135.0f * MapRenderState::miniMapScale); 
         float IM_MAP_MARGIN = 20.0f;
         // 强制向下取整，防止 ImGui 渲染到亚像素网格导致 DX11 采样边缘发毛
         float cx = std::floor(ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R);
@@ -578,12 +581,15 @@ namespace DX11Hook {
             draw_list->AddCircle(ImVec2(cx, cy), IM_MAP_R, IM_COL32(30, 30, 30, 255), 64, 2.0f);
         }
 
+        ImFont* font = ImGui::GetFont();
+        float fontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
+        
         char coordBuf[64];
-        snprintf(coordBuf, sizeof(coordBuf), "%d, %d, %d", g_playerBlockX, (int)g_playerY, g_playerBlockZ);
-        ImVec2 coordSize = ImGui::CalcTextSize(coordBuf);
-        ImVec2 coordPos(cx - coordSize.x / 2, cy + IM_MAP_R + 22); 
-        draw_list->AddText(ImVec2(coordPos.x + 1, coordPos.y + 1), IM_COL32(0,0,0,200), coordBuf);
-        draw_list->AddText(coordPos, IM_COL32(255, 255, 255, 255), coordBuf);
+        snprintf(coordBuf, sizeof(coordBuf), "%d, %d, %d", g_playerBlockX, (int)std::floor(g_playerY - 1.62f), g_playerBlockZ);
+        ImVec2 coordSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, coordBuf);
+        ImVec2 coordPos(cx - coordSize.x / 2, cy + IM_MAP_R + 15 + fontSize); 
+        draw_list->AddText(font, fontSize, ImVec2(coordPos.x + 1, coordPos.y + 1), IM_COL32(0,0,0,200), coordBuf, NULL, 0.0f, NULL);
+        draw_list->AddText(font, fontSize, coordPos, IM_COL32(255, 255, 255, 255), coordBuf, NULL, 0.0f, NULL);
 
         std::string biomeStr = MapRenderState::currentBiomeName;
         size_t startPos = biomeStr.find("(");
@@ -591,15 +597,16 @@ namespace DX11Hook {
         if (startPos != std::string::npos && endPos != std::string::npos) {
             biomeStr = biomeStr.substr(startPos + 1, endPos - startPos - 1);
         }
-        ImVec2 biomeSize = ImGui::CalcTextSize(biomeStr.c_str());
-        ImVec2 biomePos(cx - biomeSize.x / 2, cy + IM_MAP_R + 46);
-        draw_list->AddText(ImVec2(biomePos.x + 1, biomePos.y + 1), IM_COL32(0,0,0,200), biomeStr.c_str());
-        draw_list->AddText(biomePos, IM_COL32(220, 220, 220, 255), biomeStr.c_str());
+        ImVec2 biomeSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, biomeStr.c_str());
+        ImVec2 biomePos(cx - biomeSize.x / 2, cy + IM_MAP_R + 15 + fontSize * 2.2f);
+        draw_list->AddText(font, fontSize, ImVec2(biomePos.x + 1, biomePos.y + 1), IM_COL32(0,0,0,200), biomeStr.c_str(), NULL, 0.0f, NULL);
+        draw_list->AddText(font, fontSize, biomePos, IM_COL32(220, 220, 220, 255), biomeStr.c_str(), NULL, 0.0f, NULL);
 
-        draw_list->AddText(ImVec2(cx - 8, cy - IM_MAP_R - 20), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_N"));
-        draw_list->AddText(ImVec2(cx - 8, cy + IM_MAP_R - 2), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_S"));
-        draw_list->AddText(ImVec2(cx + IM_MAP_R + 4, cy - 9), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_E"));
-        draw_list->AddText(ImVec2(cx - IM_MAP_R - 20, cy - 9), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_W"));
+        float cpOffset = fontSize / 2.0f;
+        draw_list->AddText(font, fontSize, ImVec2(cx - cpOffset, cy - IM_MAP_R - 5 - fontSize), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_N"), NULL, 0.0f, NULL);
+        draw_list->AddText(font, fontSize, ImVec2(cx - cpOffset, cy + IM_MAP_R - 2), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_S"), NULL, 0.0f, NULL);
+        draw_list->AddText(font, fontSize, ImVec2(cx + IM_MAP_R + 4, cy - cpOffset), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_E"), NULL, 0.0f, NULL);
+        draw_list->AddText(font, fontSize, ImVec2(cx - IM_MAP_R - 4 - font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, LanguageManager::GetText("COMPASS_W")).x, cy - cpOffset), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_W"), NULL, 0.0f, NULL);
 
         static std::vector<RadarEntity> s_cachedEntities;
         if (g_radarUpdated.load()) {
@@ -926,9 +933,11 @@ namespace DX11Hook {
             
             draw_list->AddCallback(LinearSamplerCallback, nullptr);
         } else {
+            ImFont* font = ImGui::GetFont();
+            float fontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
             const char* netherMsg = LanguageManager::GetText("NETHER_WARNING");
-            ImVec2 ts = ImGui::CalcTextSize(netherMsg);
-            draw_list->AddText(ImVec2(cx - ts.x / 2, cy - ts.y / 2 - 50.0f), IM_COL32(255, 80, 80, 200), netherMsg);
+            ImVec2 ts = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, netherMsg);
+            draw_list->AddText(font, fontSize, ImVec2(cx - ts.x / 2, cy - ts.y / 2 - 50.0f), IM_COL32(255, 80, 80, 200), netherMsg, NULL, 0.0f, NULL);
         }
         
         float px = cx + MapRenderState::bigMapOffsetX;
@@ -969,25 +978,28 @@ namespace DX11Hook {
         float hoverWx = g_smoothPX + (io.MousePos.x - cx - MapRenderState::bigMapOffsetX) / MapRenderState::bigMapZoom;
         float hoverWz = g_smoothPZ + (io.MousePos.y - cy - MapRenderState::bigMapOffsetZ) / MapRenderState::bigMapZoom;
 
+        ImFont* mFont = ImGui::GetFont();
+        float mFontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
+        
         char infoBuf[256];
         snprintf(infoBuf, sizeof(infoBuf), LanguageManager::GetText("BIGMAP_TITLE"), MapRenderState::bigMapZoom);
-        draw_list->AddText(ImVec2(20, 20), IM_COL32(255, 200, 50, 255), infoBuf);
-        draw_list->AddText(ImVec2(20, 45), IM_COL32(200, 200, 200, 255), LanguageManager::GetText("BIGMAP_HELP"));
+        draw_list->AddText(mFont, mFontSize, ImVec2(20, 20), IM_COL32(255, 200, 50, 255), infoBuf, NULL, 0.0f, NULL);
+        draw_list->AddText(mFont, mFontSize, ImVec2(20, 20 + mFontSize + 5), IM_COL32(200, 200, 200, 255), LanguageManager::GetText("BIGMAP_HELP"), NULL, 0.0f, NULL);
         
         snprintf(infoBuf, sizeof(infoBuf), LanguageManager::GetText("CURSOR_POS"), (int)std::floor(hoverWx), (int)std::floor(hoverWz));
-        ImVec2 textSize = ImGui::CalcTextSize(infoBuf);
-        draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - textSize.x / 2 - 15, io.DisplaySize.y - 45), 
+        ImVec2 textSize = mFont->CalcTextSizeA(mFontSize, FLT_MAX, 0.0f, infoBuf);
+        draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - textSize.x / 2 - 15, io.DisplaySize.y - textSize.y - 25), 
                                  ImVec2(io.DisplaySize.x / 2 + textSize.x / 2 + 15, io.DisplaySize.y - 10), 
                                  IM_COL32(0, 0, 0, 180), 5.0f);
-        draw_list->AddText(ImVec2(io.DisplaySize.x / 2 - textSize.x / 2, io.DisplaySize.y - 35), IM_COL32(255, 255, 255, 255), infoBuf);
+        draw_list->AddText(mFont, mFontSize, ImVec2(io.DisplaySize.x / 2 - textSize.x / 2, io.DisplaySize.y - textSize.y - 17), IM_COL32(255, 255, 255, 255), infoBuf, NULL, 0.0f, NULL);
 
         char biomeBuf[512];
         snprintf(biomeBuf, sizeof(biomeBuf), LanguageManager::GetText("BIOME_LABEL"), MapRenderState::currentBiomeName.c_str());
-        ImVec2 biomeTextSize = ImGui::CalcTextSize(biomeBuf);
+        ImVec2 biomeTextSize = mFont->CalcTextSizeA(mFontSize, FLT_MAX, 0.0f, biomeBuf);
         draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2 - 20, 15), 
-                                 ImVec2(io.DisplaySize.x / 2 + biomeTextSize.x / 2 + 20, 50), 
+                                 ImVec2(io.DisplaySize.x / 2 + biomeTextSize.x / 2 + 20, 15 + biomeTextSize.y + 15), 
                                  IM_COL32(0, 0, 0, 180), 5.0f);
-        draw_list->AddText(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2, 25), IM_COL32(180, 255, 180, 255), biomeBuf);
+        draw_list->AddText(mFont, mFontSize, ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2, 22), IM_COL32(180, 255, 180, 255), biomeBuf, NULL, 0.0f, NULL);
 
         ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - 240, 20));
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.6f));
@@ -1013,7 +1025,7 @@ namespace DX11Hook {
             ImGui::OpenPopup("SettingsPopup");
         }
         
-        ImGui::SetNextWindowSize(ImVec2(220, 160));
+        ImGui::SetNextWindowSize(ImVec2(220, 260));
         if (ImGui::BeginPopup("SettingsPopup")) {
             ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_OPS"));
             ImGui::Separator();
@@ -1024,6 +1036,20 @@ namespace DX11Hook {
             if (ImGui::Checkbox(LanguageManager::GetText("SQUARE_MINIMAP"), &MapRenderState::isSquareMap)) {
                 LanguageManager::SaveConfig();
             }
+            
+            ImGui::PushItemWidth(-1);
+            if (ImGui::SliderFloat("##TextScaleSlider", &MapRenderState::uiTextScale, 0.5f, 2.5f, "% .2f x")) {
+                LanguageManager::SaveConfig();
+            }
+            ImGui::PopItemWidth();
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", LanguageManager::GetText("TEXT_SCALE"));
+            
+            ImGui::PushItemWidth(-1);
+            if (ImGui::SliderFloat("##MiniMapScaleSlider", &MapRenderState::miniMapScale, 0.5f, 2.5f, "% .2f x")) {
+                LanguageManager::SaveConfig();
+            }
+            ImGui::PopItemWidth();
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", LanguageManager::GetText("MINIMAP_SCALE"));
             ImGui::Spacing();
 
             std::string previewName = LanguageManager::g_currentLanguage;

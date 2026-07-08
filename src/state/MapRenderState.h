@@ -41,6 +41,8 @@ namespace MapRenderState {
 
     inline bool showMiniMap = true;  // 是否显示小地图
     inline bool isSquareMap = false; // 是否为方形小地图
+    inline float uiTextScale = 1.0f; // UI 文本缩放比例
+    inline float miniMapScale = 1.0f; // 小地图本身大小缩放
 }
 
 // 【全球探索级】：匹配 16 区块能见度的究极扫描半径（513x513个方块）！

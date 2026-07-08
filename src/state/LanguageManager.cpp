@@ -774,6 +774,8 @@ namespace LanguageManager {
                 g_currentLanguage = j.value("language", "en");
                 MapRenderState::showMiniMap = j.value("showMiniMap", true);
                 MapRenderState::isSquareMap = j.value("isSquareMap", false);
+                MapRenderState::uiTextScale = j.value("uiTextScale", 1.0f);
+                MapRenderState::miniMapScale = j.value("miniMapScale", 1.0f);
             } catch (...) {
                 g_currentLanguage = "en";
             }
@@ -788,6 +790,8 @@ namespace LanguageManager {
         j["language"] = g_currentLanguage;
         j["showMiniMap"] = MapRenderState::showMiniMap;
         j["isSquareMap"] = MapRenderState::isSquareMap;
+        j["uiTextScale"] = MapRenderState::uiTextScale;
+        j["miniMapScale"] = MapRenderState::miniMapScale;
 
         std::ofstream out(filePath);
         if (out.is_open()) {
@@ -798,6 +802,16 @@ namespace LanguageManager {
 
     const char* GetText(const std::string& key) {
         std::lock_guard<std::mutex> lock(g_cacheMutex);
+        if (key == "TEXT_SCALE") {
+            if (g_currentLanguage == "zh_CN") return "文本缩放比例";
+            if (g_currentLanguage == "zh_TW") return "文字縮放比例";
+            return "Text Scale";
+        }
+        if (key == "MINIMAP_SCALE") {
+            if (g_currentLanguage == "zh_CN") return "小地图缩放";
+            if (g_currentLanguage == "zh_TW") return "小地圖縮放";
+            return "Minimap Scale";
+        }
         auto it = g_translationCache.find(key);
         if (it != g_translationCache.end()) {
             return it->second.c_str();
