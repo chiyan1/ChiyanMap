@@ -220,6 +220,13 @@ namespace DX11Hook {
                 return 1;
             }
             if (uMsg == WM_KEYDOWN && wParam == 0x55 && !isTyping) {
+                CURSORINFO ci = {}; ci.cbSize = sizeof(CURSORINFO);
+                if (GetCursorInfo(&ci)) {
+                    // 当处于游戏原生的聊天、物品栏等界面时（鼠标显示），不拦截按键
+                    if (ci.flags == CURSOR_SHOWING && !MapRenderState::IsUIActive()) {
+                        return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    }
+                }
                 MapRenderState::showWaypointUI = !MapRenderState::showWaypointUI;
                 return 1;
             }
@@ -258,9 +265,34 @@ namespace DX11Hook {
                 return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
             }
 
+            if (uMsg == WM_KEYDOWN && wParam == 0x4A && !isTyping) {
+                if (!MapRenderState::showMiniMap) {
+                    return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                }
+                CURSORINFO ci = {}; ci.cbSize = sizeof(CURSORINFO);
+                if (GetCursorInfo(&ci)) {
+                    if (ci.flags == CURSOR_SHOWING && !MapRenderState::IsUIActive()) {
+                        return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                    }
+                }
+                
+                if (MapRenderState::showMiniMap) {
+                    MapRenderState::rotateMiniMap = !MapRenderState::rotateMiniMap;
+                    LanguageManager::SaveConfig();
+                    return 1;
+                }
+                
+                return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+            }
+
             if (MapRenderState::IsUIActive()) {
                 ClipCursor(NULL);
                 if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE) {
+                    if (MapRenderState::showMiniMapPosSettings) {
+                        MapRenderState::showMiniMapPosSettings = false; // 触发回退操作
+                        MapRenderState::showBigMap = true; // 返回大地图
+                        return 1;
+                    }
                     MapRenderState::showBigMap = false;
                     MapRenderState::showWaypointUI = false; 
                     return 1;
@@ -538,6 +570,19 @@ namespace DX11Hook {
     // ==========================================
     inline void RenderImGuiXaeroMap() {
         if (!MapRenderState::showMiniMap) return; 
+
+        // 【原生界面避让系统】如果我们的模组界面未开启，但系统鼠标却处于显示状态
+        // 意味着玩家正处于聊天栏、命令输入、背包或暂停菜单中，此时主动隐藏小地图以避免阻碍视线。
+        if (!MapRenderState::IsUIActive()) {
+            CURSORINFO ci = {};
+            ci.cbSize = sizeof(CURSORINFO);
+            if (GetCursorInfo(&ci)) {
+                if (ci.flags == CURSOR_SHOWING) {
+                    return;
+                }
+            }
+        }
+
         if (!g_mapTextureView) return;
         UpdateMapTexture();
 
@@ -546,9 +591,36 @@ namespace DX11Hook {
         // 乘以小地图大小缩放因子，动态调整地图尺寸
         float IM_MAP_R = std::floor(135.0f * MapRenderState::miniMapScale); 
         float IM_MAP_MARGIN = 20.0f;
+        
+        // 计算原生基础中心点
+        float base_cx = std::floor(ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R);
+        float base_cy = std::floor(IM_MAP_MARGIN + IM_MAP_R);
+        
+        // 应用偏移量
+        float cx = base_cx + MapRenderState::miniMapOffsetX;
+        float cy = base_cy + MapRenderState::miniMapOffsetY;
+
+        // 【屏幕越界保护系统】计算文本边界并强行将地图锁死在屏幕内
+        float fontSizeBottom = ImGui::GetFontSize() * MapRenderState::uiTextScale;
+        float bottomTextSpace = 15.0f + fontSizeBottom * 2.5f + fontSizeBottom; // 底层文本需要的最小冗余高度
+        
+        float min_cx = IM_MAP_MARGIN + IM_MAP_R;
+        float max_cx = ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R;
+        float min_cy = IM_MAP_MARGIN + IM_MAP_R;
+        float max_cy = ImGui::GetIO().DisplaySize.y - IM_MAP_MARGIN - IM_MAP_R - bottomTextSpace;
+
+        if (cx < min_cx) cx = min_cx;
+        if (cx > max_cx) cx = max_cx;
+        if (cy < min_cy) cy = min_cy;
+        if (cy > max_cy) cy = max_cy;
+
+        // 反写回真实限制过的偏移值，确保拖动条数值与实际物理边界完美同步
+        MapRenderState::miniMapOffsetX = cx - base_cx;
+        MapRenderState::miniMapOffsetY = cy - base_cy;
+        
         // 强制向下取整，防止 ImGui 渲染到亚像素网格导致 DX11 采样边缘发毛
-        float cx = std::floor(ImGui::GetIO().DisplaySize.x - IM_MAP_MARGIN - IM_MAP_R);
-        float cy = std::floor(IM_MAP_MARGIN + IM_MAP_R);
+        cx = std::floor(cx);
+        cy = std::floor(cy);
 
         float pX = g_smoothPX;
         float pZ = g_smoothPZ;
@@ -557,27 +629,66 @@ namespace DX11Hook {
         float dx = pX - g_textureCenterX;
         float dz = pZ - g_textureCenterZ;
 
+        float playerYaw = g_localPlayer ? g_localPlayer->getRotation().y : 0.0f;
+        // 算出地图需要旋转的弧度：如果要将玩家朝向置于正北，则地图需反向旋转其 yaw 角
+        float mapRotateRad = MapRenderState::rotateMiniMap ? -(playerYaw + 180.0f) * (3.14159265f / 180.0f) : 0.0f;
+        float c_rot = std::cos(mapRotateRad);
+        float s_rot = std::sin(mapRotateRad);
+
         float ZOOM_RADIUS = 50.0f; 
         float u = 0.5f + (dx / MAP_DATA_SIZE);
         float v = 0.5f + (dz / MAP_DATA_SIZE);
         float uvR = ZOOM_RADIUS / MAP_DATA_SIZE;
 
-        ImVec2 uv0(u - uvR, v - uvR);
-        ImVec2 uv1(u + uvR, v + uvR);
+        float drawRadius = IM_MAP_R;
+        float uvDrawR = uvR;
+        // 对于方形地图，如果开启旋转，为了避免边角露馅，渲染内容必须扩大 1.415 倍（正方形对角线长度）
+        if (MapRenderState::isSquareMap && MapRenderState::rotateMiniMap) {
+            drawRadius = IM_MAP_R * 1.415f;
+            uvDrawR = uvR * 1.415f;
+        }
+
+        ImVec2 uv0(u - uvDrawR, v - uvDrawR);
+        ImVec2 uv1(u + uvDrawR, v + uvDrawR);
+        ImVec2 drawMin(cx - drawRadius, cy - drawRadius);
+        ImVec2 drawMax(cx + drawRadius, cy + drawRadius);
         ImVec2 mapMin(cx - IM_MAP_R, cy - IM_MAP_R);
         ImVec2 mapMax(cx + IM_MAP_R, cy + IM_MAP_R);
 
+        // 如果是方形地图，直接利用 ImGui 的底层 DrawList 屏幕空间裁剪实现 Mask 遮罩
+        if (MapRenderState::isSquareMap) draw_list->PushClipRect(mapMin, mapMax, true);
+        
+        int vtxStart = draw_list->VtxBuffer.Size;
+
         if (MapRenderState::isSquareMap) {
-            draw_list->AddRectFilled(mapMin, mapMax, IM_COL32(20, 20, 20, 255));
+            draw_list->AddRectFilled(drawMin, drawMax, IM_COL32(20, 20, 20, 255));
             draw_list->AddCallback(PointSamplerCallback, nullptr);
-            draw_list->AddImage((void*)g_mapTextureView, mapMin, mapMax, uv0, uv1, IM_COL32_WHITE);
+            draw_list->AddImage((void*)g_mapTextureView, drawMin, drawMax, uv0, uv1, IM_COL32_WHITE);
             draw_list->AddCallback(LinearSamplerCallback, nullptr);
+        } else {
+            draw_list->AddCircleFilled(ImVec2(cx, cy), drawRadius, IM_COL32(20, 20, 20, 255), 64);
+            draw_list->AddCallback(PointSamplerCallback, nullptr);
+            draw_list->AddImageRounded((void*)g_mapTextureView, drawMin, drawMax, uv0, uv1, IM_COL32_WHITE, drawRadius);
+            draw_list->AddCallback(LinearSamplerCallback, nullptr);
+        }
+
+        // 强行在提交前对绘制顶点进行矩阵旋转
+        if (MapRenderState::rotateMiniMap) {
+            for (int i = vtxStart; i < draw_list->VtxBuffer.Size; i++) {
+                ImVec2& p = draw_list->VtxBuffer[i].pos;
+                float p_dx = p.x - cx;
+                float p_dy = p.y - cy;
+                p.x = cx + p_dx * c_rot - p_dy * s_rot;
+                p.y = cy + p_dx * s_rot + p_dy * c_rot;
+            }
+        }
+
+        if (MapRenderState::isSquareMap) draw_list->PopClipRect();
+
+        // 绘制物理外边框
+        if (MapRenderState::isSquareMap) {
             draw_list->AddRect(mapMin, mapMax, IM_COL32(30, 30, 30, 255), 0.0f, 0, 2.0f);
         } else {
-            draw_list->AddCircleFilled(ImVec2(cx, cy), IM_MAP_R, IM_COL32(20, 20, 20, 255), 64);
-            draw_list->AddCallback(PointSamplerCallback, nullptr);
-            draw_list->AddImageRounded((void*)g_mapTextureView, mapMin, mapMax, uv0, uv1, IM_COL32_WHITE, IM_MAP_R);
-            draw_list->AddCallback(LinearSamplerCallback, nullptr);
             draw_list->AddCircle(ImVec2(cx, cy), IM_MAP_R, IM_COL32(30, 30, 30, 255), 64, 2.0f);
         }
 
@@ -585,28 +696,44 @@ namespace DX11Hook {
         float fontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
         
         char coordBuf[64];
-        snprintf(coordBuf, sizeof(coordBuf), "%d, %d, %d", g_playerBlockX, (int)std::floor(g_playerY - 1.62f), g_playerBlockZ);
+        snprintf(coordBuf, sizeof(coordBuf), "%d, %d, %d", g_playerBlockX, (int)std::floor(g_playerY), g_playerBlockZ);
         ImVec2 coordSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, coordBuf);
         ImVec2 coordPos(cx - coordSize.x / 2, cy + IM_MAP_R + 15 + fontSize); 
         draw_list->AddText(font, fontSize, ImVec2(coordPos.x + 1, coordPos.y + 1), IM_COL32(0,0,0,200), coordBuf, NULL, 0.0f, NULL);
         draw_list->AddText(font, fontSize, coordPos, IM_COL32(255, 255, 255, 255), coordBuf, NULL, 0.0f, NULL);
 
-        std::string biomeStr = MapRenderState::currentBiomeName;
-        size_t startPos = biomeStr.find("(");
-        size_t endPos = biomeStr.find(")");
-        if (startPos != std::string::npos && endPos != std::string::npos) {
-            biomeStr = biomeStr.substr(startPos + 1, endPos - startPos - 1);
-        }
+        std::string biomeStr = MapRenderState::translatedBiomeName;
         ImVec2 biomeSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, biomeStr.c_str());
         ImVec2 biomePos(cx - biomeSize.x / 2, cy + IM_MAP_R + 15 + fontSize * 2.2f);
         draw_list->AddText(font, fontSize, ImVec2(biomePos.x + 1, biomePos.y + 1), IM_COL32(0,0,0,200), biomeStr.c_str(), NULL, 0.0f, NULL);
         draw_list->AddText(font, fontSize, biomePos, IM_COL32(220, 220, 220, 255), biomeStr.c_str(), NULL, 0.0f, NULL);
 
-        float cpOffset = fontSize / 2.0f;
-        draw_list->AddText(font, fontSize, ImVec2(cx - cpOffset, cy - IM_MAP_R - 5 - fontSize), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_N"), NULL, 0.0f, NULL);
-        draw_list->AddText(font, fontSize, ImVec2(cx - cpOffset, cy + IM_MAP_R - 2), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_S"), NULL, 0.0f, NULL);
-        draw_list->AddText(font, fontSize, ImVec2(cx + IM_MAP_R + 4, cy - cpOffset), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_E"), NULL, 0.0f, NULL);
-        draw_list->AddText(font, fontSize, ImVec2(cx - IM_MAP_R - 4 - font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, LanguageManager::GetText("COMPASS_W")).x, cy - cpOffset), IM_COL32(220, 220, 255, 255), LanguageManager::GetText("COMPASS_W"), NULL, 0.0f, NULL);
+        // 绘制正向的指南针东南西北（根据地图旋转角度推算正确的位置）
+        auto drawRotatedText = [&](const char* text, float offX, float offY) {
+            float rotX = offX * c_rot - offY * s_rot;
+            float rotY = offX * s_rot + offY * c_rot;
+            
+            // 如果是方形地图且在旋转，文字会因为距离固定而跑到地图框内部。
+            // 这里将其动态投影到方形外边框上，确保方向字母始终在方形外部平移。
+            if (MapRenderState::isSquareMap) {
+                float maxAxis = std::max(std::abs(rotX), std::abs(rotY));
+                if (maxAxis > 0.001f) {
+                    float textDist = IM_MAP_R + 4.0f + fontSize / 2.0f;
+                    rotX = (rotX / maxAxis) * textDist;
+                    rotY = (rotY / maxAxis) * textDist;
+                }
+            }
+            
+            ImVec2 ts = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, text);
+            ImVec2 pos(cx + rotX - ts.x / 2.0f, cy + rotY - ts.y / 2.0f);
+            draw_list->AddText(font, fontSize, ImVec2(pos.x + 1, pos.y + 1), IM_COL32(0,0,0,200), text, NULL, 0.0f, NULL);
+            draw_list->AddText(font, fontSize, pos, IM_COL32(220, 220, 255, 255), text, NULL, 0.0f, NULL);
+        };
+        float textDist = IM_MAP_R + 4.0f + fontSize / 2.0f;
+        drawRotatedText(LanguageManager::GetText("COMPASS_N"), 0.0f, -textDist);
+        drawRotatedText(LanguageManager::GetText("COMPASS_S"), 0.0f, textDist);
+        drawRotatedText(LanguageManager::GetText("COMPASS_E"), textDist, 0.0f);
+        drawRotatedText(LanguageManager::GetText("COMPASS_W"), -textDist, 0.0f);
 
         static std::vector<RadarEntity> s_cachedEntities;
         if (g_radarUpdated.load()) {
@@ -616,15 +743,19 @@ namespace DX11Hook {
 
         float scale = IM_MAP_R / ZOOM_RADIUS; 
         for (const auto& ent : s_cachedEntities) {
-            // 让实体也跟随绝对平滑的坐标系移动
             float edx = ent.x - pX;
             float edz = ent.z - pZ;
-            float ex = cx + edx * scale;
-            float ez = cy + edz * scale;
+            
+            // 应用相对雷达坐标的矩阵旋转
+            float rotDx = edx * c_rot - edz * s_rot;
+            float rotDz = edx * s_rot + edz * c_rot;
+            
+            float ex = cx + rotDx * scale;
+            float ez = cy + rotDz * scale;
             
             bool inBounds = false;
             if (MapRenderState::isSquareMap) {
-                inBounds = (std::abs(ex - cx) <= IM_MAP_R && std::abs(ez - cy) <= IM_MAP_R);
+                inBounds = (std::abs(rotDx * scale) <= IM_MAP_R && std::abs(rotDz * scale) <= IM_MAP_R);
             } else {
                 float distSq = (ex - cx) * (ex - cx) + (ez - cy) * (ez - cy);
                 inBounds = (distSq <= IM_MAP_R * IM_MAP_R);
@@ -650,26 +781,29 @@ namespace DX11Hook {
                 float physicalDist = std::sqrt(wDx * wDx + wDz * wDz);
                 if (physicalDist < 0.001f) physicalDist = 0.001f;
 
-                float ex = cx + wDx * scale;
-                float ez = cy + wDz * scale;
+                float rotDx = wDx * c_rot - wDz * s_rot;
+                float rotDz = wDx * s_rot + wDz * c_rot;
+
+                float ex = cx + rotDx * scale;
+                float ez = cy + rotDz * scale;
                 
                 bool inMap = false;
                 float edgeX = cx, edgeZ = cy;
 
                 if (MapRenderState::isSquareMap) {
-                    if (std::abs(wDx * scale) <= IM_MAP_R && std::abs(wDz * scale) <= IM_MAP_R) {
+                    if (std::abs(rotDx * scale) <= IM_MAP_R && std::abs(rotDz * scale) <= IM_MAP_R) {
                         inMap = true;
                     } else {
-                        float maxDist = std::max(std::abs(wDx), std::abs(wDz));
-                        edgeX = cx + (wDx / maxDist) * IM_MAP_R;
-                        edgeZ = cy + (wDz / maxDist) * IM_MAP_R;
+                        float maxDist = std::max(std::abs(rotDx), std::abs(rotDz));
+                        edgeX = cx + (rotDx / maxDist) * IM_MAP_R;
+                        edgeZ = cy + (rotDz / maxDist) * IM_MAP_R;
                     }
                 } else {
                     if (physicalDist <= ZOOM_RADIUS) {
                         inMap = true;
                     } else {
-                        edgeX = cx + (wDx / physicalDist) * IM_MAP_R;
-                        edgeZ = cy + (wDz / physicalDist) * IM_MAP_R;
+                        edgeX = cx + (rotDx / physicalDist) * IM_MAP_R;
+                        edgeZ = cy + (rotDz / physicalDist) * IM_MAP_R;
                     }
                 }
 
@@ -681,8 +815,8 @@ namespace DX11Hook {
             }
         }
 
-        float playerYaw = g_localPlayer ? g_localPlayer->getRotation().y : 0.0f;
-        float yawRad = (playerYaw + 180.0f) * (3.14159265f / 180.0f); 
+        // 绘制玩家朝向指示器。如果地图旋转开启，指示器永远朝上 (角度 0)。
+        float yawRad = MapRenderState::rotateMiniMap ? 0.0f : (playerYaw + 180.0f) * (3.14159265f / 180.0f); 
         float cosY = std::cos(yawRad);
         float sinY = std::sin(yawRad);
         auto rotate = [&](float x, float y) -> ImVec2 { return ImVec2(cx + (x * cosY - y * sinY), cy + (x * sinY + y * cosY)); };
@@ -764,6 +898,121 @@ namespace DX11Hook {
     // ==========================================
     // 提取公共重命名模态弹窗组件
     // ==========================================
+    inline void RenderMiniMapPosSettings() {
+        static float origX = 0.0f;
+        static float origY = 0.0f;
+        static float origScale = 1.0f;
+        static bool initialized = false;
+
+        if (!MapRenderState::showMiniMapPosSettings) {
+            if (initialized) {
+                // 窗口异常关闭时的状态还原
+                MapRenderState::miniMapOffsetX = origX;
+                MapRenderState::miniMapOffsetY = origY;
+                MapRenderState::miniMapScale = origScale;
+                initialized = false;
+            }
+            return;
+        }
+
+        if (!initialized) {
+            origX = MapRenderState::miniMapOffsetX;
+            origY = MapRenderState::miniMapOffsetY;
+            origScale = MapRenderState::miniMapScale;
+            initialized = true;
+        }
+
+        // 窗口正居中显示，宽度适度加宽以容纳文字和三个滑块
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(ImVec2(480, 0), ImGuiCond_Appearing); 
+
+        if (ImGui::Begin(LanguageManager::GetText("MINIMAP_POS_SETTINGS"), &MapRenderState::showMiniMapPosSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize)) {
+            
+            float displayX = ImGui::GetIO().DisplaySize.x;
+            float displayY = ImGui::GetIO().DisplaySize.y;
+            
+            float availWidth = ImGui::GetContentRegionAvail().x;
+            float btnSize = ImGui::GetFrameHeight();
+            float inputWidth = 55.0f;
+            float spacing = ImGui::GetStyle().ItemSpacing.x;
+            float labelWidth = std::max(ImGui::CalcTextSize(LanguageManager::GetText("X_OFFSET")).x, ImGui::CalcTextSize(LanguageManager::GetText("MINIMAP_SCALE")).x);
+            float sliderWidth = availWidth - labelWidth - (btnSize * 2.0f) - inputWidth - (spacing * 4.0f) - 15.0f;
+
+            float IM_MAP_R = std::floor(135.0f * MapRenderState::miniMapScale);
+            float IM_MAP_MARGIN = 20.0f;
+            float fontSize = ImGui::GetFontSize() * MapRenderState::uiTextScale;
+            float bottomTextSpace = 15.0f + fontSize * 2.5f + fontSize;
+
+            // 动态计算绝对边界范围（剔除了无意义的多余滑动区域）
+            float minOffsetX = 2.0f * (IM_MAP_MARGIN + IM_MAP_R) - displayX;
+            float maxOffsetX = 0.0f;
+            float minOffsetY = 0.0f;
+            float maxOffsetY = displayY - 2.0f * (IM_MAP_MARGIN + IM_MAP_R) - bottomTextSpace;
+
+            auto drawRow = [&](const char* label, const char* idSlider, const char* idSub, const char* idInput, const char* idAdd, float& value, float minVal, float maxVal, float step, const char* format) {
+                ImGui::Text("%s", label);
+                ImGui::SameLine(labelWidth + 15.0f);
+                
+                ImGui::PushItemWidth(sliderWidth);
+                ImGui::SliderFloat(idSlider, &value, minVal, maxVal, format);
+                ImGui::PopItemWidth();
+                
+                ImGui::SameLine();
+                if (ImGui::ArrowButton(idSub, ImGuiDir_Left)) value -= step; 
+                
+                ImGui::SameLine();
+                ImGui::PushItemWidth(inputWidth);
+                ImGui::InputFloat(idInput, &value, 0.0f, 0.0f, format);
+                ImGui::PopItemWidth();
+                
+                ImGui::SameLine();
+                if (ImGui::ArrowButton(idAdd, ImGuiDir_Right)) value += step; 
+            };
+
+            drawRow(LanguageManager::GetText("X_OFFSET"), "##XSlider", "##XSub", "##XInput", "##XAdd", MapRenderState::miniMapOffsetX, minOffsetX, maxOffsetX, 5.0f, "%.0f");
+            drawRow(LanguageManager::GetText("Y_OFFSET"), "##YSlider", "##YSub", "##YInput", "##YAdd", MapRenderState::miniMapOffsetY, minOffsetY, maxOffsetY, 5.0f, "%.0f");
+            drawRow(LanguageManager::GetText("MINIMAP_SCALE"), "##ScaleSlider", "##ScaleSub", "##ScaleInput", "##ScaleAdd", MapRenderState::miniMapScale, 0.2f, 2.5f, 0.1f, "%.2f");
+
+            if (MapRenderState::miniMapScale < 0.2f) MapRenderState::miniMapScale = 0.2f;
+
+            ImGui::Spacing();
+            float btnWidth = (availWidth - spacing) / 2.0f;
+            
+            if (ImGui::Button(LanguageManager::GetText("DEFAULT_POS"), ImVec2(btnWidth, 0))) {
+                MapRenderState::miniMapOffsetX = 0.0f;
+                MapRenderState::miniMapOffsetY = 0.0f;
+                MapRenderState::miniMapScale = 1.0f;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(LanguageManager::GetText("TOP_LEFT_POS"), ImVec2(btnWidth, 0))) {
+                float current_R = std::floor(135.0f * MapRenderState::miniMapScale);
+                MapRenderState::miniMapOffsetX = - (displayX - (IM_MAP_MARGIN + current_R) * 2.0f);
+                MapRenderState::miniMapOffsetY = 0.0f; 
+            }
+            
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button(LanguageManager::GetText("SAVE_AND_EXIT"), ImVec2(btnWidth, 0))) {
+                LanguageManager::SaveConfig();
+                MapRenderState::showMiniMapPosSettings = false;
+                MapRenderState::showBigMap = true;
+                initialized = false;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(LanguageManager::GetText("DONT_SAVE"), ImVec2(btnWidth, 0))) {
+                MapRenderState::miniMapOffsetX = origX;
+                MapRenderState::miniMapOffsetY = origY;
+                MapRenderState::miniMapScale = origScale;
+                MapRenderState::showMiniMapPosSettings = false;
+                MapRenderState::showBigMap = true;
+                initialized = false;
+            }
+        }
+        ImGui::End();
+    }
+
     inline void RenderRenameModal(const char* modalId, std::string& wpId, bool& trigger) {
         if (trigger) {
             ImGui::OpenPopup(modalId);
@@ -994,7 +1243,8 @@ namespace DX11Hook {
         draw_list->AddText(mFont, mFontSize, ImVec2(io.DisplaySize.x / 2 - textSize.x / 2, io.DisplaySize.y - textSize.y - 17), IM_COL32(255, 255, 255, 255), infoBuf, NULL, 0.0f, NULL);
 
         char biomeBuf[512];
-        snprintf(biomeBuf, sizeof(biomeBuf), LanguageManager::GetText("BIOME_LABEL"), MapRenderState::currentBiomeName.c_str());
+        std::string combinedBiome = MapRenderState::rawBiomeName + " (" + MapRenderState::translatedBiomeName + ")";
+        snprintf(biomeBuf, sizeof(biomeBuf), LanguageManager::GetText("BIOME_LABEL"), combinedBiome.c_str());
         ImVec2 biomeTextSize = mFont->CalcTextSizeA(mFontSize, FLT_MAX, 0.0f, biomeBuf);
         draw_list->AddRectFilled(ImVec2(io.DisplaySize.x / 2 - biomeTextSize.x / 2 - 20, 15), 
                                  ImVec2(io.DisplaySize.x / 2 + biomeTextSize.x / 2 + 20, 15 + biomeTextSize.y + 15), 
@@ -1008,24 +1258,34 @@ namespace DX11Hook {
         ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_PLAYER_STATUS"));
         ImGui::Separator();
         ImGui::Text(LanguageManager::GetText("PLAYER_POS_X"), g_playerBlockX);
-        ImGui::Text(LanguageManager::GetText("PLAYER_POS_Y"), (int)g_playerY);
+        ImGui::Text(LanguageManager::GetText("PLAYER_POS_Y"), (int)std::floor(g_playerY));
         ImGui::Text(LanguageManager::GetText("PLAYER_POS_Z"), g_playerBlockZ);
         
         ImGui::Spacing(); ImGui::Spacing();
         
-        // 并排摆放 [视角回中] 主按钮与 [⚙] 齿轮设置按钮
-        float availWidth = ImGui::GetContentRegionAvail().x;
-        if (ImGui::Button(LanguageManager::GetText("CENTER_CAMERA"), ImVec2(availWidth - 42.0f, 35.0f))) {
+        // 居中并排摆放 [⛶ 视角回中] 与 [⚙ 齿轮设置] 按钮
+        float btnWidth = 35.0f;
+        float spacing = ImGui::GetStyle().ItemSpacing.x;
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() - (btnWidth * 2.0f + spacing)) * 0.5f);
+        
+        if (ImGui::Button("\xe2\x9b\xb6", ImVec2(btnWidth, btnWidth))) { // U+26F6 (Square with crosshairs)
             MapRenderState::bigMapOffsetX = 0.0f;
             MapRenderState::bigMapOffsetZ = 0.0f;
         }
-        ImGui::SameLine();
-        
-        if (ImGui::Button("\xe2\x9a\x99", ImVec2(35.0f, 35.0f))) {
-            ImGui::OpenPopup("SettingsPopup");
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("%s", LanguageManager::GetText("CENTER_CAMERA"));
         }
         
-        ImGui::SetNextWindowSize(ImVec2(220, 260));
+        ImGui::SameLine();
+        
+        if (ImGui::Button("\xe2\x9a\x99", ImVec2(btnWidth, btnWidth))) { // U+2699 (Gear)
+            ImGui::OpenPopup("SettingsPopup");
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("%s", LanguageManager::GetText("SETTINGS_TOOLTIP"));
+        }
+        
+        ImGui::SetNextWindowSize(ImVec2(290, 270));
         if (ImGui::BeginPopup("SettingsPopup")) {
             ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_OPS"));
             ImGui::Separator();
@@ -1036,20 +1296,54 @@ namespace DX11Hook {
             if (ImGui::Checkbox(LanguageManager::GetText("SQUARE_MINIMAP"), &MapRenderState::isSquareMap)) {
                 LanguageManager::SaveConfig();
             }
-            
-            ImGui::PushItemWidth(-1);
-            if (ImGui::SliderFloat("##TextScaleSlider", &MapRenderState::uiTextScale, 0.5f, 2.5f, "% .2f x")) {
+            if (ImGui::Checkbox(LanguageManager::GetText("ROTATE_MINIMAP"), &MapRenderState::rotateMiniMap)) {
                 LanguageManager::SaveConfig();
             }
-            ImGui::PopItemWidth();
+            ImGui::Spacing();
+            
             ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", LanguageManager::GetText("TEXT_SCALE"));
+            float availWidth = ImGui::GetContentRegionAvail().x;
+            float btnSize = ImGui::GetFrameHeight();
+            float inputWidth = 45.0f;
+            float spacing = ImGui::GetStyle().ItemSpacing.x;
+            float sliderWidth = availWidth - (btnSize * 2.0f) - inputWidth - (spacing * 3.0f);
             
-            ImGui::PushItemWidth(-1);
-            if (ImGui::SliderFloat("##MiniMapScaleSlider", &MapRenderState::miniMapScale, 0.5f, 2.5f, "% .2f x")) {
+            bool tScaleChanged = false;
+            
+            ImGui::PushItemWidth(sliderWidth);
+            tScaleChanged |= ImGui::SliderFloat("##TextScaleSlider", &MapRenderState::uiTextScale, 0.5f, 2.5f, "%.2f x");
+            ImGui::PopItemWidth();
+            
+            ImGui::SameLine();
+            if (ImGui::ArrowButton("##TextScaleSub", ImGuiDir_Left)) {
+                MapRenderState::uiTextScale -= 0.1f;
+                tScaleChanged = true;
+            }
+            
+            ImGui::SameLine();
+            ImGui::PushItemWidth(inputWidth);
+            tScaleChanged |= ImGui::InputFloat("##TextInput", &MapRenderState::uiTextScale, 0.0f, 0.0f, "%.2f");
+            ImGui::PopItemWidth();
+            
+            ImGui::SameLine();
+            if (ImGui::ArrowButton("##TextScaleAdd", ImGuiDir_Right)) {
+                MapRenderState::uiTextScale += 0.1f;
+                tScaleChanged = true;
+            }
+            
+            if (tScaleChanged) {
+                if (MapRenderState::uiTextScale < 0.1f) MapRenderState::uiTextScale = 0.1f;
                 LanguageManager::SaveConfig();
             }
-            ImGui::PopItemWidth();
-            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", LanguageManager::GetText("MINIMAP_SCALE"));
+            
+            ImGui::Spacing();
+            ImGui::Spacing();
+            
+            if (ImGui::Button(LanguageManager::GetText("EDIT_MINIMAP_POS"), ImVec2(-1, 0))) {
+                MapRenderState::showMiniMapPosSettings = true;
+                MapRenderState::showBigMap = false;
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::Spacing();
 
             std::string previewName = LanguageManager::g_currentLanguage;
@@ -1060,6 +1354,7 @@ namespace DX11Hook {
                 }
             }
             
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", LanguageManager::GetText("LANG_SELECT"));
             ImGui::PushItemWidth(-1);
             if (ImGui::BeginCombo("##LangSelectCombo", previewName.c_str())) {
                 for (const auto& p : LanguageManager::g_availableLanguages) {
@@ -1362,7 +1657,7 @@ namespace DX11Hook {
                 if (ImGui::IsWindowAppearing()) {
                     nameBuf[0] = '\0'; 
                     pos[0] = (MapRenderState::addWaypointX != -999999) ? MapRenderState::addWaypointX : g_playerBlockX;
-                    pos[1] = (MapRenderState::addWaypointY != -999999) ? MapRenderState::addWaypointY : (int)g_playerY;
+                    pos[1] = (MapRenderState::addWaypointY != -999999) ? MapRenderState::addWaypointY : (int)std::floor(g_playerY);
                     pos[2] = (MapRenderState::addWaypointZ != -999999) ? MapRenderState::addWaypointZ : g_playerBlockZ;
                     
                     MapRenderState::addWaypointX = -999999;
@@ -1465,6 +1760,9 @@ namespace DX11Hook {
                 if (MapRenderState::showWaypointUI) {
                     RenderImGuiWaypointUI();
                 }
+
+                // 无条件调用，内含状态检测，处理还原逻辑
+                RenderMiniMapPosSettings();
 
                 ImGui::Render();
                 ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -11,8 +11,9 @@ namespace MapRenderState {
     inline float bigMapOffsetZ = 0.0f;
     inline float bigMapZoom = 3.0f; // 默认放大 3 倍
 
-    // [微步骤 11] 当前玩家所处生物群系名称
-    inline std::string currentBiomeName = "Unknown Biome";
+    // 当前玩家所处生物群系名称 (拆分为原始命名空间ID与本地化名称)
+    inline std::string rawBiomeName = "minecraft:unknown";
+    inline std::string translatedBiomeName = "Unknown Biome";
 
     // [新增] 世界与维度隔离系统状态
     inline std::string currentWorldId = "";
@@ -22,9 +23,14 @@ namespace MapRenderState {
     // [新增] 路径点 UI 开启状态
     inline bool showWaypointUI = false;
 
+    // [新增] 小地图偏移与位置设置
+    inline float miniMapOffsetX = 0.0f; // 小地图 X 偏移
+    inline float miniMapOffsetY = 0.0f; // 小地图 Y 偏移
+    inline bool showMiniMapPosSettings = false; // 小地图位置设置面板
+
     // [统一拦截枢纽] 判断是否有任何全屏 UI 处于活动状态
     inline bool IsUIActive() {
-        return showBigMap || showWaypointUI;
+        return showBigMap || showWaypointUI || showMiniMapPosSettings;
     }
 
     // [新增] 跨菜单桥接：大地图右键唤起新建地标的预设坐标
@@ -41,6 +47,7 @@ namespace MapRenderState {
 
     inline bool showMiniMap = true;  // 是否显示小地图
     inline bool isSquareMap = false; // 是否为方形小地图
+    inline bool rotateMiniMap = false; // 小地图跟随视角旋转
     inline float uiTextScale = 1.0f; // UI 文本缩放比例
     inline float miniMapScale = 1.0f; // 小地图本身大小缩放
 }

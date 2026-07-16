@@ -54,65 +54,66 @@ inline std::mutex g_mapDataMutex;
 // ==========================================
 // 生物群系中文翻译字典引擎
 // ==========================================
-inline std::string TranslateBiomeName(const std::string& rawName) {
-    if (LanguageManager::g_currentLanguage != "zh_CN" && LanguageManager::g_currentLanguage != "zh_TW") {
-        std::string formattedName = rawName;
-        for (size_t i = 0; i < formattedName.length(); ++i) {
-            if (formattedName[i] == '_') formattedName[i] = ' ';
-            if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
-        }
-        return formattedName;
-    }
+    inline std::string TranslateBiomeName(const std::string& rawName) {
+        std::string cleanName = rawName;
+        size_t colonPos = cleanName.find(":");
+        if (colonPos != std::string::npos) cleanName = cleanName.substr(colonPos + 1);
 
-    std::string lower = rawName;
-    for (char& c : lower) if (c >= 'A' && c <= 'Z') c += 32;
-    
-    if (lower.find("plains") != std::string::npos && lower.find("ice") == std::string::npos && lower.find("snow") == std::string::npos) return "平原";
-    if (lower.find("desert") != std::string::npos) return "沙漠";
-    if (lower.find("extreme_hills") != std::string::npos || lower.find("windswept") != std::string::npos) return "风啸山丘";
-    if (lower.find("forest") != std::string::npos && lower.find("dark") == std::string::npos && lower.find("birch") == std::string::npos && lower.find("crimson") == std::string::npos && lower.find("warped") == std::string::npos) return "森林";
-    if (lower.find("taiga") != std::string::npos) return "针叶林";
-    if (lower.find("swamp") != std::string::npos) {
-        if (lower.find("mangrove") != std::string::npos) return "红树林沼泽";
-        return "沼泽";
+        std::string lower = cleanName;
+        for (char& c : lower) if (c >= 'A' && c <= 'Z') c += 32;
+        
+        std::string biomeKey = "BIOME_UNKNOWN";
+        if (lower.find("plains") != std::string::npos && lower.find("ice") == std::string::npos && lower.find("snow") == std::string::npos) biomeKey = "BIOME_PLAINS";
+        else if (lower.find("desert") != std::string::npos) biomeKey = "BIOME_DESERT";
+        else if (lower.find("extreme_hills") != std::string::npos || lower.find("windswept") != std::string::npos) biomeKey = "BIOME_EXTREME_HILLS";
+        else if (lower.find("forest") != std::string::npos && lower.find("dark") == std::string::npos && lower.find("birch") == std::string::npos && lower.find("crimson") == std::string::npos && lower.find("warped") == std::string::npos) biomeKey = "BIOME_FOREST";
+        else if (lower.find("taiga") != std::string::npos) biomeKey = "BIOME_TAIGA";
+        else if (lower.find("swamp") != std::string::npos) biomeKey = (lower.find("mangrove") != std::string::npos) ? "BIOME_MANGROVE_SWAMP" : "BIOME_SWAMP";
+        else if (lower.find("river") != std::string::npos) biomeKey = "BIOME_RIVER";
+        else if (lower.find("hell") != std::string::npos || lower.find("nether") != std::string::npos) biomeKey = "BIOME_HELL";
+        else if (lower.find("the_end") != std::string::npos) biomeKey = "BIOME_THE_END";
+        else if (lower.find("ocean") != std::string::npos) {
+            if (lower.find("frozen") != std::string::npos) biomeKey = "BIOME_FROZEN_OCEAN";
+            else if (lower.find("warm") != std::string::npos) biomeKey = "BIOME_WARM_OCEAN";
+            else if (lower.find("cold") != std::string::npos) biomeKey = "BIOME_COLD_OCEAN";
+            else biomeKey = "BIOME_OCEAN";
+        }
+        else if (lower.find("ice_plains") != std::string::npos || lower.find("snowy_plains") != std::string::npos) biomeKey = "BIOME_SNOWY_PLAINS";
+        else if (lower.find("ice_spikes") != std::string::npos) biomeKey = "BIOME_ICE_SPIKES";
+        else if (lower.find("mushroom") != std::string::npos) biomeKey = "BIOME_MUSHROOM";
+        else if (lower.find("beach") != std::string::npos) biomeKey = "BIOME_BEACH";
+        else if (lower.find("jungle") != std::string::npos) biomeKey = (lower.find("bamboo") != std::string::npos) ? "BIOME_BAMBOO_JUNGLE" : "BIOME_JUNGLE";
+        else if (lower.find("birch_forest") != std::string::npos) biomeKey = "BIOME_BIRCH_FOREST";
+        else if (lower.find("dark_forest") != std::string::npos || lower.find("roofed_forest") != std::string::npos) biomeKey = "BIOME_DARK_FOREST";
+        else if (lower.find("savanna") != std::string::npos) biomeKey = "BIOME_SAVANNA";
+        else if (lower.find("mesa") != std::string::npos || lower.find("badlands") != std::string::npos) biomeKey = "BIOME_MESA";
+        else if (lower.find("cherry") != std::string::npos) biomeKey = "BIOME_CHERRY";
+        else if (lower.find("crimson_forest") != std::string::npos) biomeKey = "BIOME_CRIMSON_FOREST";
+        else if (lower.find("warped_forest") != std::string::npos) biomeKey = "BIOME_WARPED_FOREST";
+        else if (lower.find("soul_sand_valley") != std::string::npos) biomeKey = "BIOME_SOUL_SAND_VALLEY";
+        else if (lower.find("basalt_deltas") != std::string::npos) biomeKey = "BIOME_BASALT_DELTAS";
+        else if (lower.find("meadow") != std::string::npos) biomeKey = "BIOME_MEADOW";
+        else if (lower.find("grove") != std::string::npos) biomeKey = "BIOME_GROVE";
+        else if (lower.find("snowy_slopes") != std::string::npos) biomeKey = "BIOME_SNOWY_SLOPES";
+        else if (lower.find("jagged_peaks") != std::string::npos) biomeKey = "BIOME_JAGGED_PEAKS";
+        else if (lower.find("frozen_peaks") != std::string::npos) biomeKey = "BIOME_FROZEN_PEAKS";
+        else if (lower.find("stony_peaks") != std::string::npos) biomeKey = "BIOME_STONY_PEAKS";
+        else if (lower.find("deep_dark") != std::string::npos) biomeKey = "BIOME_DEEP_DARK";
+        else if (lower.find("pale_garden") != std::string::npos) biomeKey = "BIOME_PALE_GARDEN";
+
+        std::string result = LanguageManager::GetText(biomeKey);
+        
+        // 若找不到对应语言，回退将英文名首字母大写返回
+        if (result == biomeKey) {
+            std::string formattedName = cleanName;
+            for (size_t i = 0; i < formattedName.length(); ++i) {
+                if (formattedName[i] == '_') formattedName[i] = ' ';
+                if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
+            }
+            return formattedName;
+        }
+        return result;
     }
-    if (lower.find("river") != std::string::npos) return "河流";
-    if (lower.find("hell") != std::string::npos || lower.find("nether") != std::string::npos) return "下界荒野";
-    if (lower.find("the_end") != std::string::npos) return "末地";
-    if (lower.find("ocean") != std::string::npos) {
-        if (lower.find("frozen") != std::string::npos) return "冻洋";
-        if (lower.find("warm") != std::string::npos) return "暖洋";
-        if (lower.find("cold") != std::string::npos) return "冷洋";
-        return "海洋";
-    }
-    if (lower.find("ice_plains") != std::string::npos || lower.find("snowy_plains") != std::string::npos) return "积雪平原";
-    if (lower.find("ice_spikes") != std::string::npos) return "冰刺平原";
-    if (lower.find("mushroom") != std::string::npos) return "蘑菇岛";
-    if (lower.find("beach") != std::string::npos) return "海滩";
-    if (lower.find("jungle") != std::string::npos) {
-        if (lower.find("bamboo") != std::string::npos) return "竹林";
-        return "丛林";
-    }
-    if (lower.find("birch_forest") != std::string::npos) return "白桦森林";
-    if (lower.find("dark_forest") != std::string::npos || lower.find("roofed_forest") != std::string::npos) return "黑橡木森林";
-    if (lower.find("savanna") != std::string::npos) return "热带草原";
-    if (lower.find("mesa") != std::string::npos || lower.find("badlands") != std::string::npos) return "恶地";
-    if (lower.find("cherry") != std::string::npos) return "樱花树林";
-    if (lower.find("crimson_forest") != std::string::npos) return "绯红森林";
-    if (lower.find("warped_forest") != std::string::npos) return "诡异森林";
-    if (lower.find("soul_sand_valley") != std::string::npos) return "灵魂沙峡谷";
-    if (lower.find("basalt_deltas") != std::string::npos) return "玄武岩三角洲";
-    if (lower.find("meadow") != std::string::npos) return "草甸";
-    if (lower.find("grove") != std::string::npos) return "雪林";
-    if (lower.find("snowy_slopes") != std::string::npos) return "积雪的山坡";
-    if (lower.find("jagged_peaks") != std::string::npos) return "尖峭山峰";
-    if (lower.find("frozen_peaks") != std::string::npos) return "冰封山峰";
-    if (lower.find("stony_peaks") != std::string::npos) return "裸岩山峰";
-    if (lower.find("deep_dark") != std::string::npos) return "深暗之域";
-    if (lower.find("pale_garden") != std::string::npos) return "苍白花园";
-    
-    return "未知群系";
-}
 
 // ==========================================
 // 真彩自然光色彩引擎
@@ -481,18 +482,16 @@ LL_TYPE_INSTANCE_HOOK(
                 auto const& biome = regionPtr->getBiome(BlockPos(g_playerBlockX, (int)g_playerY, g_playerBlockZ));
                 {
                     std::string rawName = biome.mHash->getString();
-                    std::string translatedName = TranslateBiomeName(rawName);
+                    std::string displayRawName = rawName;
                     
-                    if (LanguageManager::g_currentLanguage == "zh_CN" || LanguageManager::g_currentLanguage == "zh_TW") {
-                        std::string formattedName = rawName;
-                        for (size_t i = 0; i < formattedName.length(); ++i) {
-                            if (formattedName[i] == '_') formattedName[i] = ' ';
-                            if (i == 0 || formattedName[i - 1] == ' ') formattedName[i] = (char)std::toupper(formattedName[i]);
-                        }
-                        MapRenderState::currentBiomeName = formattedName + " (" + translatedName + ")";
-                    } else {
-                        MapRenderState::currentBiomeName = translatedName;
+                    // 剥离命名空间前缀（例如将 minecraft:plains 转为 plains）
+                    size_t colonPos = displayRawName.find(":");
+                    if (colonPos != std::string::npos) {
+                        displayRawName = displayRawName.substr(colonPos + 1);
                     }
+                    
+                    MapRenderState::rawBiomeName = displayRawName;
+                    MapRenderState::translatedBiomeName = TranslateBiomeName(rawName);
                 }
             }
         } catch (...) {}
