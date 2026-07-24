@@ -1,0 +1,1072 @@
+﻿Compiled from "MapPixel.java"
+public class xaero.map.region.MapPixel {
+  private static final int VOID_COLOR = -16121833;
+
+  private static final float DEFAULT_AMBIENT_LIGHT = 0.7f;
+
+  private static final float DEFAULT_AMBIENT_LIGHT_COLORED = 0.2f;
+
+  private static final float DEFAULT_AMBIENT_LIGHT_WHITE = 0.5f;
+
+  private static final float DEFAULT_MAX_DIRECT_LIGHT = 0.6666667f;
+
+  private static final float GLOWING_MAX_DIRECT_LIGHT = 0.22222224f;
+
+  protected net.minecraft.world.level.block.state.BlockState state;
+
+  protected byte light;
+
+  protected boolean glowing;
+
+  public xaero.map.region.MapPixel();
+    Code:
+         0: aload_0
+         1: invokespecial #3                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: iconst_0
+         6: putfield      #9                  // Field light:B
+         9: aload_0
+        10: iconst_0
+        11: putfield      #13                 // Field glowing:Z
+        14: return
+
+  private int getVanillaTransparency(net.minecraft.world.level.block.Block);
+    Code:
+         0: aload_1
+         1: instanceof    #17                 // class net/minecraft/world/level/block/LiquidBlock
+         4: ifeq          13
+         7: sipush        191
+        10: goto          28
+        13: aload_1
+        14: instanceof    #19                 // class net/minecraft/world/level/block/IceBlock
+        17: ifeq          26
+        20: sipush        216
+        23: goto          28
+        26: bipush        127
+        28: ireturn
+
+  public void getPixelColours(int[], xaero.map.MapWriter, net.minecraft.client.multiplayer.ClientLevel, xaero.map.world.MapDimension, net.minecraft.core.Registry<net.minecraft.world.level.block.Block>, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTile, int, int, xaero.map.region.MapBlock, int, int, int, int, java.util.ArrayList<xaero.map.region.Overlay>, net.minecraft.core.BlockPos$MutableBlockPos, net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome>, net.minecraft.core.Registry<net.minecraft.world.level.dimension.DimensionType>, float, float, float, xaero.map.biome.BlockTintProvider, xaero.map.MapProcessor, xaero.map.region.OverlayManager, xaero.map.cache.BlockStateShortShapeCache, xaero.map.region.MapUpdateFastConfig);
+    Code:
+         0: aload         13
+         2: ifnull        16
+         5: iload         16
+         7: ldc           #23                 // int 2147483647
+         9: if_icmpeq     16
+        12: iconst_0
+        13: goto          18
+        16: ldc           #24                 // int -16121833
+        18: istore        30
+        20: aload_0
+        21: getfield      #9                  // Field light:B
+        24: istore        31
+        26: bipush        9
+        28: istore        32
+        30: fconst_1
+        31: fstore        33
+        33: fconst_1
+        34: fstore        34
+        36: fconst_1
+        37: fstore        35
+        39: aload         19
+        41: aload         10
+        43: invokevirtual #25                 // Method xaero/map/region/MapTile.getChunkX:()I
+        46: bipush        16
+        48: imul
+        49: iload         11
+        51: iadd
+        52: iload         14
+        54: aload         10
+        56: invokevirtual #31                 // Method xaero/map/region/MapTile.getChunkZ:()I
+        59: bipush        16
+        61: imul
+        62: iload         12
+        64: iadd
+        65: invokevirtual #34                 // Method net/minecraft/core/BlockPos$MutableBlockPos.set:(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        68: pop
+        69: aload_0
+        70: getfield      #40                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+        73: astore        36
+        75: aload         36
+        77: invokevirtual #44                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+        80: instanceof    #50                 // class net/minecraft/world/level/block/AirBlock
+        83: istore        37
+        85: aload_0
+        86: instanceof    #52                 // class xaero/map/region/MapBlock
+        89: istore        38
+        91: iload         37
+        93: ifne          222
+        96: aload         29
+        98: getfield      #54                 // Field xaero/map/region/MapUpdateFastConfig.blockColors:I
+       101: ifne          121
+       104: aload_2
+       105: aload         36
+       107: iconst_1
+       108: aload_3
+       109: aload         5
+       111: aload         19
+       113: invokevirtual #60                 // Method xaero/map/MapWriter.loadBlockColourFromTexture:(Lnet/minecraft/world/level/block/state/BlockState;ZLnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/Registry;Lnet/minecraft/core/BlockPos;)I
+       116: istore        30
+       118: goto          182
+       121: aload         36
+       123: invokevirtual #44                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       126: astore        39
+       128: aload_0
+       129: aload         39
+       131: invokevirtual #66                 // Method getVanillaTransparency:(Lnet/minecraft/world/level/block/Block;)I
+       134: istore        40
+       136: aload         36
+       138: aload_3
+       139: aload         19
+       141: invokevirtual #70                 // Method net/minecraft/world/level/block/state/BlockState.getMapColor:(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/material/MapColor;
+       144: getfield      #74                 // Field net/minecraft/world/level/material/MapColor.col:I
+       147: istore        30
+       149: iload         38
+       151: ifne          164
+       154: iload         30
+       156: ifne          164
+       159: aload_1
+       160: iconst_0
+       161: iconst_m1
+       162: iastore
+       163: return
+       164: iload         40
+       166: bipush        24
+       168: ishl
+       169: iload         30
+       171: ldc           #79                 // int 16777215
+       173: iand
+       174: ior
+       175: istore        30
+       177: goto          182
+       180: astore        39
+       182: iload         38
+       184: ifne          222
+       187: aload         29
+       189: getfield      #82                 // Field xaero/map/region/MapUpdateFastConfig.stainedGlass:Z
+       192: ifne          222
+       195: aload         36
+       197: invokevirtual #44                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       200: instanceof    #85                 // class net/minecraft/world/level/block/StainedGlassBlock
+       203: ifne          217
+       206: aload         36
+       208: invokevirtual #44                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       211: instanceof    #87                 // class net/minecraft/world/level/block/StainedGlassPaneBlock
+       214: ifeq          222
+       217: aload_1
+       218: iconst_0
+       219: iconst_m1
+       220: iastore
+       221: return
+       222: iload         30
+       224: bipush        16
+       226: ishr
+       227: sipush        255
+       230: iand
+       231: istore        39
+       233: iload         30
+       235: bipush        8
+       237: ishr
+       238: sipush        255
+       241: iand
+       242: istore        40
+       244: iload         30
+       246: sipush        255
+       249: iand
+       250: istore        41
+       252: aload         29
+       254: getfield      #89                 // Field xaero/map/region/MapUpdateFastConfig.biomeColorsInVanilla:Z
+       257: ifne          268
+       260: aload         29
+       262: getfield      #54                 // Field xaero/map/region/MapUpdateFastConfig.blockColors:I
+       265: ifne          375
+       268: aload         25
+       270: aload         19
+       272: aload         36
+       274: iload         38
+       276: ifne          283
+       279: iconst_1
+       280: goto          284
+       283: iconst_0
+       284: aload         10
+       286: aload         6
+       288: invokevirtual #92                 // Method xaero/map/region/MapTileChunk.getInRegion:()Lxaero/map/region/MapRegion;
+       291: invokevirtual #98                 // Method xaero/map/region/MapRegion.getCaveLayer:()I
+       294: aload         4
+       296: aload         21
+       298: invokevirtual #103                // Method xaero/map/world/MapDimension.getDimensionType:(Lnet/minecraft/core/Registry;)Lnet/minecraft/world/level/dimension/DimensionType;
+       301: invokevirtual #109                // Method xaero/map/biome/BlockTintProvider.getBiomeColor:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;ZLxaero/map/region/MapTile;ILnet/minecraft/world/level/dimension/DimensionType;)I
+       304: istore        42
+       306: iload         39
+       308: i2f
+       309: ldc           #115                // float 255.0f
+       311: fdiv
+       312: fstore        43
+       314: iload         40
+       316: i2f
+       317: ldc           #115                // float 255.0f
+       319: fdiv
+       320: fstore        44
+       322: iload         41
+       324: i2f
+       325: ldc           #115                // float 255.0f
+       327: fdiv
+       328: fstore        45
+       330: iload         42
+       332: bipush        16
+       334: ishr
+       335: sipush        255
+       338: iand
+       339: i2f
+       340: fload         43
+       342: fmul
+       343: f2i
+       344: istore        39
+       346: iload         42
+       348: bipush        8
+       350: ishr
+       351: sipush        255
+       354: iand
+       355: i2f
+       356: fload         44
+       358: fmul
+       359: f2i
+       360: istore        40
+       362: iload         42
+       364: sipush        255
+       367: iand
+       368: i2f
+       369: fload         45
+       371: fmul
+       372: f2i
+       373: istore        41
+       375: aload_0
+       376: getfield      #13                 // Field glowing:Z
+       379: ifeq          439
+       382: iload         39
+       384: iload         40
+       386: iadd
+       387: iload         41
+       389: iadd
+       390: istore        42
+       392: ldc           #116                // float 407.0f
+       394: fstore        43
+       396: fconst_1
+       397: fload         43
+       399: iload         42
+       401: i2f
+       402: fdiv
+       403: invokestatic  #117                // Method java/lang/Math.max:(FF)F
+       406: fstore        44
+       408: iload         39
+       410: i2f
+       411: fload         44
+       413: fmul
+       414: f2i
+       415: istore        39
+       417: iload         40
+       419: i2f
+       420: fload         44
+       422: fmul
+       423: f2i
+       424: istore        40
+       426: iload         41
+       428: i2f
+       429: fload         44
+       431: fmul
+       432: f2i
+       433: istore        41
+       435: bipush        15
+       437: istore        31
+       439: iconst_0
+       440: istore        42
+       442: iconst_0
+       443: istore        43
+       445: iconst_0
+       446: istore        44
+       448: fconst_1
+       449: fstore        45
+       451: aload         29
+       453: getfield      #123                // Field xaero/map/region/MapUpdateFastConfig.legibleCaveMaps:Z
+       456: ifeq          470
+       459: iload         16
+       461: ldc           #23                 // int 2147483647
+       463: if_icmpeq     470
+       466: iconst_1
+       467: goto          471
+       470: iconst_0
+       471: istore        46
+       473: iconst_0
+       474: istore        47
+       476: aload         18
+       478: ifnull        744
+       481: aload         18
+       483: invokevirtual #126                // Method java/util/ArrayList.isEmpty:()Z
+       486: ifne          744
+       489: bipush        15
+       491: istore        48
+       493: iconst_0
+       494: istore        49
+       496: iload         49
+       498: aload         18
+       500: invokevirtual #132                // Method java/util/ArrayList.size:()I
+       503: if_icmpge     701
+       506: aload         18
+       508: iload         49
+       510: invokevirtual #135                // Method java/util/ArrayList.get:(I)Ljava/lang/Object;
+       513: checkcast     #139                // class xaero/map/region/Overlay
+       516: astore        50
+       518: aload         50
+       520: aload         13
+       522: aload_1
+       523: aload_2
+       524: aload_3
+       525: aload         4
+       527: aload         5
+       529: aload         6
+       531: aload         7
+       533: aload         8
+       535: aload         9
+       537: aload         10
+       539: iload         11
+       541: iload         12
+       543: iload         16
+       545: iload         17
+       547: aload         19
+       549: aload         20
+       551: aload         21
+       553: fload         22
+       555: fload         23
+       557: fload         24
+       559: aload         25
+       561: aload         26
+       563: aload         27
+       565: aload         29
+       567: invokevirtual #141                // Method xaero/map/region/Overlay.getPixelColour:(Lxaero/map/region/MapBlock;[ILxaero/map/MapWriter;Lnet/minecraft/client/multiplayer/ClientLevel;Lxaero/map/world/MapDimension;Lnet/minecraft/core/Registry;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTile;IIIILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;FFFLxaero/map/biome/BlockTintProvider;Lxaero/map/MapProcessor;Lxaero/map/region/OverlayManager;Lxaero/map/region/MapUpdateFastConfig;)V
+       570: aload_1
+       571: iconst_0
+       572: iaload
+       573: iconst_m1
+       574: if_icmpne     580
+       577: goto          695
+       580: iconst_1
+       581: istore        47
+       583: iload         49
+       585: ifne          595
+       588: aload         50
+       590: getfield      #145                // Field xaero/map/region/Overlay.light:B
+       593: istore        31
+       595: aload_1
+       596: iconst_3
+       597: iaload
+       598: i2f
+       599: ldc           #115                // float 255.0f
+       601: fdiv
+       602: fstore        51
+       604: aload_0
+       605: iload         32
+       607: i2f
+       608: aload         50
+       610: getfield      #145                // Field xaero/map/region/Overlay.light:B
+       613: iload         48
+       615: invokevirtual #146                // Method getBlockBrightness:(FII)F
+       618: fload         51
+       620: fmul
+       621: fload         45
+       623: fmul
+       624: fstore        52
+       626: iload         42
+       628: i2f
+       629: aload_1
+       630: iconst_0
+       631: iaload
+       632: i2f
+       633: fload         52
+       635: fmul
+       636: fadd
+       637: f2i
+       638: istore        42
+       640: iload         43
+       642: i2f
+       643: aload_1
+       644: iconst_1
+       645: iaload
+       646: i2f
+       647: fload         52
+       649: fmul
+       650: fadd
+       651: f2i
+       652: istore        43
+       654: iload         44
+       656: i2f
+       657: aload_1
+       658: iconst_2
+       659: iaload
+       660: i2f
+       661: fload         52
+       663: fmul
+       664: fadd
+       665: f2i
+       666: istore        44
+       668: iload         48
+       670: aload         50
+       672: invokevirtual #150                // Method xaero/map/region/Overlay.getOpacity:()I
+       675: isub
+       676: istore        48
+       678: iload         48
+       680: ifge          686
+       683: iconst_0
+       684: istore        48
+       686: fload         45
+       688: fconst_1
+       689: fload         51
+       691: fsub
+       692: fmul
+       693: fstore        45
+       695: iinc          49, 1
+       698: goto          496
+       701: iload         46
+       703: ifne          744
+       706: iload         47
+       708: ifeq          744
+       711: aload_0
+       712: getfield      #13                 // Field glowing:Z
+       715: ifne          744
+       718: iload         37
+       720: ifne          744
+       723: aload_0
+       724: iload         32
+       726: i2f
+       727: aload_0
+       728: getfield      #9                  // Field light:B
+       731: iload         48
+       733: invokevirtual #146                // Method getBlockBrightness:(FII)F
+       736: dup
+       737: fstore        35
+       739: dup
+       740: fstore        34
+       742: fstore        33
+       744: iload         38
+       746: ifeq          1612
+       749: aload         13
+       751: getfield      #153                // Field xaero/map/region/MapBlock.slopeUnknown:Z
+       754: ifeq          809
+       757: iload         37
+       759: ifne          791
+       762: aload         13
+       764: iload         11
+       766: iload         12
+       768: aload         10
+       770: aload         6
+       772: aload         7
+       774: aload         8
+       776: aload         9
+       778: iload         14
+       780: iconst_0
+       781: aload         28
+       783: aload         29
+       785: invokevirtual #156                // Method xaero/map/region/MapBlock.fixHeightType:(IILxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;IZLxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/region/MapUpdateFastConfig;)V
+       788: goto          809
+       791: aload         13
+       793: iconst_0
+       794: invokevirtual #160                // Method xaero/map/region/MapBlock.setVerticalSlope:(B)V
+       797: aload         13
+       799: iconst_0
+       800: invokevirtual #164                // Method xaero/map/region/MapBlock.setDiagonalSlope:(B)V
+       803: aload         13
+       805: iconst_0
+       806: putfield      #153                // Field xaero/map/region/MapBlock.slopeUnknown:Z
+       809: fconst_1
+       810: fstore        48
+       812: aload         29
+       814: getfield      #167                // Field xaero/map/region/MapUpdateFastConfig.terrainSlopes:I
+       817: istore        49
+       819: iload         46
+       821: ifeq          828
+       824: bipush        15
+       826: istore        31
+       828: iload         14
+       830: sipush        32767
+       833: if_icmpeq     1231
+       836: iload         46
+       838: ifeq          1079
+       841: iload         37
+       843: ifeq          851
+       846: iload         47
+       848: ifeq          1079
+       851: iconst_0
+       852: istore        50
+       854: iload         14
+       856: istore        51
+       858: iload         16
+       860: iconst_1
+       861: iadd
+       862: iload         17
+       864: isub
+       865: istore        52
+       867: iload         16
+       869: istore        53
+       871: iload         16
+       873: ldc           #170                // int -2147483648
+       875: if_icmpne     918
+       878: iconst_0
+       879: istore        52
+       881: bipush        63
+       883: istore        53
+       885: iload         51
+       887: bipush        6
+       889: ishr
+       890: iconst_1
+       891: iand
+       892: istore        54
+       894: bipush        63
+       896: iload         54
+       898: imul
+       899: iconst_1
+       900: iconst_2
+       901: iload         54
+       903: imul
+       904: isub
+       905: iload         51
+       907: bipush        63
+       909: iand
+       910: imul
+       911: iadd
+       912: istore        51
+       914: bipush        16
+       916: istore        50
+       918: iconst_1
+       919: iload         53
+       921: iadd
+       922: iload         52
+       924: isub
+       925: istore        54
+       927: iload         37
+       929: ifne          982
+       932: aload_0
+       933: getfield      #13                 // Field glowing:Z
+       936: ifne          982
+       939: fconst_1
+       940: iload         50
+       942: i2f
+       943: fadd
+       944: iload         51
+       946: i2f
+       947: fadd
+       948: iload         52
+       950: i2f
+       951: fsub
+       952: iload         50
+       954: iload         54
+       956: iadd
+       957: i2f
+       958: fdiv
+       959: fstore        55
+       961: fload         33
+       963: fload         55
+       965: fmul
+       966: fstore        33
+       968: fload         34
+       970: fload         55
+       972: fmul
+       973: fstore        34
+       975: fload         35
+       977: fload         55
+       979: fmul
+       980: fstore        35
+       982: iload         47
+       984: ifeq          1076
+       987: iload         15
+       989: istore        51
+       991: iload         16
+       993: ldc           #170                // int -2147483648
+       995: if_icmpne     1027
+       998: iload         51
+      1000: bipush        6
+      1002: ishr
+      1003: iconst_1
+      1004: iand
+      1005: istore        56
+      1007: bipush        63
+      1009: iload         56
+      1011: imul
+      1012: iconst_1
+      1013: iconst_2
+      1014: iload         56
+      1016: imul
+      1017: isub
+      1018: iload         51
+      1020: bipush        63
+      1022: iand
+      1023: imul
+      1024: iadd
+      1025: istore        51
+      1027: fconst_1
+      1028: iload         50
+      1030: i2f
+      1031: fadd
+      1032: iload         51
+      1034: i2f
+      1035: fadd
+      1036: iload         52
+      1038: i2f
+      1039: fsub
+      1040: iload         50
+      1042: iload         54
+      1044: iadd
+      1045: i2f
+      1046: fdiv
+      1047: fstore        55
+      1049: iload         42
+      1051: i2f
+      1052: fload         55
+      1054: fmul
+      1055: f2i
+      1056: istore        42
+      1058: iload         43
+      1060: i2f
+      1061: fload         55
+      1063: fmul
+      1064: f2i
+      1065: istore        43
+      1067: iload         44
+      1069: i2f
+      1070: fload         55
+      1072: fmul
+      1073: f2i
+      1074: istore        44
+      1076: goto          1231
+      1079: iload         37
+      1081: ifne          1231
+      1084: aload_0
+      1085: getfield      #13                 // Field glowing:Z
+      1088: ifne          1231
+      1091: aload         29
+      1093: getfield      #171                // Field xaero/map/region/MapUpdateFastConfig.terrainDepth:Z
+      1096: ifeq          1231
+      1099: iload         16
+      1101: ldc           #23                 // int 2147483647
+      1103: if_icmpne     1117
+      1106: iload         14
+      1108: i2f
+      1109: ldc           #174                // float 63.0f
+      1111: fdiv
+      1112: fstore        48
+      1114: goto          1175
+      1117: iload         16
+      1119: ldc           #170                // int -2147483648
+      1121: if_icmpne     1150
+      1124: ldc           #175                // float 0.7f
+      1126: ldc           #176                // float 0.3f
+      1128: iload         14
+      1130: i2f
+      1131: fmul
+      1132: aload         4
+      1134: aload         21
+      1136: invokevirtual #103                // Method xaero/map/world/MapDimension.getDimensionType:(Lnet/minecraft/core/Registry;)Lnet/minecraft/world/level/dimension/DimensionType;
+      1139: invokevirtual #177                // Method net/minecraft/world/level/dimension/DimensionType.logicalHeight:()I
+      1142: i2f
+      1143: fdiv
+      1144: fadd
+      1145: fstore        48
+      1147: goto          1175
+      1150: iload         16
+      1152: iload         17
+      1154: isub
+      1155: istore        50
+      1157: ldc           #175                // float 0.7f
+      1159: ldc           #176                // float 0.3f
+      1161: iload         14
+      1163: iload         50
+      1165: isub
+      1166: i2f
+      1167: fmul
+      1168: iload         17
+      1170: i2f
+      1171: fdiv
+      1172: fadd
+      1173: fstore        48
+      1175: iload         49
+      1177: iconst_2
+      1178: if_icmplt     1185
+      1181: fconst_1
+      1182: goto          1187
+      1185: ldc           #182                // float 1.15f
+      1187: fstore        50
+      1189: iload         49
+      1191: iconst_2
+      1192: if_icmplt     1200
+      1195: ldc           #183                // float 0.9f
+      1197: goto          1202
+      1200: ldc           #175                // float 0.7f
+      1202: fstore        51
+      1204: fload         48
+      1206: fload         50
+      1208: fcmpl
+      1209: ifle          1219
+      1212: fload         50
+      1214: fstore        48
+      1216: goto          1231
+      1219: fload         48
+      1221: fload         51
+      1223: fcmpg
+      1224: ifge          1231
+      1227: fload         51
+      1229: fstore        48
+      1231: iload         37
+      1233: ifne          1572
+      1236: iload         49
+      1238: ifle          1572
+      1241: aload         13
+      1243: getfield      #153                // Field xaero/map/region/MapBlock.slopeUnknown:Z
+      1246: ifne          1572
+      1249: aload         13
+      1251: invokevirtual #184                // Method xaero/map/region/MapBlock.getVerticalSlope:()B
+      1254: istore        50
+      1256: iload         49
+      1258: iconst_1
+      1259: if_icmpne     1298
+      1262: iload         50
+      1264: ifle          1280
+      1267: fload         48
+      1269: f2d
+      1270: ldc2_w        #188                // double 1.15d
+      1273: dmul
+      1274: d2f
+      1275: fstore        48
+      1277: goto          1572
+      1280: iload         50
+      1282: ifge          1572
+      1285: fload         48
+      1287: f2d
+      1288: ldc2_w        #190                // double 0.85d
+      1291: dmul
+      1292: d2f
+      1293: fstore        48
+      1295: goto          1572
+      1298: aload         13
+      1300: invokevirtual #192                // Method xaero/map/region/MapBlock.getDiagonalSlope:()B
+      1303: istore        51
+      1305: ldc           #195                // float 0.2f
+      1307: fstore        52
+      1309: ldc           #196                // float 0.5f
+      1311: fstore        53
+      1313: ldc           #197                // float 0.6666667f
+      1315: fstore        54
+      1317: aload_0
+      1318: getfield      #13                 // Field glowing:Z
+      1321: ifeq          1334
+      1324: fconst_0
+      1325: fstore        52
+      1327: fconst_1
+      1328: fstore        53
+      1330: ldc           #198                // float 0.22222224f
+      1332: fstore        54
+      1334: fconst_0
+      1335: fstore        55
+      1337: iload         49
+      1339: iconst_2
+      1340: if_icmpne     1427
+      1343: iload         50
+      1345: ineg
+      1346: i2f
+      1347: fstore        56
+      1349: fload         56
+      1351: fconst_1
+      1352: fcmpg
+      1353: ifge          1424
+      1356: iload         50
+      1358: iconst_1
+      1359: if_icmpne     1374
+      1362: iload         51
+      1364: iconst_1
+      1365: if_icmpne     1374
+      1368: fconst_1
+      1369: fstore        55
+      1371: goto          1424
+      1374: iload         50
+      1376: iload         51
+      1378: isub
+      1379: i2f
+      1380: fstore        57
+      1382: fconst_1
+      1383: fload         56
+      1385: fsub
+      1386: fstore        58
+      1388: fload         57
+      1390: fload         57
+      1392: fmul
+      1393: fconst_1
+      1394: fadd
+      1395: fload         56
+      1397: fload         56
+      1399: fmul
+      1400: fadd
+      1401: f2d
+      1402: invokestatic  #199                // Method java/lang/Math.sqrt:(D)D
+      1405: d2f
+      1406: fstore        59
+      1408: fload         58
+      1410: fload         59
+      1412: fdiv
+      1413: f2d
+      1414: ldc2_w        #203                // double 2.0d
+      1417: invokestatic  #199                // Method java/lang/Math.sqrt:(D)D
+      1420: ddiv
+      1421: d2f
+      1422: fstore        55
+      1424: goto          1481
+      1427: iload         50
+      1429: iflt          1481
+      1432: iload         50
+      1434: iconst_1
+      1435: if_icmpne     1444
+      1438: fconst_1
+      1439: fstore        55
+      1441: goto          1481
+      1444: iload         50
+      1446: iload         50
+      1448: imul
+      1449: iconst_1
+      1450: iadd
+      1451: i2d
+      1452: invokestatic  #199                // Method java/lang/Math.sqrt:(D)D
+      1455: d2f
+      1456: fstore        56
+      1458: iload         50
+      1460: iconst_1
+      1461: iadd
+      1462: i2f
+      1463: fstore        57
+      1465: fload         57
+      1467: fload         56
+      1469: fdiv
+      1470: f2d
+      1471: ldc2_w        #203                // double 2.0d
+      1474: invokestatic  #199                // Method java/lang/Math.sqrt:(D)D
+      1477: ddiv
+      1478: d2f
+      1479: fstore        55
+      1481: fconst_0
+      1482: fstore        56
+      1484: fload         55
+      1486: fconst_1
+      1487: fcmpl
+      1488: ifne          1498
+      1491: fload         54
+      1493: fstore        56
+      1495: goto          1526
+      1498: fload         55
+      1500: fconst_0
+      1501: fcmpl
+      1502: ifle          1526
+      1505: fload         55
+      1507: ldc           #205                // float 10.0f
+      1509: fmul
+      1510: f2d
+      1511: invokestatic  #206                // Method java/lang/Math.ceil:(D)D
+      1514: d2f
+      1515: ldc           #205                // float 10.0f
+      1517: fdiv
+      1518: fload         54
+      1520: fmul
+      1521: ldc           #209                // float 0.88388f
+      1523: fmul
+      1524: fstore        56
+      1526: fload         53
+      1528: fload         56
+      1530: fadd
+      1531: fstore        57
+      1533: fload         33
+      1535: fload         22
+      1537: fload         52
+      1539: fmul
+      1540: fload         57
+      1542: fadd
+      1543: fmul
+      1544: fstore        33
+      1546: fload         34
+      1548: fload         23
+      1550: fload         52
+      1552: fmul
+      1553: fload         57
+      1555: fadd
+      1556: fmul
+      1557: fstore        34
+      1559: fload         35
+      1561: fload         24
+      1563: fload         52
+      1565: fmul
+      1566: fload         57
+      1568: fadd
+      1569: fmul
+      1570: fstore        35
+      1572: fload         33
+      1574: fload         48
+      1576: fmul
+      1577: fstore        33
+      1579: fload         34
+      1581: fload         48
+      1583: fmul
+      1584: fstore        34
+      1586: fload         35
+      1588: fload         48
+      1590: fmul
+      1591: fstore        35
+      1593: aload_1
+      1594: iconst_3
+      1595: aload_0
+      1596: iload         32
+      1598: i2f
+      1599: iload         31
+      1601: invokevirtual #210                // Method getPixelLight:(FI)F
+      1604: ldc           #115                // float 255.0f
+      1606: fmul
+      1607: f2i
+      1608: iastore
+      1609: goto          1642
+      1612: aload_1
+      1613: iconst_3
+      1614: iload         30
+      1616: bipush        24
+      1618: ishr
+      1619: sipush        255
+      1622: iand
+      1623: iastore
+      1624: aload_1
+      1625: iconst_3
+      1626: iaload
+      1627: ifne          1642
+      1630: aload_1
+      1631: iconst_3
+      1632: aload_0
+      1633: aload         36
+      1635: invokevirtual #44                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+      1638: invokevirtual #66                 // Method getVanillaTransparency:(Lnet/minecraft/world/level/block/Block;)I
+      1641: iastore
+      1642: aload_1
+      1643: iconst_0
+      1644: iload         39
+      1646: i2f
+      1647: fload         33
+      1649: fmul
+      1650: fload         45
+      1652: fmul
+      1653: iload         42
+      1655: i2f
+      1656: fadd
+      1657: f2i
+      1658: iastore
+      1659: aload_1
+      1660: iconst_0
+      1661: iaload
+      1662: sipush        255
+      1665: if_icmple     1674
+      1668: aload_1
+      1669: iconst_0
+      1670: sipush        255
+      1673: iastore
+      1674: aload_1
+      1675: iconst_1
+      1676: iload         40
+      1678: i2f
+      1679: fload         34
+      1681: fmul
+      1682: fload         45
+      1684: fmul
+      1685: iload         43
+      1687: i2f
+      1688: fadd
+      1689: f2i
+      1690: iastore
+      1691: aload_1
+      1692: iconst_1
+      1693: iaload
+      1694: sipush        255
+      1697: if_icmple     1706
+      1700: aload_1
+      1701: iconst_1
+      1702: sipush        255
+      1705: iastore
+      1706: aload_1
+      1707: iconst_2
+      1708: iload         41
+      1710: i2f
+      1711: fload         35
+      1713: fmul
+      1714: fload         45
+      1716: fmul
+      1717: iload         44
+      1719: i2f
+      1720: fadd
+      1721: f2i
+      1722: iastore
+      1723: aload_1
+      1724: iconst_2
+      1725: iaload
+      1726: sipush        255
+      1729: if_icmple     1738
+      1732: aload_1
+      1733: iconst_2
+      1734: sipush        255
+      1737: iastore
+      1738: return
+      Exception table:
+         from    to  target type
+           121   163   180   Class java/lang/Exception
+           164   177   180   Class java/lang/Exception
+
+  public float getBlockBrightness(float, int, int);
+    Code:
+         0: fload_1
+         1: iload_3
+         2: iload_2
+         3: invokestatic  #214                // Method java/lang/Math.max:(II)I
+         6: i2f
+         7: fadd
+         8: ldc           #217                // float 15.0f
+        10: fload_1
+        11: fadd
+        12: fdiv
+        13: freturn
+
+  private float getPixelLight(float, int);
+    Code:
+         0: iload_2
+         1: ifne          8
+         4: fconst_0
+         5: goto          15
+         8: aload_0
+         9: fload_1
+        10: iload_2
+        11: iconst_0
+        12: invokevirtual #146                // Method getBlockBrightness:(FII)F
+        15: freturn
+
+  public net.minecraft.world.level.block.state.BlockState getState();
+    Code:
+         0: aload_0
+         1: getfield      #40                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+         4: areturn
+
+  public void setState(net.minecraft.world.level.block.state.BlockState);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #40                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+         5: return
+
+  public void setLight(byte);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #9                  // Field light:B
+         5: return
+
+  public void setGlowing(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #13                 // Field glowing:Z
+         5: return
+}
+

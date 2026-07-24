@@ -1,0 +1,335 @@
+﻿Compiled from "WorldMapConfigConstants.java"
+public class xaero.map.common.config.WorldMapConfigConstants {
+  public static final net.minecraft.network.chat.Component INGAME_TOOLTIP;
+
+  public static final net.minecraft.network.chat.Component LEGACY_PLUGIN_TOOLTIP;
+
+  public static final net.minecraft.network.chat.Component FAIRPLAY_TOOLTIP;
+
+  public static final net.minecraft.network.chat.Component EFFECT_TOOLTIP;
+
+  public static final net.minecraft.network.chat.Component MINIMAP_TOOLTIP;
+
+  public static net.minecraft.network.chat.Component[] BLOCK_COLORS_NAMES;
+
+  public static net.minecraft.network.chat.Component[] TERRAIN_SLOPES_NAMES;
+
+  public static net.minecraft.network.chat.Component SEC;
+
+  public static net.minecraft.network.chat.Component MILLISEC;
+
+  public static net.minecraft.network.chat.Component[] DEFAULT_CAVE_MODE_TYPE_NAMES;
+
+  public static net.minecraft.network.chat.Component[] ARROW_COLOR_NAMES;
+
+  public static float[][] ARROW_COLORS;
+
+  public xaero.map.common.config.WorldMapConfigConstants();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  static {};
+    Code:
+         0: ldc           #7                  // String gui.xaero_wm_option_requires_ingame
+         2: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+         5: putstatic     #15                 // Field INGAME_TOOLTIP:Lnet/minecraft/network/chat/Component;
+         8: ldc           #21                 // String gui.xaero_world_map_redirect_legacy
+        10: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        13: putstatic     #23                 // Field LEGACY_PLUGIN_TOOLTIP:Lnet/minecraft/network/chat/Component;
+        16: ldc           #26                 // String gui.xaero_world_map_config_redirect_fairplay
+        18: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        21: putstatic     #28                 // Field FAIRPLAY_TOOLTIP:Lnet/minecraft/network/chat/Component;
+        24: ldc           #31                 // String gui.xaero_world_map_config_redirect_effect
+        26: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        29: putstatic     #33                 // Field EFFECT_TOOLTIP:Lnet/minecraft/network/chat/Component;
+        32: ldc           #36                 // String gui.xaero_wm_option_requires_minimap
+        34: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        37: putstatic     #38                 // Field MINIMAP_TOOLTIP:Lnet/minecraft/network/chat/Component;
+        40: iconst_2
+        41: anewarray     #10                 // class net/minecraft/network/chat/Component
+        44: dup
+        45: iconst_0
+        46: ldc           #41                 // String gui.xaero_accurate
+        48: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        51: aastore
+        52: dup
+        53: iconst_1
+        54: ldc           #43                 // String gui.xaero_vanilla
+        56: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        59: aastore
+        60: putstatic     #45                 // Field BLOCK_COLORS_NAMES:[Lnet/minecraft/network/chat/Component;
+        63: iconst_4
+        64: anewarray     #10                 // class net/minecraft/network/chat/Component
+        67: dup
+        68: iconst_0
+        69: ldc           #49                 // String gui.xaero_off
+        71: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        74: aastore
+        75: dup
+        76: iconst_1
+        77: ldc           #51                 // String gui.xaero_wm_slopes_legacy
+        79: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        82: aastore
+        83: dup
+        84: iconst_2
+        85: ldc           #53                 // String gui.xaero_wm_slopes_default_3d
+        87: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        90: aastore
+        91: dup
+        92: iconst_3
+        93: ldc           #55                 // String gui.xaero_wm_slopes_default_2d
+        95: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        98: aastore
+        99: putstatic     #57                 // Field TERRAIN_SLOPES_NAMES:[Lnet/minecraft/network/chat/Component;
+       102: ldc           #60                 // String gui.xaero_wm_unit_s
+       104: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       107: putstatic     #62                 // Field SEC:Lnet/minecraft/network/chat/Component;
+       110: ldc           #65                 // String gui.xaero_wm_unit_ms
+       112: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       115: putstatic     #67                 // Field MILLISEC:Lnet/minecraft/network/chat/Component;
+       118: iconst_3
+       119: anewarray     #10                 // class net/minecraft/network/chat/Component
+       122: dup
+       123: iconst_0
+       124: ldc           #49                 // String gui.xaero_off
+       126: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       129: aastore
+       130: dup
+       131: iconst_1
+       132: ldc           #70                 // String gui.xaero_wm_cave_mode_type_layered
+       134: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       137: aastore
+       138: dup
+       139: iconst_2
+       140: ldc           #72                 // String gui.xaero_wm_cave_mode_type_full
+       142: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       145: aastore
+       146: putstatic     #74                 // Field DEFAULT_CAVE_MODE_TYPE_NAMES:[Lnet/minecraft/network/chat/Component;
+       149: bipush        10
+       151: anewarray     #10                 // class net/minecraft/network/chat/Component
+       154: dup
+       155: iconst_0
+       156: ldc           #77                 // String gui.xaero_wm_color_minimap
+       158: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       161: aastore
+       162: dup
+       163: iconst_1
+       164: ldc           #79                 // String gui.xaero_wm_team_color
+       166: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       169: aastore
+       170: dup
+       171: iconst_2
+       172: ldc           #81                 // String gui.xaero_wm_red
+       174: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       177: aastore
+       178: dup
+       179: iconst_3
+       180: ldc           #83                 // String gui.xaero_wm_green
+       182: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       185: aastore
+       186: dup
+       187: iconst_4
+       188: ldc           #85                 // String gui.xaero_wm_blue
+       190: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       193: aastore
+       194: dup
+       195: iconst_5
+       196: ldc           #87                 // String gui.xaero_wm_yellow
+       198: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       201: aastore
+       202: dup
+       203: bipush        6
+       205: ldc           #89                 // String gui.xaero_wm_purple
+       207: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       210: aastore
+       211: dup
+       212: bipush        7
+       214: ldc           #91                 // String gui.xaero_wm_white
+       216: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       219: aastore
+       220: dup
+       221: bipush        8
+       223: ldc           #93                 // String gui.xaero_wm_black
+       225: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       228: aastore
+       229: dup
+       230: bipush        9
+       232: ldc           #95                 // String gui.xaero_wm_legacy_color
+       234: invokestatic  #9                  // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       237: aastore
+       238: putstatic     #97                 // Field ARROW_COLOR_NAMES:[Lnet/minecraft/network/chat/Component;
+       241: bipush        8
+       243: anewarray     #100                // class "[F"
+       246: dup
+       247: iconst_0
+       248: iconst_4
+       249: newarray       float
+       251: dup
+       252: iconst_0
+       253: ldc           #102                // float 0.8f
+       255: fastore
+       256: dup
+       257: iconst_1
+       258: ldc           #103                // float 0.1f
+       260: fastore
+       261: dup
+       262: iconst_2
+       263: ldc           #103                // float 0.1f
+       265: fastore
+       266: dup
+       267: iconst_3
+       268: fconst_1
+       269: fastore
+       270: aastore
+       271: dup
+       272: iconst_1
+       273: iconst_4
+       274: newarray       float
+       276: dup
+       277: iconst_0
+       278: ldc           #104                // float 0.09f
+       280: fastore
+       281: dup
+       282: iconst_1
+       283: ldc           #105                // float 0.57f
+       285: fastore
+       286: dup
+       287: iconst_2
+       288: fconst_0
+       289: fastore
+       290: dup
+       291: iconst_3
+       292: fconst_1
+       293: fastore
+       294: aastore
+       295: dup
+       296: iconst_2
+       297: iconst_4
+       298: newarray       float
+       300: dup
+       301: iconst_0
+       302: fconst_0
+       303: fastore
+       304: dup
+       305: iconst_1
+       306: ldc           #106                // float 0.55f
+       308: fastore
+       309: dup
+       310: iconst_2
+       311: fconst_1
+       312: fastore
+       313: dup
+       314: iconst_3
+       315: fconst_1
+       316: fastore
+       317: aastore
+       318: dup
+       319: iconst_3
+       320: iconst_4
+       321: newarray       float
+       323: dup
+       324: iconst_0
+       325: fconst_1
+       326: fastore
+       327: dup
+       328: iconst_1
+       329: ldc           #107                // float 0.93f
+       331: fastore
+       332: dup
+       333: iconst_2
+       334: fconst_0
+       335: fastore
+       336: dup
+       337: iconst_3
+       338: fconst_1
+       339: fastore
+       340: aastore
+       341: dup
+       342: iconst_4
+       343: iconst_4
+       344: newarray       float
+       346: dup
+       347: iconst_0
+       348: ldc           #108                // float 0.73f
+       350: fastore
+       351: dup
+       352: iconst_1
+       353: ldc           #109                // float 0.33f
+       355: fastore
+       356: dup
+       357: iconst_2
+       358: ldc           #110                // float 0.83f
+       360: fastore
+       361: dup
+       362: iconst_3
+       363: fconst_1
+       364: fastore
+       365: aastore
+       366: dup
+       367: iconst_5
+       368: iconst_4
+       369: newarray       float
+       371: dup
+       372: iconst_0
+       373: fconst_1
+       374: fastore
+       375: dup
+       376: iconst_1
+       377: fconst_1
+       378: fastore
+       379: dup
+       380: iconst_2
+       381: fconst_1
+       382: fastore
+       383: dup
+       384: iconst_3
+       385: fconst_1
+       386: fastore
+       387: aastore
+       388: dup
+       389: bipush        6
+       391: iconst_4
+       392: newarray       float
+       394: dup
+       395: iconst_0
+       396: fconst_0
+       397: fastore
+       398: dup
+       399: iconst_1
+       400: fconst_0
+       401: fastore
+       402: dup
+       403: iconst_2
+       404: fconst_0
+       405: fastore
+       406: dup
+       407: iconst_3
+       408: fconst_1
+       409: fastore
+       410: aastore
+       411: dup
+       412: bipush        7
+       414: iconst_4
+       415: newarray       float
+       417: dup
+       418: iconst_0
+       419: ldc           #111                // float 0.4588f
+       421: fastore
+       422: dup
+       423: iconst_1
+       424: fconst_0
+       425: fastore
+       426: dup
+       427: iconst_2
+       428: fconst_0
+       429: fastore
+       430: dup
+       431: iconst_3
+       432: fconst_1
+       433: fastore
+       434: aastore
+       435: putstatic     #112                // Field ARROW_COLORS:[[F
+       438: return
+}

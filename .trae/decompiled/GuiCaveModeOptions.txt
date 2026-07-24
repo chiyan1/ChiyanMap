@@ -1,0 +1,480 @@
+﻿Compiled from "GuiCaveModeOptions.java"
+public class xaero.map.gui.GuiCaveModeOptions {
+  private xaero.map.world.MapDimension dimension;
+
+  private boolean enabled;
+
+  private net.minecraft.client.gui.components.AbstractWidget caveModeStartSlider;
+
+  private net.minecraft.client.gui.components.EditBox caveModeStartField;
+
+  private boolean shouldUpdateSlider;
+
+  public xaero.map.gui.GuiCaveModeOptions();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public void onInit(xaero.map.gui.GuiMap, xaero.map.MapProcessor);
+    Code:
+         0: aload_0
+         1: aconst_null
+         2: putfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+         5: aload_0
+         6: aconst_null
+         7: putfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        10: aload_0
+        11: aload_2
+        12: invokevirtual #17                 // Method xaero/map/MapProcessor.getMapWorld:()Lxaero/map/world/MapWorld;
+        15: invokevirtual #23                 // Method xaero/map/world/MapWorld.getFutureDimension:()Lxaero/map/world/MapDimension;
+        18: putfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        21: aload_0
+        22: aload_0
+        23: getfield      #33                 // Field enabled:Z
+        26: ifeq          46
+        29: aload_0
+        30: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        33: ifnull        46
+        36: invokestatic  #37                 // Method xaero/map/config/util/WorldMapClientConfigUtils.getEffectiveCaveModeAllowed:()Z
+        39: ifeq          46
+        42: iconst_1
+        43: goto          47
+        46: iconst_0
+        47: putfield      #33                 // Field enabled:Z
+        50: aload_0
+        51: getfield      #33                 // Field enabled:Z
+        54: ifeq          127
+        57: aload_0
+        58: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        61: ifnull        127
+        64: aload_0
+        65: aload_1
+        66: invokevirtual #43                 // Method updateSlider:(Lxaero/map/gui/GuiMap;)V
+        69: aload_0
+        70: aload_1
+        71: invokevirtual #47                 // Method updateField:(Lxaero/map/gui/GuiMap;)V
+        74: new           #50                 // class xaero/lib/client/gui/widget/Tooltip
+        77: dup
+        78: ldc           #52                 // String gui.xaero_wm_box_cave_mode_type
+        80: invokespecial #54                 // Method xaero/lib/client/gui/widget/Tooltip."<init>":(Ljava/lang/String;)V
+        83: astore_3
+        84: aload_1
+        85: new           #57                 // class xaero/map/gui/TooltipButton
+        88: dup
+        89: bipush        20
+        91: aload_1
+        92: getfield      #59                 // Field xaero/map/gui/GuiMap.height:I
+        95: bipush        62
+        97: isub
+        98: sipush        150
+       101: bipush        20
+       103: aload_0
+       104: invokevirtual #65                 // Method getCaveModeTypeButtonMessage:()Lnet/minecraft/network/chat/Component;
+       107: aload_0
+       108: aload_1
+       109: invokedynamic #69,  0             // InvokeDynamic #0:onPress:(Lxaero/map/gui/GuiCaveModeOptions;Lxaero/map/gui/GuiMap;)Lnet/minecraft/client/gui/components/Button$OnPress;
+       114: aload_3
+       115: invokedynamic #73,  0             // InvokeDynamic #1:get:(Lxaero/lib/client/gui/widget/Tooltip;)Ljava/util/function/Supplier;
+       120: invokespecial #77                 // Method xaero/map/gui/TooltipButton."<init>":(IIIILnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;Ljava/util/function/Supplier;)V
+       123: invokevirtual #80                 // Method xaero/map/gui/GuiMap.addButton:(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+       126: pop
+       127: return
+
+  private void onCaveModeTypeButton(net.minecraft.client.gui.components.Button, xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+         4: iconst_1
+         5: invokevirtual #84                 // Method xaero/map/world/MapDimension.toggleCaveModeType:(Z)V
+         8: aload_2
+         9: invokevirtual #90                 // Method xaero/map/gui/GuiMap.getMapProcessor:()Lxaero/map/MapProcessor;
+        12: getfield      #94                 // Field xaero/map/MapProcessor.uiSync:Ljava/lang/Object;
+        15: dup
+        16: astore_3
+        17: monitorenter
+        18: aload_0
+        19: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        22: invokevirtual #98                 // Method xaero/map/world/MapDimension.saveConfigUnsynced:()V
+        25: aload_3
+        26: monitorexit
+        27: goto          37
+        30: astore        4
+        32: aload_3
+        33: monitorexit
+        34: aload         4
+        36: athrow
+        37: aload_1
+        38: aload_0
+        39: invokevirtual #65                 // Method getCaveModeTypeButtonMessage:()Lnet/minecraft/network/chat/Component;
+        42: invokevirtual #101                // Method net/minecraft/client/gui/components/Button.setMessage:(Lnet/minecraft/network/chat/Component;)V
+        45: return
+      Exception table:
+         from    to  target type
+            18    27    30   any
+            30    34    30   any
+
+  private net.minecraft.client.gui.components.EditBox createField(xaero.map.gui.GuiMap);
+    Code:
+         0: new           #107                // class net/minecraft/client/gui/components/EditBox
+         3: dup
+         4: invokestatic  #109                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+         7: getfield      #115                // Field net/minecraft/client/Minecraft.font:Lnet/minecraft/client/gui/Font;
+        10: sipush        172
+        13: aload_1
+        14: getfield      #59                 // Field xaero/map/gui/GuiMap.height:I
+        17: bipush        40
+        19: isub
+        20: bipush        50
+        22: bipush        20
+        24: ldc           #119                // String gui.xaero_wm_cave_mode_start
+        26: invokestatic  #121                // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        29: invokespecial #127                // Method net/minecraft/client/gui/components/EditBox."<init>":(Lnet/minecraft/client/gui/Font;IIIILnet/minecraft/network/chat/Component;)V
+        32: astore_2
+        33: aload_2
+        34: bipush        7
+        36: invokevirtual #130                // Method net/minecraft/client/gui/components/EditBox.setMaxLength:(I)V
+        39: aload_0
+        40: invokevirtual #134                // Method getCaveStart:()I
+        43: istore_3
+        44: aload_2
+        45: iload_3
+        46: ldc           #140                // int 2147483647
+        48: if_icmpne     56
+        51: ldc           #141                // String
+        53: goto          62
+        56: iload_3
+        57: invokedynamic #143,  0            // InvokeDynamic #2:makeConcatWithConstants:(I)Ljava/lang/String;
+        62: invokevirtual #147                // Method net/minecraft/client/gui/components/EditBox.setValue:(Ljava/lang/String;)V
+        65: aload_2
+        66: aload_0
+        67: invokedynamic #150,  0            // InvokeDynamic #3:accept:(Lxaero/map/gui/GuiCaveModeOptions;)Ljava/util/function/Consumer;
+        72: invokevirtual #154                // Method net/minecraft/client/gui/components/EditBox.setResponder:(Ljava/util/function/Consumer;)V
+        75: aload_2
+        76: areturn
+
+  private int getCaveStart();
+    Code:
+         0: getstatic     #158                // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+         3: invokevirtual #164                // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #168                // Method xaero/lib/common/config/channel/ConfigChannel.getPrimaryClientConfigManager:()Lxaero/lib/common/config/single/SingleConfigManager;
+         9: invokevirtual #174                // Method xaero/lib/common/config/single/SingleConfigManager.getConfig:()Lxaero/lib/common/config/Config;
+        12: astore_1
+        13: aload_1
+        14: getstatic     #180                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.CAVE_MODE_START:Lxaero/lib/common/config/option/ConfigOption;
+        17: invokevirtual #186                // Method xaero/lib/common/config/Config.get:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        20: checkcast     #138                // class java/lang/Integer
+        23: invokevirtual #191                // Method java/lang/Integer.intValue:()I
+        26: ireturn
+
+  private void setCaveStart(int);
+    Code:
+         0: getstatic     #158                // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+         3: invokevirtual #164                // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #168                // Method xaero/lib/common/config/channel/ConfigChannel.getPrimaryClientConfigManager:()Lxaero/lib/common/config/single/SingleConfigManager;
+         9: invokevirtual #174                // Method xaero/lib/common/config/single/SingleConfigManager.getConfig:()Lxaero/lib/common/config/Config;
+        12: astore_2
+        13: aload_2
+        14: getstatic     #180                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.CAVE_MODE_START:Lxaero/lib/common/config/option/ConfigOption;
+        17: iload_1
+        18: invokestatic  #194                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        21: invokevirtual #198                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+        24: pop
+        25: getstatic     #158                // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+        28: invokevirtual #164                // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+        31: invokevirtual #202                // Method xaero/lib/common/config/channel/ConfigChannel.getPrimaryClientConfigManagerIO:()Lxaero/lib/common/config/single/io/SingleConfigManagerIO;
+        34: invokevirtual #206                // Method xaero/lib/common/config/single/io/SingleConfigManagerIO.save:()V
+        37: return
+
+  private net.minecraft.client.gui.components.AbstractWidget createSlider(xaero.map.gui.GuiMap);
+    Code:
+         0: ldc           #119                // String gui.xaero_wm_cave_mode_start
+         2: invokestatic  #121                // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+         5: astore_2
+         6: aload_2
+         7: invokedynamic #211,  0            // InvokeDynamic #4:get:(Lnet/minecraft/network/chat/Component;)Ljava/util/function/Supplier;
+        12: astore_3
+        13: aload_0
+        14: invokevirtual #134                // Method getCaveStart:()I
+        17: istore        4
+        19: bipush        -64
+        21: istore        5
+        23: sipush        319
+        26: istore        6
+        28: iload         5
+        30: iconst_1
+        31: isub
+        32: istore        7
+        34: iload         6
+        36: iload         7
+        38: isub
+        39: istore        8
+        41: iload         4
+        43: iload         7
+        45: isub
+        46: i2d
+        47: iload         8
+        49: i2d
+        50: ddiv
+        51: dconst_0
+        52: dconst_1
+        53: invokestatic  #214                // Method net/minecraft/util/Mth.clamp:(DDD)D
+        56: dstore        9
+        58: new           #220                // class xaero/lib/client/gui/widget/XaeroSliderWidget
+        61: dup
+        62: bipush        20
+        64: aload_1
+        65: getfield      #59                 // Field xaero/map/gui/GuiMap.height:I
+        68: bipush        40
+        70: isub
+        71: sipush        150
+        74: bipush        20
+        76: aload_3
+        77: invokeinterface #222,  1          // InterfaceMethod java/util/function/Supplier.get:()Ljava/lang/Object;
+        82: checkcast     #122                // class net/minecraft/network/chat/Component
+        85: dload         9
+        87: aload_0
+        88: iload         8
+        90: iload         7
+        92: aload_1
+        93: invokedynamic #227,  0            // InvokeDynamic #5:accept:(Lxaero/map/gui/GuiCaveModeOptions;IILxaero/map/gui/GuiMap;)Ljava/util/function/DoubleConsumer;
+        98: aload_3
+        99: invokespecial #230                // Method xaero/lib/client/gui/widget/XaeroSliderWidget."<init>":(IIIILnet/minecraft/network/chat/Component;DLjava/util/function/DoubleConsumer;Ljava/util/function/Supplier;)V
+       102: areturn
+
+  private void updateField(xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+         4: ifnonnull     25
+         7: aload_1
+         8: aload_0
+         9: aload_0
+        10: aload_1
+        11: invokevirtual #233                // Method createField:(Lxaero/map/gui/GuiMap;)Lnet/minecraft/client/gui/components/EditBox;
+        14: dup_x1
+        15: putfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        18: invokevirtual #80                 // Method xaero/map/gui/GuiMap.addButton:(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+        21: pop
+        22: goto          43
+        25: aload_1
+        26: aload_0
+        27: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        30: aload_0
+        31: aload_0
+        32: aload_1
+        33: invokevirtual #233                // Method createField:(Lxaero/map/gui/GuiMap;)Lnet/minecraft/client/gui/components/EditBox;
+        36: dup_x1
+        37: putfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        40: invokevirtual #237                // Method xaero/map/gui/GuiMap.replaceRenderableWidget:(Lnet/minecraft/client/gui/components/AbstractWidget;Lnet/minecraft/client/gui/components/AbstractWidget;)V
+        43: return
+
+  private void updateSlider(xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+         4: ifnonnull     25
+         7: aload_1
+         8: aload_0
+         9: aload_0
+        10: aload_1
+        11: invokevirtual #241                // Method createSlider:(Lxaero/map/gui/GuiMap;)Lnet/minecraft/client/gui/components/AbstractWidget;
+        14: dup_x1
+        15: putfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+        18: invokevirtual #80                 // Method xaero/map/gui/GuiMap.addButton:(Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+        21: pop
+        22: goto          43
+        25: aload_1
+        26: aload_0
+        27: getfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+        30: aload_0
+        31: aload_0
+        32: aload_1
+        33: invokevirtual #241                // Method createSlider:(Lxaero/map/gui/GuiMap;)Lnet/minecraft/client/gui/components/AbstractWidget;
+        36: dup_x1
+        37: putfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+        40: invokevirtual #237                // Method xaero/map/gui/GuiMap.replaceRenderableWidget:(Lnet/minecraft/client/gui/components/AbstractWidget;Lnet/minecraft/client/gui/components/AbstractWidget;)V
+        43: return
+
+  public void toggle(xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: invokestatic  #37                 // Method xaero/map/config/util/WorldMapClientConfigUtils.getEffectiveCaveModeAllowed:()Z
+         4: ifeq          18
+         7: aload_0
+         8: getfield      #33                 // Field enabled:Z
+        11: ifne          18
+        14: iconst_1
+        15: goto          19
+        18: iconst_0
+        19: putfield      #33                 // Field enabled:Z
+        22: aload_1
+        23: aload_1
+        24: getfield      #245                // Field xaero/map/gui/GuiMap.width:I
+        27: aload_1
+        28: getfield      #59                 // Field xaero/map/gui/GuiMap.height:I
+        31: invokevirtual #248                // Method xaero/map/gui/GuiMap.init:(II)V
+        34: return
+
+  public void onCaveModeStartSet(xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: getfield      #33                 // Field enabled:Z
+         4: ifeq          12
+         7: aload_0
+         8: aload_1
+         9: invokevirtual #47                 // Method updateField:(Lxaero/map/gui/GuiMap;)V
+        12: return
+
+  public void tick(xaero.map.gui.GuiMap);
+    Code:
+         0: aload_0
+         1: getfield      #252                // Field shouldUpdateSlider:Z
+         4: ifeq          17
+         7: aload_0
+         8: aload_1
+         9: invokevirtual #43                 // Method updateSlider:(Lxaero/map/gui/GuiMap;)V
+        12: aload_0
+        13: iconst_0
+        14: putfield      #252                // Field shouldUpdateSlider:Z
+        17: aload_0
+        18: getfield      #33                 // Field enabled:Z
+        21: ifeq          59
+        24: aload_0
+        25: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        28: aload_0
+        29: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        32: invokevirtual #255                // Method net/minecraft/client/gui/components/EditBox.getValue:()Ljava/lang/String;
+        35: invokevirtual #259                // Method java/lang/String.isEmpty:()Z
+        38: ifeq          54
+        41: ldc_w         #264                // String gui.xaero_wm_cave_mode_start_auto
+        44: iconst_0
+        45: anewarray     #2                  // class java/lang/Object
+        48: invokestatic  #266                // Method net/minecraft/client/resources/language/I18n.get:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+        51: goto          56
+        54: ldc           #141                // String
+        56: invokevirtual #271                // Method net/minecraft/client/gui/components/EditBox.setSuggestion:(Ljava/lang/String;)V
+        59: return
+
+  public void unfocusAll();
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+         4: ifnull        15
+         7: aload_0
+         8: getfield      #13                 // Field caveModeStartField:Lnet/minecraft/client/gui/components/EditBox;
+        11: iconst_0
+        12: invokevirtual #274                // Method net/minecraft/client/gui/components/EditBox.setFocused:(Z)V
+        15: aload_0
+        16: getfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+        19: ifnull        30
+        22: aload_0
+        23: getfield      #7                  // Field caveModeStartSlider:Lnet/minecraft/client/gui/components/AbstractWidget;
+        26: iconst_0
+        27: invokevirtual #277                // Method net/minecraft/client/gui/components/AbstractWidget.setFocused:(Z)V
+        30: return
+
+  private net.minecraft.network.chat.Component getCaveModeTypeButtonMessage();
+    Code:
+         0: ldc_w         #280                // String gui.xaero_wm_cave_mode_type
+         3: iconst_0
+         4: anewarray     #2                  // class java/lang/Object
+         7: invokestatic  #266                // Method net/minecraft/client/resources/language/I18n.get:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+        10: aload_0
+        11: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        14: ifnonnull     23
+        17: ldc_w         #282                // String N/A
+        20: goto          59
+        23: aload_0
+        24: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        27: invokevirtual #284                // Method xaero/map/world/MapDimension.getCaveModeType:()I
+        30: ifne          39
+        33: ldc_w         #287                // String gui.xaero_off
+        36: goto          59
+        39: aload_0
+        40: getfield      #29                 // Field dimension:Lxaero/map/world/MapDimension;
+        43: invokevirtual #284                // Method xaero/map/world/MapDimension.getCaveModeType:()I
+        46: iconst_1
+        47: if_icmpne     56
+        50: ldc_w         #289                // String gui.xaero_wm_cave_mode_type_layered
+        53: goto          59
+        56: ldc_w         #291                // String gui.xaero_wm_cave_mode_type_full
+        59: iconst_0
+        60: anewarray     #2                  // class java/lang/Object
+        63: invokestatic  #266                // Method net/minecraft/client/resources/language/I18n.get:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+        66: invokedynamic #293,  0            // InvokeDynamic #6:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+        71: invokestatic  #296                // InterfaceMethod net/minecraft/network/chat/Component.literal:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        74: areturn
+
+  public boolean isEnabled();
+    Code:
+         0: aload_0
+         1: getfield      #33                 // Field enabled:Z
+         4: ireturn
+
+  private void lambda$createSlider$1(int, int, xaero.map.gui.GuiMap, double);
+    Code:
+         0: dload         4
+         2: iload_1
+         3: i2d
+         4: dmul
+         5: invokestatic  #299                // Method java/lang/Math.round:(D)J
+         8: l2i
+         9: iload_2
+        10: iadd
+        11: istore        6
+        13: iload         6
+        15: iload_2
+        16: if_icmpne     23
+        19: ldc           #140                // int 2147483647
+        21: istore        6
+        23: aload_0
+        24: iload         6
+        26: invokevirtual #305                // Method setCaveStart:(I)V
+        29: aload_3
+        30: invokevirtual #308                // Method xaero/map/gui/GuiMap.onCaveModeStartSet:()V
+        33: return
+
+  private static net.minecraft.network.chat.Component lambda$createSlider$0(net.minecraft.network.chat.Component);
+    Code:
+         0: aload_0
+         1: areturn
+
+  private void lambda$createField$0(java.lang.String);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #259                // Method java/lang/String.isEmpty:()Z
+         5: ifne          18
+         8: aload_1
+         9: ldc_w         #311                // String auto
+        12: invokevirtual #313                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+        15: ifeq          23
+        18: ldc           #140                // int 2147483647
+        20: goto          27
+        23: aload_1
+        24: invokestatic  #317                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+        27: invokevirtual #305                // Method setCaveStart:(I)V
+        30: aload_0
+        31: iconst_1
+        32: putfield      #252                // Field shouldUpdateSlider:Z
+        35: goto          39
+        38: astore_2
+        39: return
+      Exception table:
+         from    to  target type
+             0    35    38   Class java/lang/NumberFormatException
+
+  private static xaero.lib.client.gui.widget.Tooltip lambda$onInit$1(xaero.lib.client.gui.widget.Tooltip);
+    Code:
+         0: aload_0
+         1: areturn
+
+  private void lambda$onInit$0(xaero.map.gui.GuiMap, net.minecraft.client.gui.components.Button);
+    Code:
+         0: aload_0
+         1: aload_2
+         2: aload_1
+         3: invokevirtual #323                // Method onCaveModeTypeButton:(Lnet/minecraft/client/gui/components/Button;Lxaero/map/gui/GuiMap;)V
+         6: return
+}

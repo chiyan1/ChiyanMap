@@ -1,0 +1,1961 @@
+﻿Compiled from "MinimapRenderer.java"
+public abstract class xaero.common.minimap.render.MinimapRenderer {
+  public static final int black = -16777216;
+
+  public static final int slime = -2142047936;
+
+  protected xaero.common.HudMod modMain;
+
+  protected net.minecraft.client.Minecraft mc;
+
+  protected xaero.hud.minimap.Minimap minimap;
+
+  protected xaero.common.minimap.render.MinimapRendererHelper helper;
+
+  protected xaero.hud.minimap.waypoint.render.WaypointMapRenderer waypointMapRenderer;
+
+  private int lastMinimapSize;
+
+  protected double zoom;
+
+  private net.minecraft.core.BlockPos$MutableBlockPos mutableBlockPos;
+
+  protected final xaero.hud.minimap.compass.render.CompassRenderer compassRenderer;
+
+  protected final com.mojang.blaze3d.vertex.PoseStack matrixStack;
+
+  public xaero.common.minimap.render.MinimapRenderer(xaero.common.HudMod, net.minecraft.client.Minecraft, xaero.hud.minimap.waypoint.render.WaypointMapRenderer, xaero.hud.minimap.Minimap, xaero.hud.minimap.compass.render.CompassRenderer, com.mojang.blaze3d.vertex.PoseStack);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: dconst_1
+         6: putfield      #7                  // Field zoom:D
+         9: aload_0
+        10: aload_1
+        11: putfield      #13                 // Field modMain:Lxaero/common/HudMod;
+        14: aload_0
+        15: aload_2
+        16: putfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+        19: aload_0
+        20: aload_3
+        21: putfield      #21                 // Field waypointMapRenderer:Lxaero/hud/minimap/waypoint/render/WaypointMapRenderer;
+        24: aload_0
+        25: aload         4
+        27: putfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        30: aload_0
+        31: aload         6
+        33: putfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+        36: aload_0
+        37: new           #33                 // class xaero/common/minimap/render/MinimapRendererHelper
+        40: dup
+        41: invokespecial #35                 // Method xaero/common/minimap/render/MinimapRendererHelper."<init>":()V
+        44: putfield      #36                 // Field helper:Lxaero/common/minimap/render/MinimapRendererHelper;
+        47: aload_0
+        48: new           #40                 // class net/minecraft/core/BlockPos$MutableBlockPos
+        51: dup
+        52: invokespecial #42                 // Method net/minecraft/core/BlockPos$MutableBlockPos."<init>":()V
+        55: putfield      #43                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        58: aload_0
+        59: aload         5
+        61: putfield      #47                 // Field compassRenderer:Lxaero/hud/minimap/compass/render/CompassRenderer;
+        64: return
+
+  public double getRenderAngle(boolean);
+    Code:
+         0: iload_1
+         1: ifeq          8
+         4: ldc2_w        #51                 // double 90.0d
+         7: dreturn
+         8: aload_0
+         9: invokevirtual #53                 // Method getActualAngle:()D
+        12: dreturn
+
+  private double getActualAngle();
+    Code:
+         0: aload_0
+         1: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+         4: getfield      #57                 // Field net/minecraft/client/Minecraft.gameRenderer:Lnet/minecraft/client/renderer/GameRenderer;
+         7: invokevirtual #63                 // Method net/minecraft/client/renderer/GameRenderer.mainCamera:()Lnet/minecraft/client/Camera;
+        10: invokevirtual #69                 // Method net/minecraft/client/Camera.yRot:()F
+        13: f2d
+        14: dstore_1
+        15: ldc2_w        #75                 // double -90.0d
+        18: dload_1
+        19: dsub
+        20: dreturn
+
+  protected abstract void renderChunks(xaero.hud.minimap.module.MinimapSession, xaero.common.minimap.MinimapProcessor, net.minecraft.world.phys.Vec3, net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level>, double, int, int, float, float, int, boolean, boolean, int, double, double, boolean, boolean, xaero.common.settings.ModSettings, xaero.lib.client.graphics.XaeroBufferProvider);
+
+  public void renderMinimap(xaero.hud.minimap.module.MinimapSession, xaero.common.minimap.MinimapProcessor, int, int, int, int, double, float, int, float, xaero.lib.client.graphics.XaeroBufferProvider);
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field modMain:Lxaero/common/HudMod;
+         4: invokevirtual #77                 // Method xaero/common/HudMod.getSettings:()Lxaero/common/settings/ModSettings;
+         7: astore        13
+         9: invokestatic  #83                 // Method xaero/hud/minimap/config/util/MinimapConfigClientUtils.getEffectiveMinimapSize:()I
+        12: istore        14
+        14: iload         14
+        16: aload_0
+        17: getfield      #89                 // Field lastMinimapSize:I
+        20: if_icmpeq     34
+        23: aload_0
+        24: iload         14
+        26: putfield      #89                 // Field lastMinimapSize:I
+        29: aload_2
+        30: iconst_1
+        31: invokevirtual #93                 // Method xaero/common/minimap/MinimapProcessor.setToResetImage:(Z)V
+        34: aload_2
+        35: invokevirtual #99                 // Method xaero/common/minimap/MinimapProcessor.getRadarSession:()Lxaero/hud/minimap/radar/RadarSession;
+        38: invokevirtual #103                // Method xaero/hud/minimap/radar/RadarSession.getStateUpdater:()Lxaero/hud/minimap/radar/state/RadarStateUpdater;
+        41: aload_0
+        42: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+        45: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+        48: invokevirtual #113                // Method xaero/hud/minimap/radar/state/RadarStateUpdater.setLastRenderViewEntity:(Lnet/minecraft/world/entity/Entity;)V
+        51: aload_1
+        52: invokevirtual #119                // Method xaero/hud/minimap/module/MinimapSession.getProcessor:()Lxaero/common/minimap/MinimapProcessor;
+        55: invokevirtual #125                // Method xaero/common/minimap/MinimapProcessor.getMinimapSize:()I
+        58: istore        15
+        60: aload_1
+        61: invokevirtual #119                // Method xaero/hud/minimap/module/MinimapSession.getProcessor:()Lxaero/common/minimap/MinimapProcessor;
+        64: iload         15
+        66: invokevirtual #128                // Method xaero/common/minimap/MinimapProcessor.getMinimapBufferSize:(I)I
+        69: istore        16
+        71: aload_0
+        72: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        75: invokevirtual #132                // Method xaero/hud/minimap/Minimap.usingFBO:()Z
+        78: ifeq          87
+        81: aload_2
+        82: invokevirtual #138                // Method xaero/common/minimap/MinimapProcessor.getFBOBufferSize:()I
+        85: istore        16
+        87: aload_0
+        88: getfield      #13                 // Field modMain:Lxaero/common/HudMod;
+        91: invokevirtual #141                // Method xaero/common/HudMod.getHudConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+        94: invokevirtual #145                // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+        97: astore        17
+        99: dload         7
+       101: fload         9
+       103: f2d
+       104: ddiv
+       105: d2f
+       106: fstore        18
+       108: aload_2
+       109: invokevirtual #151                // Method xaero/common/minimap/MinimapProcessor.updateZoom:()V
+       112: aload_0
+       113: aload_2
+       114: invokevirtual #154                // Method xaero/common/minimap/MinimapProcessor.getMinimapZoom:()D
+       117: putfield      #7                  // Field zoom:D
+       120: aload_0
+       121: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       124: getfield      #57                 // Field net/minecraft/client/Minecraft.gameRenderer:Lnet/minecraft/client/renderer/GameRenderer;
+       127: invokevirtual #157                // Method net/minecraft/client/renderer/GameRenderer.lighting:()Lcom/mojang/blaze3d/platform/Lighting;
+       130: getstatic     #161                // Field com/mojang/blaze3d/platform/Lighting$Entry.ITEMS_FLAT:Lcom/mojang/blaze3d/platform/Lighting$Entry;
+       133: invokevirtual #167                // Method com/mojang/blaze3d/platform/Lighting.setupFor:(Lcom/mojang/blaze3d/platform/Lighting$Entry;)V
+       136: fconst_1
+       137: fconst_1
+       138: fconst_1
+       139: fconst_1
+       140: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+       143: fconst_1
+       144: fstore        19
+       146: aload         17
+       148: getstatic     #179                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.SHAPE:Lxaero/lib/common/config/option/RangeConfigOption;
+       151: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       154: checkcast     #191                // class java/lang/Integer
+       157: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+       160: istore        20
+       162: iload         15
+       164: iconst_2
+       165: idiv
+       166: iload         20
+       168: invokestatic  #196                // Method xaero/hud/minimap/config/util/MinimapConfigClientUtils.getEffectiveNorthLocked:(II)Z
+       171: istore        21
+       173: aload_0
+       174: iload         21
+       176: invokevirtual #200                // Method getRenderAngle:(Z)D
+       179: invokestatic  #204                // Method java/lang/Math.toRadians:(D)D
+       182: dstore        22
+       184: ldc2_w        #210                // double 3.141592653589793d
+       187: dload         22
+       189: dsub
+       190: invokestatic  #212                // Method java/lang/Math.sin:(D)D
+       193: dstore        24
+       195: ldc2_w        #210                // double 3.141592653589793d
+       198: dload         22
+       200: dsub
+       201: invokestatic  #215                // Method java/lang/Math.cos:(D)D
+       204: dstore        26
+       206: aload_0
+       207: getfield      #13                 // Field modMain:Lxaero/common/HudMod;
+       210: invokevirtual #218                // Method xaero/common/HudMod.getSupportMods:()Lxaero/common/mods/SupportMods;
+       213: invokevirtual #222                // Method xaero/common/mods/SupportMods.shouldUseWorldMapChunks:()Z
+       216: ifeq          233
+       219: aload_2
+       220: invokevirtual #227                // Method xaero/common/minimap/MinimapProcessor.getMinimapWriter:()Lxaero/common/minimap/write/MinimapWriter;
+       223: invokevirtual #231                // Method xaero/common/minimap/write/MinimapWriter.isLoadedNonWorldMap:()Z
+       226: ifne          233
+       229: iconst_1
+       230: goto          234
+       233: iconst_0
+       234: istore        28
+       236: aload         17
+       238: getstatic     #236                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.LIGHTING:Lxaero/lib/common/config/option/BooleanConfigOption;
+       241: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       244: checkcast     #240                // class java/lang/Boolean
+       247: invokevirtual #242                // Method java/lang/Boolean.booleanValue:()Z
+       250: istore        29
+       252: fconst_1
+       253: fconst_1
+       254: aload_0
+       255: aload_2
+       256: iload         29
+       258: invokevirtual #245                // Method getSunBrightness:(Lxaero/common/minimap/MinimapProcessor;Z)F
+       261: invokestatic  #249                // Method java/lang/Math.min:(FF)F
+       264: fsub
+       265: aload_2
+       266: invokevirtual #227                // Method xaero/common/minimap/MinimapProcessor.getMinimapWriter:()Lxaero/common/minimap/write/MinimapWriter;
+       269: invokevirtual #253                // Method xaero/common/minimap/write/MinimapWriter.getLoadedLevels:()I
+       272: iconst_1
+       273: isub
+       274: i2f
+       275: fmul
+       276: f2i
+       277: istore        30
+       279: aload_2
+       280: invokevirtual #256                // Method xaero/common/minimap/MinimapProcessor.isCaveModeDisplayed:()Z
+       283: istore        31
+       285: iload         20
+       287: iconst_1
+       288: if_icmpne     295
+       291: iconst_1
+       292: goto          296
+       295: iconst_0
+       296: istore        32
+       298: aload_0
+       299: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       302: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+       305: fload         11
+       307: invokestatic  #259                // Method xaero/hud/entity/EntityUtils.getEntityX:(Lnet/minecraft/world/entity/Entity;F)D
+       310: dstore        33
+       312: aload_0
+       313: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       316: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+       319: fload         11
+       321: invokestatic  #265                // Method xaero/hud/entity/EntityUtils.getEntityY:(Lnet/minecraft/world/entity/Entity;F)D
+       324: dstore        35
+       326: aload_0
+       327: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       330: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+       333: fload         11
+       335: invokestatic  #268                // Method xaero/hud/entity/EntityUtils.getEntityZ:(Lnet/minecraft/world/entity/Entity;F)D
+       338: dstore        37
+       340: dload         33
+       342: dstore        39
+       344: dload         37
+       346: dstore        41
+       348: aload_0
+       349: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       352: getfield      #271                // Field net/minecraft/client/Minecraft.level:Lnet/minecraft/client/multiplayer/ClientLevel;
+       355: invokevirtual #275                // Method net/minecraft/client/multiplayer/ClientLevel.dimensionType:()Lnet/minecraft/world/level/dimension/DimensionType;
+       358: invokevirtual #281                // Method net/minecraft/world/level/dimension/DimensionType.coordinateScale:()D
+       361: dstore        43
+       363: aload_0
+       364: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+       367: getfield      #271                // Field net/minecraft/client/Minecraft.level:Lnet/minecraft/client/multiplayer/ClientLevel;
+       370: invokevirtual #286                // Method net/minecraft/client/multiplayer/ClientLevel.dimension:()Lnet/minecraft/resources/ResourceKey;
+       373: astore        45
+       375: dconst_1
+       376: dstore        46
+       378: iload         28
+       380: ifeq          457
+       383: dload         43
+       385: dstore        48
+       387: aload_0
+       388: getfield      #13                 // Field modMain:Lxaero/common/HudMod;
+       391: invokevirtual #218                // Method xaero/common/HudMod.getSupportMods:()Lxaero/common/mods/SupportMods;
+       394: getfield      #290                // Field xaero/common/mods/SupportMods.worldmapSupport:Lxaero/common/mods/SupportXaeroWorldmap;
+       397: invokevirtual #294                // Method xaero/common/mods/SupportXaeroWorldmap.getMapDimensionScale:()D
+       400: dstore        43
+       402: aload_0
+       403: getfield      #13                 // Field modMain:Lxaero/common/HudMod;
+       406: invokevirtual #218                // Method xaero/common/HudMod.getSupportMods:()Lxaero/common/mods/SupportMods;
+       409: getfield      #290                // Field xaero/common/mods/SupportMods.worldmapSupport:Lxaero/common/mods/SupportXaeroWorldmap;
+       412: invokevirtual #299                // Method xaero/common/mods/SupportXaeroWorldmap.getMapDimension:()Lnet/minecraft/resources/ResourceKey;
+       415: astore        45
+       417: dload         43
+       419: dconst_0
+       420: dcmpl
+       421: ifne          436
+       424: aload_2
+       425: invokevirtual #302                // Method xaero/common/minimap/MinimapProcessor.getLastMapDimensionScale:()D
+       428: dstore        43
+       430: aload_2
+       431: invokevirtual #305                // Method xaero/common/minimap/MinimapProcessor.getLastMapDimension:()Lnet/minecraft/resources/ResourceKey;
+       434: astore        45
+       436: dload         43
+       438: dload         48
+       440: ddiv
+       441: dstore        46
+       443: dload         39
+       445: dload         46
+       447: ddiv
+       448: dstore        39
+       450: dload         41
+       452: dload         46
+       454: ddiv
+       455: dstore        41
+       457: aload_2
+       458: dload         43
+       460: invokevirtual #308                // Method xaero/common/minimap/MinimapProcessor.setLastMapDimensionScale:(D)V
+       463: aload_2
+       464: aload         45
+       466: invokevirtual #312                // Method xaero/common/minimap/MinimapProcessor.setLastMapDimension:(Lnet/minecraft/resources/ResourceKey;)V
+       469: new           #316                // class net/minecraft/world/phys/Vec3
+       472: dup
+       473: dload         39
+       475: dload         35
+       477: dload         41
+       479: invokespecial #318                // Method net/minecraft/world/phys/Vec3."<init>":(DDD)V
+       482: astore        48
+       484: aload_0
+       485: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+       488: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+       491: aload_0
+       492: aload_1
+       493: aload_2
+       494: aload         48
+       496: aload         45
+       498: dload         43
+       500: iload         15
+       502: iload         16
+       504: fload         19
+       506: fload         11
+       508: iload         30
+       510: iload         28
+       512: iload         21
+       514: iload         20
+       516: dload         24
+       518: dload         26
+       520: iload         31
+       522: iload         32
+       524: aload         13
+       526: aload         12
+       528: invokevirtual #326                // Method renderChunks:(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/resources/ResourceKey;DIIFFIZZIDDZZLxaero/common/settings/ModSettings;Lxaero/lib/client/graphics/XaeroBufferProvider;)V
+       531: aload_0
+       532: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       535: invokevirtual #132                // Method xaero/hud/minimap/Minimap.usingFBO:()Z
+       538: ifeq          544
+       541: fconst_1
+       542: fstore        19
+       544: aload_0
+       545: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+       548: fconst_1
+       549: fload         18
+       551: fdiv
+       552: fconst_1
+       553: fload         18
+       555: fdiv
+       556: fconst_1
+       557: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+       560: iload_3
+       561: i2f
+       562: fload         18
+       564: fmul
+       565: f2i
+       566: istore        49
+       568: iload         4
+       570: i2f
+       571: fload         18
+       573: fmul
+       574: f2i
+       575: istore        50
+       577: iload         15
+       579: iconst_2
+       580: idiv
+       581: i2f
+       582: fload         19
+       584: fdiv
+       585: f2i
+       586: istore        51
+       588: bipush        32
+       590: ldc2_w        #210                // double 3.141592653589793d
+       593: iload         51
+       595: bipush        8
+       597: iadd
+       598: i2d
+       599: dmul
+       600: ldc2_w        #334                // double 8.0d
+       603: ddiv
+       604: ldc2_w        #336                // double 4.0d
+       607: ddiv
+       608: invokestatic  #338                // Method java/lang/Math.ceil:(D)D
+       611: d2i
+       612: iconst_4
+       613: imul
+       614: invokestatic  #341                // Method java/lang/Math.max:(II)I
+       617: istore        52
+       619: ldc2_w        #345                // double -0.7853981633974483d
+       622: dstore        53
+       624: bipush        32
+       626: istore        55
+       628: iconst_4
+       629: istore        56
+       631: dconst_0
+       632: dstore        57
+       634: aload_0
+       635: invokevirtual #347                // Method getTas:()Lnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;
+       638: astore        59
+       640: iload         32
+       642: ifne          702
+       645: aload_0
+       646: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+       649: aload_0
+       650: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+       653: iload         49
+       655: bipush        9
+       657: iadd
+       658: i2f
+       659: fload         19
+       661: fdiv
+       662: f2i
+       663: i2f
+       664: iload         50
+       666: bipush        9
+       668: iadd
+       669: i2f
+       670: fload         19
+       672: fdiv
+       673: f2i
+       674: i2f
+       675: iconst_0
+       676: sipush        256
+       679: iload         51
+       681: isub
+       682: iload         51
+       684: i2f
+       685: iload         51
+       687: i2f
+       688: iload         51
+       690: i2f
+       691: ldc_w         #355                // float 256.0f
+       694: aload         59
+       696: invokevirtual #356                // Method xaero/common/minimap/render/MinimapRendererHelper.drawMyTexturedModalRect:(Lcom/mojang/blaze3d/vertex/PoseStack;FFIIFFFFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+       699: goto          778
+       702: iload         15
+       704: iconst_4
+       705: idiv
+       706: iload         56
+       708: iadd
+       709: i2f
+       710: fstore        60
+       712: dload         53
+       714: iload         55
+       716: iconst_2
+       717: idiv
+       718: i2f
+       719: fload         60
+       721: fdiv
+       722: f2d
+       723: dsub
+       724: dstore        57
+       726: aload_0
+       727: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+       730: aload_0
+       731: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+       734: dload         57
+       736: iload         52
+       738: iload         49
+       740: bipush        9
+       742: iadd
+       743: i2f
+       744: fload         19
+       746: fdiv
+       747: f2i
+       748: i2f
+       749: iload         50
+       751: bipush        9
+       753: iadd
+       754: i2f
+       755: fload         19
+       757: fdiv
+       758: f2i
+       759: i2f
+       760: iconst_0
+       761: sipush        256
+       764: iload         51
+       766: isub
+       767: iload         51
+       769: i2f
+       770: ldc_w         #355                // float 256.0f
+       773: aload         59
+       775: invokevirtual #360                // Method xaero/common/minimap/render/MinimapRendererHelper.drawTexturedElipseInsideRectangle:(Lcom/mojang/blaze3d/vertex/PoseStack;DIFFIIFFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+       778: aload_0
+       779: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       782: invokevirtual #132                // Method xaero/hud/minimap/Minimap.usingFBO:()Z
+       785: ifne          811
+       788: aload_0
+       789: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+       792: fconst_1
+       793: fload         19
+       795: fdiv
+       796: fconst_1
+       797: fload         19
+       799: fdiv
+       800: fconst_1
+       801: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+       804: fconst_1
+       805: fconst_1
+       806: fconst_1
+       807: fconst_1
+       808: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+       811: aload         17
+       813: getstatic     #364                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.FRAME:Lxaero/lib/common/config/option/RangeConfigOption;
+       816: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       819: checkcast     #191                // class java/lang/Integer
+       822: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+       825: istore        60
+       827: iload         60
+       829: getstatic     #367                // Field xaero/hud/minimap/common/config/MinimapConfigConstants.FRAME_NAMES:[Lnet/minecraft/network/chat/Component;
+       832: arraylength
+       833: iconst_1
+       834: isub
+       835: if_icmpge     842
+       838: iconst_1
+       839: goto          843
+       842: iconst_0
+       843: istore        61
+       845: iload         60
+       847: ifle          917
+       850: aload         17
+       852: getstatic     #373                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.FRAME_COLOR:Lxaero/lib/common/config/option/RangeConfigOption;
+       855: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       858: checkcast     #191                // class java/lang/Integer
+       861: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+       864: istore        62
+       866: getstatic     #376                // Field xaero/hud/minimap/common/config/MinimapConfigConstants.COLORS:[I
+       869: iload         62
+       871: iaload
+       872: istore        63
+       874: iload         63
+       876: bipush        16
+       878: ishr
+       879: sipush        255
+       882: iand
+       883: i2f
+       884: ldc_w         #380                // float 255.0f
+       887: fdiv
+       888: iload         63
+       890: bipush        8
+       892: ishr
+       893: sipush        255
+       896: iand
+       897: i2f
+       898: ldc_w         #380                // float 255.0f
+       901: fdiv
+       902: iload         63
+       904: sipush        255
+       907: iand
+       908: i2f
+       909: ldc_w         #380                // float 255.0f
+       912: fdiv
+       913: fconst_1
+       914: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+       917: aload_0
+       918: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+       921: astore        62
+       923: aconst_null
+       924: astore        63
+       926: iload         61
+       928: ifeq          963
+       931: getstatic     #381                // Field xaero/hud/render/TextureLocations.MINIMAP_FRAME_TEXTURES:Lnet/minecraft/resources/Identifier;
+       934: invokestatic  #387                // Method xaero/lib/client/graphics/util/TextureUtils.getView:(Lnet/minecraft/resources/Identifier;)Lcom/mojang/blaze3d/textures/GpuTextureView;
+       937: astore        64
+       939: getstatic     #381                // Field xaero/hud/render/TextureLocations.MINIMAP_FRAME_TEXTURES:Lnet/minecraft/resources/Identifier;
+       942: invokestatic  #393                // Method xaero/lib/client/graphics/util/TextureUtils.getSampler:(Lnet/minecraft/resources/Identifier;)Lcom/mojang/blaze3d/textures/GpuSampler;
+       945: astore        65
+       947: new           #397                // class net/minecraft/client/renderer/rendertype/PreparedRenderType$Texture
+       950: dup
+       951: ldc_w         #399                // String Sampler0
+       954: aload         64
+       956: aload         65
+       958: invokespecial #401                // Method net/minecraft/client/renderer/rendertype/PreparedRenderType$Texture."<init>":(Ljava/lang/String;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;)V
+       961: astore        63
+       963: iload         61
+       965: ifeq          1578
+       968: iload         32
+       970: ifne          1578
+       973: iload         49
+       975: bipush        9
+       977: iadd
+       978: iload         15
+       980: iconst_2
+       981: idiv
+       982: iadd
+       983: iconst_4
+       984: iadd
+       985: bipush        16
+       987: isub
+       988: istore        64
+       990: iload         50
+       992: bipush        9
+       994: iadd
+       995: iload         15
+       997: iconst_2
+       998: idiv
+       999: iadd
+      1000: iconst_4
+      1001: iadd
+      1002: bipush        16
+      1004: isub
+      1005: istore        65
+      1007: getstatic     #404                // Field com/mojang/blaze3d/PrimitiveTopology.QUADS:Lcom/mojang/blaze3d/PrimitiveTopology;
+      1010: getstatic     #410                // Field com/mojang/blaze3d/vertex/DefaultVertexFormat.POSITION_TEX:Lcom/mojang/blaze3d/vertex/VertexFormat;
+      1013: invokestatic  #416                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.begin:(Lcom/mojang/blaze3d/PrimitiveTopology;Lcom/mojang/blaze3d/vertex/VertexFormat;)Lcom/mojang/blaze3d/vertex/BufferBuilder;
+      1016: astore        66
+      1018: aload_0
+      1019: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1022: invokevirtual #420                // Method com/mojang/blaze3d/vertex/PoseStack.last:()Lcom/mojang/blaze3d/vertex/PoseStack$Pose;
+      1025: invokevirtual #424                // Method com/mojang/blaze3d/vertex/PoseStack$Pose.pose:()Lorg/joml/Matrix4f;
+      1028: astore        67
+      1030: iload         60
+      1032: ifne          1041
+      1035: sipush        192
+      1038: goto          1056
+      1041: iload         60
+      1043: iconst_1
+      1044: if_icmpne     1053
+      1047: sipush        208
+      1050: goto          1056
+      1053: sipush        224
+      1056: istore        68
+      1058: aload         62
+      1060: aload         67
+      1062: aload         66
+      1064: iload         49
+      1066: bipush        9
+      1068: iadd
+      1069: iconst_4
+      1070: isub
+      1071: i2f
+      1072: iload         50
+      1074: bipush        9
+      1076: iadd
+      1077: iconst_4
+      1078: isub
+      1079: i2f
+      1080: iload         68
+      1082: bipush        97
+      1084: bipush        16
+      1086: bipush        16
+      1088: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1091: aload         62
+      1093: aload         67
+      1095: aload         66
+      1097: iload         64
+      1099: i2f
+      1100: iload         50
+      1102: bipush        9
+      1104: iadd
+      1105: iconst_4
+      1106: isub
+      1107: i2f
+      1108: iload         68
+      1110: bipush        113
+      1112: bipush        16
+      1114: bipush        16
+      1116: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1119: aload         62
+      1121: aload         67
+      1123: aload         66
+      1125: iload         49
+      1127: bipush        9
+      1129: iadd
+      1130: iconst_4
+      1131: isub
+      1132: i2f
+      1133: iload         65
+      1135: i2f
+      1136: iload         68
+      1138: sipush        129
+      1141: bipush        16
+      1143: bipush        16
+      1145: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1148: aload         62
+      1150: aload         67
+      1152: aload         66
+      1154: iload         64
+      1156: i2f
+      1157: iload         65
+      1159: i2f
+      1160: iload         68
+      1162: sipush        145
+      1165: bipush        16
+      1167: bipush        16
+      1169: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1172: iload         49
+      1174: bipush        9
+      1176: iadd
+      1177: iconst_4
+      1178: isub
+      1179: bipush        16
+      1181: iadd
+      1182: istore        69
+      1184: iload         64
+      1186: iload         69
+      1188: isub
+      1189: istore        70
+      1191: iload         60
+      1193: ifne          1200
+      1196: iconst_0
+      1197: goto          1213
+      1200: iload         60
+      1202: iconst_1
+      1203: if_icmpne     1211
+      1206: bipush        32
+      1208: goto          1213
+      1211: bipush        64
+      1213: istore        71
+      1215: sipush        226
+      1218: istore        72
+      1220: iload         70
+      1222: i2d
+      1223: iload         72
+      1225: i2d
+      1226: ddiv
+      1227: invokestatic  #338                // Method java/lang/Math.ceil:(D)D
+      1230: d2i
+      1231: istore        73
+      1233: iconst_0
+      1234: istore        74
+      1236: iload         74
+      1238: iload         73
+      1240: if_icmpge     1360
+      1243: iload         49
+      1245: bipush        9
+      1247: iadd
+      1248: iconst_4
+      1249: isub
+      1250: bipush        16
+      1252: iadd
+      1253: iload         74
+      1255: iload         72
+      1257: imul
+      1258: iadd
+      1259: istore        75
+      1261: iload         72
+      1263: istore        76
+      1265: iload         74
+      1267: iload         73
+      1269: iconst_1
+      1270: isub
+      1271: if_icmpne     1291
+      1274: iload         75
+      1276: iload         76
+      1278: iadd
+      1279: iload         64
+      1281: if_icmple     1291
+      1284: iload         64
+      1286: iload         75
+      1288: isub
+      1289: istore        76
+      1291: aload         62
+      1293: aload         67
+      1295: aload         66
+      1297: iload         75
+      1299: i2f
+      1300: iload         50
+      1302: bipush        9
+      1304: iadd
+      1305: iconst_4
+      1306: isub
+      1307: i2f
+      1308: iconst_0
+      1309: iload         71
+      1311: iload         76
+      1313: bipush        16
+      1315: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1318: aload         62
+      1320: aload         67
+      1322: aload         66
+      1324: iload         75
+      1326: i2f
+      1327: iload         50
+      1329: bipush        9
+      1331: iadd
+      1332: iload         15
+      1334: iconst_2
+      1335: idiv
+      1336: iadd
+      1337: bipush        12
+      1339: isub
+      1340: i2f
+      1341: iconst_0
+      1342: iload         71
+      1344: bipush        16
+      1346: iadd
+      1347: iload         76
+      1349: bipush        16
+      1351: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1354: iinc          74, 1
+      1357: goto          1236
+      1360: iload         50
+      1362: bipush        9
+      1364: iadd
+      1365: iconst_4
+      1366: isub
+      1367: bipush        16
+      1369: iadd
+      1370: istore        74
+      1372: iload         65
+      1374: iload         74
+      1376: isub
+      1377: istore        75
+      1379: iload         60
+      1381: ifne          1388
+      1384: iconst_0
+      1385: goto          1402
+      1388: iload         60
+      1390: iconst_1
+      1391: if_icmpne     1399
+      1394: bipush        64
+      1396: goto          1402
+      1399: sipush        128
+      1402: istore        76
+      1404: bipush        113
+      1406: istore        77
+      1408: iload         75
+      1410: i2d
+      1411: iload         77
+      1413: i2d
+      1414: ddiv
+      1415: invokestatic  #338                // Method java/lang/Math.ceil:(D)D
+      1418: d2i
+      1419: istore        78
+      1421: iconst_0
+      1422: istore        79
+      1424: iload         79
+      1426: iload         78
+      1428: if_icmpge     1562
+      1431: iload         50
+      1433: bipush        9
+      1435: iadd
+      1436: iconst_4
+      1437: isub
+      1438: bipush        16
+      1440: iadd
+      1441: iload         79
+      1443: iload         77
+      1445: imul
+      1446: iadd
+      1447: istore        80
+      1449: iload         76
+      1451: bipush        32
+      1453: iload         79
+      1455: iconst_1
+      1456: iand
+      1457: imul
+      1458: iadd
+      1459: istore        81
+      1461: iload         77
+      1463: istore        82
+      1465: iload         79
+      1467: iload         78
+      1469: iconst_1
+      1470: isub
+      1471: if_icmpne     1491
+      1474: iload         80
+      1476: iload         82
+      1478: iadd
+      1479: iload         65
+      1481: if_icmple     1491
+      1484: iload         65
+      1486: iload         80
+      1488: isub
+      1489: istore        82
+      1491: aload         62
+      1493: aload         67
+      1495: aload         66
+      1497: iload         49
+      1499: bipush        9
+      1501: iadd
+      1502: iconst_4
+      1503: isub
+      1504: i2f
+      1505: iload         80
+      1507: i2f
+      1508: iload         81
+      1510: bipush        97
+      1512: bipush        16
+      1514: iload         82
+      1516: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1519: aload         62
+      1521: aload         67
+      1523: aload         66
+      1525: iload         49
+      1527: bipush        9
+      1529: iadd
+      1530: iload         15
+      1532: iconst_2
+      1533: idiv
+      1534: iadd
+      1535: bipush        12
+      1537: isub
+      1538: i2f
+      1539: iload         80
+      1541: i2f
+      1542: iload         81
+      1544: bipush        16
+      1546: iadd
+      1547: bipush        97
+      1549: bipush        16
+      1551: iload         82
+      1553: invokevirtual #430                // Method xaero/common/minimap/render/MinimapRendererHelper.addTexturedRectToExistingBuffer:(Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/vertex/VertexConsumer;FFIIII)V
+      1556: iinc          79, 1
+      1559: goto          1424
+      1562: aload         66
+      1564: invokevirtual #434                // Method com/mojang/blaze3d/vertex/BufferBuilder.build:()Lcom/mojang/blaze3d/vertex/MeshData;
+      1567: getstatic     #440                // Field xaero/lib/client/graphics/XaeroRenderType.RP_POSITION_TEX_NO_ALPHA:Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+      1570: aload         63
+      1572: invokestatic  #446                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.drawImmediateMeshData:(Lcom/mojang/blaze3d/vertex/MeshData;Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+      1575: goto          1867
+      1578: iload         61
+      1580: ifeq          1867
+      1583: iload         60
+      1585: ifne          1594
+      1588: sipush        210
+      1591: goto          1609
+      1594: iload         60
+      1596: iconst_1
+      1597: if_icmpne     1606
+      1600: sipush        214
+      1603: goto          1609
+      1606: sipush        218
+      1609: istore        64
+      1611: ldc2_w        #450                // double 0.7853981633974483d
+      1614: dload         57
+      1616: dsub
+      1617: dstore        65
+      1619: dload         65
+      1621: ldc2_w        #452                // double 2.0d
+      1624: ddiv
+      1625: ldc2_w        #210                // double 3.141592653589793d
+      1628: ddiv
+      1629: iload         52
+      1631: i2d
+      1632: dmul
+      1633: d2i
+      1634: istore        67
+      1636: iload         49
+      1638: bipush        9
+      1640: iadd
+      1641: istore        68
+      1643: iload         50
+      1645: bipush        9
+      1647: iadd
+      1648: istore        69
+      1650: iload         15
+      1652: iconst_2
+      1653: idiv
+      1654: istore        70
+      1656: aload         62
+      1658: aload_0
+      1659: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1662: iconst_0
+      1663: iconst_0
+      1664: dload         57
+      1666: iconst_0
+      1667: iload         67
+      1669: iload         52
+      1671: iload         56
+      1673: i2f
+      1674: iload         68
+      1676: i2f
+      1677: iload         69
+      1679: i2f
+      1680: iconst_0
+      1681: iload         64
+      1683: iload         70
+      1685: i2f
+      1686: ldc_w         #454                // float 73.0f
+      1689: iload         56
+      1691: i2f
+      1692: iload         55
+      1694: ldc_w         #355                // float 256.0f
+      1697: aload         63
+      1699: invokevirtual #455                // Method xaero/common/minimap/render/MinimapRendererHelper.drawTexturedElipseInsideRectangleFrame:(Lcom/mojang/blaze3d/vertex/PoseStack;ZZDIIIFFFIIFFFIFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+      1702: aload         62
+      1704: aload_0
+      1705: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1708: iconst_1
+      1709: iconst_0
+      1710: dload         57
+      1712: iload         67
+      1714: iload         67
+      1716: iload         52
+      1718: iconst_4
+      1719: idiv
+      1720: iadd
+      1721: iload         52
+      1723: iload         56
+      1725: i2f
+      1726: iload         68
+      1728: i2f
+      1729: iload         69
+      1731: i2f
+      1732: sipush        138
+      1735: iload         64
+      1737: iload         70
+      1739: i2f
+      1740: ldc_w         #459                // float 68.0f
+      1743: iload         56
+      1745: i2f
+      1746: bipush        20
+      1748: ldc_w         #355                // float 256.0f
+      1751: aload         63
+      1753: invokevirtual #455                // Method xaero/common/minimap/render/MinimapRendererHelper.drawTexturedElipseInsideRectangleFrame:(Lcom/mojang/blaze3d/vertex/PoseStack;ZZDIIIFFFIIFFFIFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+      1756: aload         62
+      1758: aload_0
+      1759: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1762: iconst_1
+      1763: iconst_1
+      1764: dload         57
+      1766: iload         67
+      1768: iload         52
+      1770: iconst_4
+      1771: idiv
+      1772: iadd
+      1773: iload         67
+      1775: iload         52
+      1777: iconst_2
+      1778: idiv
+      1779: iadd
+      1780: iload         52
+      1782: iload         56
+      1784: i2f
+      1785: iload         68
+      1787: i2f
+      1788: iload         69
+      1790: i2f
+      1791: sipush        138
+      1794: iload         64
+      1796: iload         70
+      1798: i2f
+      1799: ldc_w         #459                // float 68.0f
+      1802: iload         56
+      1804: i2f
+      1805: bipush        20
+      1807: ldc_w         #355                // float 256.0f
+      1810: aload         63
+      1812: invokevirtual #455                // Method xaero/common/minimap/render/MinimapRendererHelper.drawTexturedElipseInsideRectangleFrame:(Lcom/mojang/blaze3d/vertex/PoseStack;ZZDIIIFFFIIFFFIFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+      1815: aload         62
+      1817: aload_0
+      1818: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1821: iconst_0
+      1822: iconst_0
+      1823: dload         57
+      1825: iload         67
+      1827: iload         52
+      1829: iconst_2
+      1830: idiv
+      1831: iadd
+      1832: iload         52
+      1834: iload         52
+      1836: iload         56
+      1838: i2f
+      1839: iload         68
+      1841: i2f
+      1842: iload         69
+      1844: i2f
+      1845: iconst_0
+      1846: iload         64
+      1848: iload         70
+      1850: i2f
+      1851: ldc_w         #454                // float 73.0f
+      1854: iload         56
+      1856: i2f
+      1857: iload         55
+      1859: ldc_w         #355                // float 256.0f
+      1862: aload         63
+      1864: invokevirtual #455                // Method xaero/common/minimap/render/MinimapRendererHelper.drawTexturedElipseInsideRectangleFrame:(Lcom/mojang/blaze3d/vertex/PoseStack;ZZDIIIFFFIIFFFIFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;)V
+      1867: fconst_1
+      1868: fconst_1
+      1869: fconst_1
+      1870: fconst_1
+      1871: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+      1874: aload_0
+      1875: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1878: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+      1881: aload_0
+      1882: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1885: iload         49
+      1887: bipush        9
+      1889: iadd
+      1890: i2f
+      1891: iload         50
+      1893: bipush        9
+      1895: iadd
+      1896: i2f
+      1897: fconst_0
+      1898: invokevirtual #460                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(FFF)V
+      1901: aload_0
+      1902: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1905: fconst_1
+      1906: fload         9
+      1908: fdiv
+      1909: fconst_1
+      1910: fload         9
+      1912: fdiv
+      1913: fconst_1
+      1914: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+      1917: iload         15
+      1919: i2f
+      1920: fload         9
+      1922: fmul
+      1923: fconst_2
+      1924: fdiv
+      1925: fconst_2
+      1926: fdiv
+      1927: f2i
+      1928: istore        64
+      1930: aload_0
+      1931: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      1934: iload         64
+      1936: i2d
+      1937: iload         64
+      1939: i2d
+      1940: ldc2_w        #463                // double 0.5d
+      1943: invokevirtual #465                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(DDD)V
+      1946: iload         64
+      1948: ldc_w         #467                // float 3.0f
+      1951: fload         9
+      1953: fmul
+      1954: f2i
+      1955: iadd
+      1956: istore        65
+      1958: iload         65
+      1960: istore        66
+      1962: aload_0
+      1963: instanceof    #468                // class xaero/common/minimap/render/MinimapSafeModeRenderer
+      1966: istore        67
+      1968: getstatic     #470                // Field xaero/lib/XaeroLib.INSTANCE:Lxaero/lib/XaeroLib;
+      1971: invokevirtual #476                // Method xaero/lib/XaeroLib.getClient:()Lxaero/lib/client/XaeroLibClient;
+      1974: invokevirtual #480                // Method xaero/lib/client/XaeroLibClient.getBufferProvider:()Lxaero/lib/client/graphics/XaeroBufferProvider;
+      1977: astore        68
+      1979: aload_1
+      1980: invokevirtual #486                // Method xaero/hud/minimap/module/MinimapSession.getMultiTextureRenderTypeRenderers:()Lxaero/common/graphics/renderer/multitexture/MultiTextureRenderTypeRendererProvider;
+      1983: astore        69
+      1985: aload_0
+      1986: getfield      #7                  // Field zoom:D
+      1989: fload         9
+      1991: f2d
+      1992: dmul
+      1993: ldc2_w        #452                // double 2.0d
+      1996: ddiv
+      1997: dstore        70
+      1999: aload         17
+      2001: getstatic     #490                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.COMPASS_OVER_EVERYTHING:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2004: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+      2007: checkcast     #240                // class java/lang/Boolean
+      2010: invokevirtual #242                // Method java/lang/Boolean.booleanValue:()Z
+      2013: istore        72
+      2015: iload         72
+      2017: ifne          2048
+      2020: aload_0
+      2021: aload_0
+      2022: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2025: aload         13
+      2027: aload         17
+      2029: aload         68
+      2031: iload         65
+      2033: iload         66
+      2035: iload         64
+      2037: dload         24
+      2039: dload         26
+      2041: iload         32
+      2043: fload         9
+      2045: invokevirtual #493                // Method renderCompass:(Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/settings/ModSettings;Lxaero/lib/client/config/ClientConfigManager;Lxaero/lib/client/graphics/XaeroBufferProvider;IIIDDZF)V
+      2048: aload_0
+      2049: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+      2052: invokevirtual #497                // Method xaero/hud/minimap/Minimap.getOverMapRendererHandler:()Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;
+      2055: dload         24
+      2057: dload         26
+      2059: dload         70
+      2061: iload         65
+      2063: iload         66
+      2065: iload         64
+      2067: iload         64
+      2069: iload         32
+      2071: fload         9
+      2073: invokevirtual #501                // Method xaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler.prepareRender:(DDDIIIIZF)V
+      2076: aload_0
+      2077: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+      2080: invokevirtual #497                // Method xaero/hud/minimap/Minimap.getOverMapRendererHandler:()Lxaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler;
+      2083: aload         48
+      2085: fload         11
+      2087: aconst_null
+      2088: dload         43
+      2090: aload         45
+      2092: invokevirtual #507                // Method xaero/hud/minimap/element/render/over/MinimapElementOverMapRendererHandler.render:(Lnet/minecraft/world/phys/Vec3;FLcom/mojang/blaze3d/pipeline/RenderTarget;DLnet/minecraft/resources/ResourceKey;)V
+      2095: iload         72
+      2097: ifeq          2128
+      2100: aload_0
+      2101: aload_0
+      2102: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2105: aload         13
+      2107: aload         17
+      2109: aload         68
+      2111: iload         65
+      2113: iload         66
+      2115: iload         64
+      2117: dload         24
+      2119: dload         26
+      2121: iload         32
+      2123: fload         9
+      2125: invokevirtual #493                // Method renderCompass:(Lcom/mojang/blaze3d/vertex/PoseStack;Lxaero/common/settings/ModSettings;Lxaero/lib/client/config/ClientConfigManager;Lxaero/lib/client/graphics/XaeroBufferProvider;IIIDDZF)V
+      2128: aload         68
+      2130: invokevirtual #511                // Method xaero/lib/client/graphics/XaeroBufferProvider.endBatch:()V
+      2133: aload_0
+      2134: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2137: invokevirtual #516                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+      2140: aload         17
+      2142: getstatic     #519                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.RADAR_MAIN_ENTITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2145: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+      2148: checkcast     #191                // class java/lang/Integer
+      2151: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+      2154: istore        73
+      2156: iload         73
+      2158: ifne          2170
+      2161: iload         21
+      2163: ifne          2170
+      2166: iconst_1
+      2167: goto          2171
+      2170: iconst_0
+      2171: istore        74
+      2173: iload         74
+      2175: ifeq          2546
+      2178: aload_0
+      2179: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2182: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+      2185: aload_0
+      2186: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2189: iload         49
+      2191: bipush        9
+      2193: iadd
+      2194: i2f
+      2195: iload         50
+      2197: bipush        9
+      2199: iadd
+      2200: i2f
+      2201: fconst_0
+      2202: invokevirtual #460                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(FFF)V
+      2205: aload_0
+      2206: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2209: ldc_w         #522                // float 0.5f
+      2212: ldc_w         #522                // float 0.5f
+      2215: fconst_1
+      2216: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+      2219: aload_0
+      2220: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2223: iload         15
+      2225: iconst_2
+      2226: idiv
+      2227: i2f
+      2228: iload         15
+      2230: iconst_2
+      2231: idiv
+      2232: i2f
+      2233: fconst_0
+      2234: invokevirtual #460                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(FFF)V
+      2237: aload_0
+      2238: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2241: ldc_w         #523                // float -5.0f
+      2244: ldc_w         #524                // float -1.0f
+      2247: ldc_w         #525                // float 5.0f
+      2250: fconst_1
+      2251: invokestatic  #526                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.negativeColorRectangle:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V
+      2254: aload_0
+      2255: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2258: ldc_w         #524                // float -1.0f
+      2261: ldc_w         #467                // float 3.0f
+      2264: fconst_1
+      2265: ldc_w         #525                // float 5.0f
+      2268: invokestatic  #526                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.negativeColorRectangle:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V
+      2271: aload_0
+      2272: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2275: ldc_w         #524                // float -1.0f
+      2278: ldc_w         #523                // float -5.0f
+      2281: fconst_1
+      2282: ldc_w         #530                // float -3.0f
+      2285: invokestatic  #526                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.negativeColorRectangle:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V
+      2288: aload_2
+      2289: invokevirtual #99                 // Method xaero/common/minimap/MinimapProcessor.getRadarSession:()Lxaero/hud/minimap/radar/RadarSession;
+      2292: astore        75
+      2294: aload         75
+      2296: invokevirtual #531                // Method xaero/hud/minimap/radar/RadarSession.getCategoryManager:()Lxaero/hud/minimap/radar/category/EntityRadarCategoryManager;
+      2299: astore        76
+      2301: aload         76
+      2303: invokevirtual #535                // Method xaero/hud/minimap/radar/category/EntityRadarCategoryManager.getRuleResolver:()Lxaero/hud/category/rule/resolver/ObjectCategoryRuleResolver;
+      2306: aload         76
+      2308: invokevirtual #541                // Method xaero/hud/minimap/radar/category/EntityRadarCategoryManager.getRootCategory:()Lxaero/hud/minimap/radar/category/EntityRadarCategory;
+      2311: aload_0
+      2312: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2315: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+      2318: aload_0
+      2319: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2322: getfield      #545                // Field net/minecraft/client/Minecraft.player:Lnet/minecraft/client/player/LocalPlayer;
+      2325: invokevirtual #549                // Method xaero/hud/category/rule/resolver/ObjectCategoryRuleResolver.resolve:(Lxaero/hud/category/FilterObjectCategory;Ljava/lang/Object;Ljava/lang/Object;)Lxaero/hud/category/FilterObjectCategory;
+      2328: checkcast     #555                // class xaero/hud/minimap/radar/category/EntityRadarCategory
+      2331: astore        77
+      2333: aload         77
+      2335: ifnonnull     2345
+      2338: aload         76
+      2340: invokevirtual #541                // Method xaero/hud/minimap/radar/category/EntityRadarCategoryManager.getRootCategory:()Lxaero/hud/minimap/radar/category/EntityRadarCategory;
+      2343: astore        77
+      2345: aload         77
+      2347: getstatic     #557                // Field xaero/hud/minimap/radar/category/setting/EntityRadarCategorySettings.COLOR:Lxaero/hud/category/setting/ObjectCategorySetting;
+      2350: invokevirtual #563                // Method xaero/hud/minimap/radar/category/EntityRadarCategory.getSettingValue:(Lxaero/hud/category/setting/ObjectCategorySetting;)Ljava/lang/Object;
+      2353: checkcast     #567                // class java/lang/Double
+      2356: invokevirtual #569                // Method java/lang/Double.intValue:()I
+      2359: invokestatic  #570                // Method xaero/hud/minimap/radar/color/RadarColor.fromIndex:(I)Lxaero/hud/minimap/radar/color/RadarColor;
+      2362: astore        78
+      2364: aload         75
+      2366: invokevirtual #576                // Method xaero/hud/minimap/radar/RadarSession.getColorHelper:()Lxaero/hud/minimap/radar/color/RadarColorHelper;
+      2369: aload         77
+      2371: aconst_null
+      2372: invokevirtual #580                // Method xaero/hud/minimap/radar/color/RadarColorHelper.getFallbackColor:(Lxaero/hud/minimap/radar/category/EntityRadarCategory;Lxaero/hud/minimap/radar/category/EntityRadarCategory;)Lxaero/hud/minimap/radar/color/RadarColor;
+      2375: astore        79
+      2377: aload         75
+      2379: invokevirtual #576                // Method xaero/hud/minimap/radar/RadarSession.getColorHelper:()Lxaero/hud/minimap/radar/color/RadarColorHelper;
+      2382: aload_0
+      2383: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2386: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+      2389: fconst_0
+      2390: iconst_0
+      2391: bipush        100
+      2393: bipush        100
+      2395: iconst_0
+      2396: aload         78
+      2398: aload         79
+      2400: invokevirtual #586                // Method xaero/hud/minimap/radar/color/RadarColorHelper.getEntityColor:(Lnet/minecraft/world/entity/Entity;FZIIZLxaero/hud/minimap/radar/color/RadarColor;Lxaero/hud/minimap/radar/color/RadarColor;)I
+      2403: istore        80
+      2405: iload         80
+      2407: bipush        16
+      2409: ishr
+      2410: sipush        255
+      2413: iand
+      2414: i2f
+      2415: ldc_w         #380                // float 255.0f
+      2418: fdiv
+      2419: iload         80
+      2421: bipush        8
+      2423: ishr
+      2424: sipush        255
+      2427: iand
+      2428: i2f
+      2429: ldc_w         #380                // float 255.0f
+      2432: fdiv
+      2433: iload         80
+      2435: sipush        255
+      2438: iand
+      2439: i2f
+      2440: ldc_w         #380                // float 255.0f
+      2443: fdiv
+      2444: fconst_1
+      2445: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+      2448: aload_0
+      2449: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+      2452: aload_0
+      2453: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2456: fconst_1
+      2457: ldc_w         #524                // float -1.0f
+      2460: ldc_w         #467                // float 3.0f
+      2463: fconst_1
+      2464: iconst_0
+      2465: invokevirtual #590                // Method xaero/common/minimap/render/MinimapRendererHelper.drawMyColoredRect:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFFZ)V
+      2468: aload_0
+      2469: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+      2472: aload_0
+      2473: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2476: ldc_w         #530                // float -3.0f
+      2479: ldc_w         #524                // float -1.0f
+      2482: ldc_w         #524                // float -1.0f
+      2485: fconst_1
+      2486: iconst_0
+      2487: invokevirtual #590                // Method xaero/common/minimap/render/MinimapRendererHelper.drawMyColoredRect:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFFZ)V
+      2490: aload_0
+      2491: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+      2494: aload_0
+      2495: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2498: ldc_w         #524                // float -1.0f
+      2501: fconst_1
+      2502: fconst_1
+      2503: ldc_w         #467                // float 3.0f
+      2506: iconst_0
+      2507: invokevirtual #590                // Method xaero/common/minimap/render/MinimapRendererHelper.drawMyColoredRect:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFFZ)V
+      2510: aload_0
+      2511: invokevirtual #351                // Method getHelper:()Lxaero/common/minimap/render/MinimapRendererHelper;
+      2514: aload_0
+      2515: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2518: ldc_w         #524                // float -1.0f
+      2521: ldc_w         #530                // float -3.0f
+      2524: fconst_1
+      2525: ldc_w         #524                // float -1.0f
+      2528: iconst_0
+      2529: invokevirtual #590                // Method xaero/common/minimap/render/MinimapRendererHelper.drawMyColoredRect:(Lcom/mojang/blaze3d/vertex/PoseStack;FFFFZ)V
+      2532: fconst_1
+      2533: fconst_1
+      2534: fconst_1
+      2535: fconst_1
+      2536: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+      2539: aload_0
+      2540: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2543: invokevirtual #516                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+      2546: iconst_2
+      2547: iload         49
+      2549: imul
+      2550: bipush        18
+      2552: iadd
+      2553: iload         15
+      2555: iconst_2
+      2556: idiv
+      2557: iadd
+      2558: i2d
+      2559: dstore        75
+      2561: iconst_2
+      2562: iload         50
+      2564: imul
+      2565: bipush        18
+      2567: iadd
+      2568: iload         15
+      2570: iconst_2
+      2571: idiv
+      2572: iadd
+      2573: i2d
+      2574: dstore        77
+      2576: aload_0
+      2577: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2580: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+      2583: aload_0
+      2584: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2587: ldc_w         #522                // float 0.5f
+      2590: ldc_w         #522                // float 0.5f
+      2593: fconst_1
+      2594: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+      2597: aload_0
+      2598: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2601: dload         75
+      2603: dload         77
+      2605: dconst_0
+      2606: invokevirtual #465                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(DDD)V
+      2609: aload_0
+      2610: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2613: invokevirtual #594                // Method net/minecraft/client/Minecraft.getTextureManager:()Lnet/minecraft/client/renderer/texture/TextureManager;
+      2616: getstatic     #598                // Field xaero/hud/render/TextureLocations.GUI_TEXTURES:Lnet/minecraft/resources/Identifier;
+      2619: invokevirtual #601                // Method net/minecraft/client/renderer/texture/TextureManager.getTexture:(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/texture/AbstractTexture;
+      2622: astore        79
+      2624: aload_0
+      2625: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2628: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+      2631: astore        80
+      2633: iload         67
+      2635: ifne          2659
+      2638: iload         74
+      2640: ifne          2659
+      2643: aload_0
+      2644: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+      2647: invokevirtual #607                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+      2650: aload         80
+      2652: iload         31
+      2654: aload         12
+      2656: invokevirtual #611                // Method xaero/common/minimap/render/MinimapFBORenderer.renderMainEntityDot:(Lnet/minecraft/world/entity/Entity;ZLxaero/lib/client/graphics/XaeroBufferProvider;)V
+      2659: new           #397                // class net/minecraft/client/renderer/rendertype/PreparedRenderType$Texture
+      2662: dup
+      2663: ldc_w         #399                // String Sampler0
+      2666: aload         79
+      2668: invokevirtual #617                // Method net/minecraft/client/renderer/texture/AbstractTexture.getTextureView:()Lcom/mojang/blaze3d/textures/GpuTextureView;
+      2671: getstatic     #623                // Field com/mojang/blaze3d/textures/FilterMode.LINEAR:Lcom/mojang/blaze3d/textures/FilterMode;
+      2674: invokestatic  #629                // Method xaero/lib/client/graphics/XaeroRenderType.getSimpleSampler:(Lcom/mojang/blaze3d/textures/FilterMode;)Lcom/mojang/blaze3d/textures/GpuSampler;
+      2677: invokespecial #401                // Method net/minecraft/client/renderer/rendertype/PreparedRenderType$Texture."<init>":(Ljava/lang/String;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;)V
+      2680: astore        81
+      2682: iload         21
+      2684: ifne          2693
+      2687: iload         73
+      2689: iconst_2
+      2690: if_icmpne     2977
+      2693: iload         21
+      2695: ifeq          2708
+      2698: aload         80
+      2700: fload         11
+      2702: invokevirtual #633                // Method net/minecraft/world/entity/Entity.getViewYRot:(F)F
+      2705: goto          2711
+      2708: ldc_w         #639                // float 180.0f
+      2711: fstore        82
+      2713: aload         17
+      2715: getstatic     #640                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.ARROW_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2718: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+      2721: checkcast     #191                // class java/lang/Integer
+      2724: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+      2727: istore        83
+      2729: iload         83
+      2731: i2f
+      2732: ldc_w         #643                // float 100.0f
+      2735: fdiv
+      2736: fstore        84
+      2738: fload         84
+      2740: fconst_1
+      2741: fcmpl
+      2742: ifne          2767
+      2745: aload_0
+      2746: aload_0
+      2747: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2750: fload         82
+      2752: dconst_0
+      2753: dconst_1
+      2754: fconst_0
+      2755: fconst_0
+      2756: fconst_0
+      2757: ldc_w         #522                // float 0.5f
+      2760: aload         81
+      2762: aload         17
+      2764: invokevirtual #644                // Method drawArrow:(Lcom/mojang/blaze3d/vertex/PoseStack;FDDFFFFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;Lxaero/lib/client/config/ClientConfigManager;)V
+      2767: aload         17
+      2769: getstatic     #648                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.ARROW_COLOR:Lxaero/lib/common/config/option/RangeConfigOption;
+      2772: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+      2775: checkcast     #191                // class java/lang/Integer
+      2778: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+      2781: istore        89
+      2783: iload         89
+      2785: iconst_m1
+      2786: if_icmpeq     2824
+      2789: getstatic     #651                // Field xaero/hud/minimap/common/config/MinimapConfigConstants.ARROW_COLORS:[[F
+      2792: iload         89
+      2794: aaload
+      2795: astore        90
+      2797: aload         90
+      2799: iconst_0
+      2800: faload
+      2801: fstore        85
+      2803: aload         90
+      2805: iconst_1
+      2806: faload
+      2807: fstore        86
+      2809: aload         90
+      2811: iconst_2
+      2812: faload
+      2813: fstore        87
+      2815: aload         90
+      2817: iconst_3
+      2818: faload
+      2819: fstore        88
+      2821: goto          2946
+      2824: aload_2
+      2825: invokevirtual #99                 // Method xaero/common/minimap/MinimapProcessor.getRadarSession:()Lxaero/hud/minimap/radar/RadarSession;
+      2828: invokevirtual #576                // Method xaero/hud/minimap/radar/RadarSession.getColorHelper:()Lxaero/hud/minimap/radar/color/RadarColorHelper;
+      2831: aload_0
+      2832: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2835: getfield      #545                // Field net/minecraft/client/Minecraft.player:Lnet/minecraft/client/player/LocalPlayer;
+      2838: ifnonnull     2846
+      2841: aload         80
+      2843: goto          2853
+      2846: aload_0
+      2847: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2850: getfield      #545                // Field net/minecraft/client/Minecraft.player:Lnet/minecraft/client/player/LocalPlayer;
+      2853: invokevirtual #655                // Method xaero/hud/minimap/radar/color/RadarColorHelper.getTeamColor:(Lnet/minecraft/world/entity/Entity;)I
+      2856: istore        90
+      2858: iload         90
+      2860: iconst_m1
+      2861: if_icmpeq     2915
+      2864: iload         90
+      2866: bipush        16
+      2868: ishr
+      2869: sipush        255
+      2872: iand
+      2873: i2f
+      2874: ldc_w         #380                // float 255.0f
+      2877: fdiv
+      2878: fstore        85
+      2880: iload         90
+      2882: bipush        8
+      2884: ishr
+      2885: sipush        255
+      2888: iand
+      2889: i2f
+      2890: ldc_w         #380                // float 255.0f
+      2893: fdiv
+      2894: fstore        86
+      2896: iload         90
+      2898: sipush        255
+      2901: iand
+      2902: i2f
+      2903: ldc_w         #380                // float 255.0f
+      2906: fdiv
+      2907: fstore        87
+      2909: fconst_1
+      2910: fstore        88
+      2912: goto          2946
+      2915: getstatic     #651                // Field xaero/hud/minimap/common/config/MinimapConfigConstants.ARROW_COLORS:[[F
+      2918: iconst_0
+      2919: aaload
+      2920: astore        91
+      2922: aload         91
+      2924: iconst_0
+      2925: faload
+      2926: fstore        85
+      2928: aload         91
+      2930: iconst_1
+      2931: faload
+      2932: fstore        86
+      2934: aload         91
+      2936: iconst_2
+      2937: faload
+      2938: fstore        87
+      2940: aload         91
+      2942: iconst_3
+      2943: faload
+      2944: fstore        88
+      2946: fload         88
+      2948: fload         84
+      2950: fmul
+      2951: fstore        88
+      2953: aload_0
+      2954: aload_0
+      2955: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2958: fload         82
+      2960: dconst_0
+      2961: dconst_0
+      2962: fload         85
+      2964: fload         86
+      2966: fload         87
+      2968: fload         88
+      2970: aload         81
+      2972: aload         17
+      2974: invokevirtual #644                // Method drawArrow:(Lcom/mojang/blaze3d/vertex/PoseStack;FDDFFFFLnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;Lxaero/lib/client/config/ClientConfigManager;)V
+      2977: aload_0
+      2978: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2981: invokevirtual #516                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+      2984: aload_0
+      2985: getfield      #29                 // Field matrixStack:Lcom/mojang/blaze3d/vertex/PoseStack;
+      2988: invokevirtual #516                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+      2991: aload_0
+      2992: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+      2995: getfield      #57                 // Field net/minecraft/client/Minecraft.gameRenderer:Lnet/minecraft/client/renderer/GameRenderer;
+      2998: invokevirtual #157                // Method net/minecraft/client/renderer/GameRenderer.lighting:()Lcom/mojang/blaze3d/platform/Lighting;
+      3001: getstatic     #659                // Field com/mojang/blaze3d/platform/Lighting$Entry.ITEMS_3D:Lcom/mojang/blaze3d/platform/Lighting$Entry;
+      3004: invokevirtual #167                // Method com/mojang/blaze3d/platform/Lighting.setupFor:(Lcom/mojang/blaze3d/platform/Lighting$Entry;)V
+      3007: return
+
+  public void renderOutsidePip(xaero.hud.minimap.module.MinimapSession, int, int, int, int, double, float, int, float, net.minecraft.client.gui.GuiGraphicsExtractor);
+    Code:
+         0: dload         6
+         2: fload         8
+         4: f2d
+         5: ddiv
+         6: d2f
+         7: fstore        12
+         9: iload_2
+        10: i2f
+        11: fload         12
+        13: fmul
+        14: f2i
+        15: istore        13
+        17: iload_3
+        18: i2f
+        19: fload         12
+        21: fmul
+        22: f2i
+        23: istore        14
+        25: aload_0
+        26: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+        29: invokevirtual #109                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+        32: astore        15
+        34: aload         15
+        36: invokevirtual #662                // Method net/minecraft/world/entity/Entity.getX:()D
+        39: invokestatic  #665                // Method xaero/common/misc/OptimizedMath.myFloor:(D)I
+        42: istore        16
+        44: aload         15
+        46: invokevirtual #671                // Method net/minecraft/world/entity/Entity.getY:()D
+        49: invokestatic  #665                // Method xaero/common/misc/OptimizedMath.myFloor:(D)I
+        52: istore        17
+        54: aload         15
+        56: invokevirtual #674                // Method net/minecraft/world/entity/Entity.getZ:()D
+        59: invokestatic  #665                // Method xaero/common/misc/OptimizedMath.myFloor:(D)I
+        62: istore        18
+        64: aload_0
+        65: getfield      #43                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        68: iload         16
+        70: iload         17
+        72: iload         18
+        74: invokevirtual #677                // Method net/minecraft/core/BlockPos$MutableBlockPos.set:(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        77: astore        19
+        79: aload         11
+        81: invokevirtual #681                // Method net/minecraft/client/gui/GuiGraphicsExtractor.pose:()Lorg/joml/Matrix3x2fStack;
+        84: invokevirtual #686                // Method org/joml/Matrix3x2fStack.pushMatrix:()Lorg/joml/Matrix3x2fStack;
+        87: pop
+        88: aload         11
+        90: invokevirtual #681                // Method net/minecraft/client/gui/GuiGraphicsExtractor.pose:()Lorg/joml/Matrix3x2fStack;
+        93: fconst_1
+        94: fload         12
+        96: fdiv
+        97: fconst_1
+        98: fload         12
+       100: fdiv
+       101: invokevirtual #691                // Method org/joml/Matrix3x2fStack.scale:(FF)Lorg/joml/Matrix3x2f;
+       104: pop
+       105: aload_0
+       106: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       109: invokevirtual #694                // Method xaero/hud/minimap/Minimap.getInfoDisplays:()Lxaero/hud/minimap/info/InfoDisplays;
+       112: invokevirtual #698                // Method xaero/hud/minimap/info/InfoDisplays.getRenderer:()Lxaero/hud/minimap/info/render/InfoDisplayRenderer;
+       115: aload_1
+       116: aload_0
+       117: getfield      #25                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       120: iload         5
+       122: iload         9
+       124: aload         19
+       126: iload         13
+       128: iload         14
+       130: fload         12
+       132: aload         11
+       134: invokevirtual #704                // Method xaero/hud/minimap/info/render/InfoDisplayRenderer.render:(Lxaero/hud/minimap/module/MinimapSession;Lxaero/hud/minimap/Minimap;IILnet/minecraft/core/BlockPos;IIFLnet/minecraft/client/gui/GuiGraphicsExtractor;)V
+       137: aload         11
+       139: invokevirtual #681                // Method net/minecraft/client/gui/GuiGraphicsExtractor.pose:()Lorg/joml/Matrix3x2fStack;
+       142: invokevirtual #709                // Method org/joml/Matrix3x2fStack.popMatrix:()Lorg/joml/Matrix3x2fStack;
+       145: pop
+       146: return
+
+  private void renderCompass(com.mojang.blaze3d.vertex.PoseStack, xaero.common.settings.ModSettings, xaero.lib.client.config.ClientConfigManager, xaero.lib.client.graphics.XaeroBufferProvider, int, int, int, double, double, boolean, float);
+    Code:
+         0: aload         4
+         2: getstatic     #712                // Field xaero/common/graphics/CustomRenderTypes.RADAR_NAME_BGS:Lnet/minecraft/client/renderer/rendertype/RenderType;
+         5: invokevirtual #718                // Method xaero/lib/client/graphics/XaeroBufferProvider.getBuffer:(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/BufferBuilder;
+         8: astore        14
+        10: aload_3
+        11: getstatic     #722                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.COMPASS_SCALE:Lxaero/lib/common/config/option/RangeConfigOption;
+        14: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        17: checkcast     #191                // class java/lang/Integer
+        20: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+        23: istore        15
+        25: aload_3
+        26: getstatic     #725                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.COMPASS_LOCATION:Lxaero/lib/common/config/option/RangeConfigOption;
+        29: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        32: checkcast     #191                // class java/lang/Integer
+        35: invokevirtual #193                // Method java/lang/Integer.intValue:()I
+        38: istore        16
+        40: iload         15
+        42: ifgt          71
+        45: iload         16
+        47: iconst_1
+        48: if_icmpne     63
+        51: fload         13
+        53: fconst_2
+        54: fdiv
+        55: f2d
+        56: invokestatic  #338                // Method java/lang/Math.ceil:(D)D
+        59: d2i
+        60: goto          66
+        63: fload         13
+        65: f2i
+        66: istore        15
+        68: goto          81
+        71: aload_3
+        72: getstatic     #722                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.COMPASS_SCALE:Lxaero/lib/common/config/option/RangeConfigOption;
+        75: invokestatic  #728                // Method xaero/hud/minimap/config/util/MinimapConfigClientUtils.getUIScale:(Lxaero/lib/client/config/ClientConfigManager;Lxaero/lib/common/config/option/IndexedConfigOption;)F
+        78: f2i
+        79: istore        15
+        81: iload         16
+        83: iconst_1
+        84: if_icmpne     157
+        87: invokestatic  #732                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+        90: invokevirtual #736                // Method net/minecraft/client/Minecraft.isEnforceUnicode:()Z
+        93: ifeq          102
+        96: iload         15
+        98: iconst_2
+        99: imul
+       100: istore        15
+       102: iload         7
+       104: i2f
+       105: ldc_w         #739                // float 7.0f
+       108: fload         13
+       110: fmul
+       111: fconst_2
+       112: fdiv
+       113: fsub
+       114: f2i
+       115: istore        7
+       117: aload_0
+       118: getfield      #47                 // Field compassRenderer:Lxaero/hud/minimap/compass/render/CompassRenderer;
+       121: aload_1
+       122: iload         7
+       124: iconst_3
+       125: iload         15
+       127: imul
+       128: isub
+       129: iload         7
+       131: iconst_3
+       132: iload         15
+       134: imul
+       135: isub
+       136: dload         8
+       138: dload         10
+       140: dconst_1
+       141: iload         12
+       143: iload         15
+       145: i2f
+       146: iconst_1
+       147: aload         4
+       149: aload         14
+       151: invokevirtual #740                // Method xaero/hud/minimap/compass/render/CompassRenderer.drawCompass:(Lcom/mojang/blaze3d/vertex/PoseStack;IIDDDZFZLxaero/lib/client/graphics/XaeroBufferProvider;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V
+       154: goto          192
+       157: iload         16
+       159: iconst_2
+       160: if_icmpne     192
+       163: aload_0
+       164: getfield      #47                 // Field compassRenderer:Lxaero/hud/minimap/compass/render/CompassRenderer;
+       167: aload_1
+       168: iload         5
+       170: iload         6
+       172: dload         8
+       174: dload         10
+       176: aload_0
+       177: getfield      #7                  // Field zoom:D
+       180: iload         12
+       182: iload         15
+       184: i2f
+       185: iconst_0
+       186: aload         4
+       188: aconst_null
+       189: invokevirtual #740                // Method xaero/hud/minimap/compass/render/CompassRenderer.drawCompass:(Lcom/mojang/blaze3d/vertex/PoseStack;IIDDDZFZLxaero/lib/client/graphics/XaeroBufferProvider;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V
+       192: return
+
+  private void drawArrow(com.mojang.blaze3d.vertex.PoseStack, float, double, double, float, float, float, float, net.minecraft.client.renderer.rendertype.PreparedRenderType$Texture, xaero.lib.client.config.ClientConfigManager);
+    Code:
+         0: aload_1
+         1: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+         4: aload_1
+         5: dload_3
+         6: dload         5
+         8: dconst_0
+         9: invokevirtual #465                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(DDD)V
+        12: aload_1
+        13: fload_2
+        14: getstatic     #746                // Field xaero/common/misc/OptimizedMath.ZP:Lorg/joml/Vector3f;
+        17: invokestatic  #750                // Method xaero/common/misc/OptimizedMath.rotatePose:(Lcom/mojang/blaze3d/vertex/PoseStack;FLorg/joml/Vector3fc;)V
+        20: aload         12
+        22: getstatic     #754                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.ARROW_SCALE:Lxaero/lib/common/config/option/SteppedConfigOption;
+        25: invokevirtual #185                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        28: checkcast     #567                // class java/lang/Double
+        31: invokevirtual #758                // Method java/lang/Double.doubleValue:()D
+        34: dstore        13
+        36: aload_1
+        37: ldc2_w        #463                // double 0.5d
+        40: dload         13
+        42: dmul
+        43: d2f
+        44: ldc2_w        #463                // double 0.5d
+        47: dload         13
+        49: dmul
+        50: d2f
+        51: fconst_1
+        52: invokevirtual #330                // Method com/mojang/blaze3d/vertex/PoseStack.scale:(FFF)V
+        55: bipush        -6
+        57: istore        15
+        59: bipush        28
+        61: istore        16
+        63: iconst_0
+        64: istore        17
+        66: aload_1
+        67: ldc_w         #761                // float -13.0f
+        70: iload         15
+        72: i2f
+        73: fconst_0
+        74: invokevirtual #460                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(FFF)V
+        77: fload         7
+        79: fload         8
+        81: fload         9
+        83: fload         10
+        85: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+        88: aload         11
+        90: aload_1
+        91: iconst_0
+        92: iconst_0
+        93: ldc_w         #762                // float 49.0f
+        96: iload         17
+        98: i2f
+        99: bipush        26
+       101: iload         16
+       103: iconst_0
+       104: invokestatic  #763                // Method xaero/lib/client/gui/util/graphics/GuiGraphicsUtils.blit:(Lnet/minecraft/client/renderer/rendertype/PreparedRenderType$Texture;Lcom/mojang/blaze3d/vertex/PoseStack;IIFFIIZ)V
+       107: fconst_1
+       108: fconst_1
+       109: fconst_1
+       110: fconst_1
+       111: invokestatic  #173                // Method xaero/lib/client/graphics/util/ImmediateRenderUtil.setShaderColor:(FFFF)V
+       114: aload_1
+       115: invokevirtual #516                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+       118: return
+
+  public double getZoom();
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field zoom:D
+         4: dreturn
+
+  public void setZoom(double);
+    Code:
+         0: aload_0
+         1: dload_1
+         2: putfield      #7                  // Field zoom:D
+         5: return
+
+  public float getSunBrightness(xaero.common.minimap.MinimapProcessor, boolean);
+    Code:
+         0: aload_0
+         1: getfield      #17                 // Field mc:Lnet/minecraft/client/Minecraft;
+         4: getfield      #271                // Field net/minecraft/client/Minecraft.level:Lnet/minecraft/client/multiplayer/ClientLevel;
+         7: astore_3
+         8: aload_3
+         9: invokestatic  #769                // Method xaero/common/minimap/mcworld/MinimapClientWorldDataHelper.getWorldData:(Lnet/minecraft/client/multiplayer/ClientLevel;)Lxaero/common/minimap/mcworld/MinimapClientWorldData;
+        12: invokevirtual #775                // Method xaero/common/minimap/mcworld/MinimapClientWorldData.getAttributeSystem:()Lnet/minecraft/world/attribute/EnvironmentAttributeSystem;
+        15: getstatic     #781                // Field net/minecraft/world/attribute/EnvironmentAttributes.SKY_LIGHT_FACTOR:Lnet/minecraft/world/attribute/EnvironmentAttribute;
+        18: getstatic     #787                // Field net/minecraft/core/BlockPos.ZERO:Lnet/minecraft/core/BlockPos;
+        21: invokevirtual #793                // Method net/minecraft/world/attribute/EnvironmentAttributeSystem.getValue:(Lnet/minecraft/world/attribute/EnvironmentAttribute;Lnet/minecraft/core/BlockPos;)Ljava/lang/Object;
+        24: checkcast     #799                // class java/lang/Float
+        27: invokevirtual #801                // Method java/lang/Float.floatValue:()F
+        30: ldc_w         #804                // float 0.24f
+        33: fsub
+        34: ldc_w         #805                // float 0.76f
+        37: fdiv
+        38: fstore        4
+        40: aload_3
+        41: invokevirtual #275                // Method net/minecraft/client/multiplayer/ClientLevel.dimensionType:()Lnet/minecraft/world/level/dimension/DimensionType;
+        44: invokevirtual #806                // Method net/minecraft/world/level/dimension/DimensionType.ambientLight:()F
+        47: ldc_w         #809                // float 24.0f
+        50: fmul
+        51: ldc_w         #810                // float 15.0f
+        54: fdiv
+        55: fstore        5
+        57: fload         5
+        59: fconst_1
+        60: fcmpl
+        61: ifle          67
+        64: fconst_1
+        65: fstore        5
+        67: fload         5
+        69: fconst_1
+        70: fload         5
+        72: fsub
+        73: fload         4
+        75: fconst_0
+        76: fconst_1
+        77: invokestatic  #811                // Method net/minecraft/util/Mth.clamp:(FFF)F
+        80: fmul
+        81: fadd
+        82: freturn
+
+  public xaero.common.minimap.render.MinimapRendererHelper getHelper();
+    Code:
+         0: aload_0
+         1: getfield      #36                 // Field helper:Lxaero/common/minimap/render/MinimapRendererHelper;
+         4: areturn
+
+  public abstract net.minecraft.client.renderer.rendertype.PreparedRenderType$Texture getTas();
+}

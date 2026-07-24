@@ -1,0 +1,320 @@
+﻿Compiled from "CaveStartCalculator.java"
+public class xaero.map.misc.CaveStartCalculator {
+  private final net.minecraft.core.BlockPos$MutableBlockPos mutableBlockPos;
+
+  private final xaero.map.misc.CachedFunction<net.minecraft.world.level.block.state.StateHolder<?, ?>, java.lang.Boolean> transparentCache;
+
+  private final xaero.map.MapWriter mapWriter;
+
+  public xaero.map.misc.CaveStartCalculator(xaero.map.MapWriter);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: new           #7                  // class net/minecraft/core/BlockPos$MutableBlockPos
+         8: dup
+         9: invokespecial #9                  // Method net/minecraft/core/BlockPos$MutableBlockPos."<init>":()V
+        12: putfield      #10                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        15: aload_0
+        16: aload_1
+        17: putfield      #16                 // Field mapWriter:Lxaero/map/MapWriter;
+        20: aload_0
+        21: new           #20                 // class xaero/map/misc/CachedFunction
+        24: dup
+        25: aload_1
+        26: invokedynamic #22,  0             // InvokeDynamic #0:apply:(Lxaero/map/MapWriter;)Ljava/util/function/Function;
+        31: invokespecial #26                 // Method xaero/map/misc/CachedFunction."<init>":(Ljava/util/function/Function;)V
+        34: putfield      #29                 // Field transparentCache:Lxaero/map/misc/CachedFunction;
+        37: return
+
+  public int getCaving(double, double, double, net.minecraft.world.level.Level);
+    Code:
+         0: getstatic     #33                 // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+         3: invokevirtual #39                 // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #43                 // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+         9: astore        8
+        11: aload         8
+        13: getstatic     #49                 // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.AUTO_CAVE_MODE:Lxaero/lib/common/config/option/RangeConfigOption;
+        16: invokevirtual #55                 // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        19: checkcast     #61                 // class java/lang/Integer
+        22: invokevirtual #63                 // Method java/lang/Integer.intValue:()I
+        25: istore        9
+        27: iload         9
+        29: ifne          35
+        32: ldc           #67                 // int 2147483647
+        34: ireturn
+        35: aload         7
+        37: invokevirtual #68                 // Method net/minecraft/world/level/Level.getMinY:()I
+        40: istore        10
+        42: aload         7
+        44: invokevirtual #73                 // Method net/minecraft/world/level/Level.getMaxY:()I
+        47: istore        11
+        49: dload_3
+        50: d2i
+        51: iconst_1
+        52: iadd
+        53: istore        12
+        55: iload         12
+        57: iconst_3
+        58: iadd
+        59: istore        13
+        61: ldc           #67                 // int 2147483647
+        63: istore        14
+        65: iload         12
+        67: iload         11
+        69: if_icmpgt     79
+        72: iload         12
+        74: iload         10
+        76: if_icmpge     82
+        79: iload         14
+        81: ireturn
+        82: dload_1
+        83: invokestatic  #76                 // Method net/minecraft/util/Mth.floor:(D)I
+        86: istore        15
+        88: dload         5
+        90: invokestatic  #76                 // Method net/minecraft/util/Mth.floor:(D)I
+        93: istore        16
+        95: iload         9
+        97: ifge          104
+       100: iconst_1
+       101: goto          108
+       104: iload         9
+       106: iconst_1
+       107: isub
+       108: istore        17
+       110: iconst_1
+       111: iload         17
+       113: iconst_2
+       114: imul
+       115: iadd
+       116: istore        18
+       118: iload         15
+       120: iload         17
+       122: isub
+       123: istore        19
+       125: iload         16
+       127: iload         17
+       129: isub
+       130: istore        20
+       132: aload_0
+       133: getfield      #16                 // Field mapWriter:Lxaero/map/MapWriter;
+       136: invokevirtual #82                 // Method xaero/map/MapWriter.getMapProcessor:()Lxaero/map/MapProcessor;
+       139: invokevirtual #88                 // Method xaero/map/MapProcessor.getMapWorld:()Lxaero/map/world/MapWorld;
+       142: invokevirtual #94                 // Method xaero/map/world/MapWorld.isIgnoreHeightmaps:()Z
+       145: istore        21
+       147: iload         12
+       149: istore        22
+       151: ldc           #67                 // int 2147483647
+       153: istore        23
+       155: aconst_null
+       156: astore        24
+       158: iload         13
+       160: istore        25
+       162: iconst_0
+       163: istore        26
+       165: iload         26
+       167: iload         18
+       169: if_icmpge     580
+       172: iconst_0
+       173: istore        27
+       175: iload         27
+       177: iload         18
+       179: if_icmpge     574
+       182: iload         19
+       184: iload         26
+       186: iadd
+       187: istore        28
+       189: iload         20
+       191: iload         27
+       193: iadd
+       194: istore        29
+       196: aload_0
+       197: getfield      #10                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       200: iload         28
+       202: iload         12
+       204: iload         29
+       206: invokevirtual #100                // Method net/minecraft/core/BlockPos$MutableBlockPos.set:(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       209: pop
+       210: aload         7
+       212: iload         28
+       214: iconst_4
+       215: ishr
+       216: iload         29
+       218: iconst_4
+       219: ishr
+       220: invokevirtual #104                // Method net/minecraft/world/level/Level.getChunk:(II)Lnet/minecraft/world/level/chunk/LevelChunk;
+       223: astore        30
+       225: aload         30
+       227: ifnull        247
+       230: aload         7
+       232: getstatic     #108                // Field net/minecraft/world/level/LightLayer.SKY:Lnet/minecraft/world/level/LightLayer;
+       235: aload_0
+       236: getfield      #10                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       239: invokevirtual #114                // Method net/minecraft/world/level/Level.getBrightness:(Lnet/minecraft/world/level/LightLayer;Lnet/minecraft/core/BlockPos;)I
+       242: istore        31
+       244: goto          250
+       247: iload         14
+       249: ireturn
+       250: iload         21
+       252: ifne          296
+       255: iload         31
+       257: bipush        15
+       259: if_icmpge     293
+       262: iload         28
+       264: bipush        15
+       266: iand
+       267: istore        32
+       269: iload         29
+       271: bipush        15
+       273: iand
+       274: istore        33
+       276: aload         30
+       278: getstatic     #118                // Field net/minecraft/world/level/levelgen/Heightmap$Types.WORLD_SURFACE:Lnet/minecraft/world/level/levelgen/Heightmap$Types;
+       281: iload         32
+       283: iload         33
+       285: invokevirtual #124                // Method net/minecraft/world/level/chunk/ChunkAccess.getHeight:(Lnet/minecraft/world/level/levelgen/Heightmap$Types;II)I
+       288: istore        23
+       290: goto          410
+       293: iload         14
+       295: ireturn
+       296: aload         30
+       298: aload         24
+       300: if_acmpeq     410
+       303: aload         30
+       305: invokevirtual #130                // Method net/minecraft/world/level/chunk/ChunkAccess.getSections:()[Lnet/minecraft/world/level/chunk/LevelChunkSection;
+       308: astore        32
+       310: aload         32
+       312: arraylength
+       313: ifne          319
+       316: iload         14
+       318: ireturn
+       319: iload         12
+       321: iload         10
+       323: isub
+       324: iconst_4
+       325: ishr
+       326: istore        33
+       328: iconst_0
+       329: istore        34
+       331: iload         33
+       333: istore        35
+       335: iload         35
+       337: aload         32
+       339: arraylength
+       340: if_icmpge     398
+       343: aload         32
+       345: iload         35
+       347: aaload
+       348: astore        36
+       350: aload         36
+       352: invokevirtual #134                // Method net/minecraft/world/level/chunk/LevelChunkSection.hasOnlyAir:()Z
+       355: ifne          392
+       358: iload         34
+       360: ifne          380
+       363: iload         22
+       365: iload         10
+       367: iload         35
+       369: iconst_4
+       370: ishl
+       371: iadd
+       372: invokestatic  #139                // Method java/lang/Math.max:(II)I
+       375: istore        22
+       377: iconst_1
+       378: istore        34
+       380: iload         10
+       382: iload         35
+       384: iconst_4
+       385: ishl
+       386: iadd
+       387: bipush        15
+       389: iadd
+       390: istore        23
+       392: iinc          35, 1
+       395: goto          335
+       398: iload         34
+       400: ifne          406
+       403: iload         14
+       405: ireturn
+       406: aload         30
+       408: astore        24
+       410: iload         23
+       412: iload         10
+       414: if_icmpge     420
+       417: iload         14
+       419: ireturn
+       420: iload         23
+       422: iload         11
+       424: if_icmple     431
+       427: iload         11
+       429: istore        23
+       431: iload         22
+       433: istore        32
+       435: iload         32
+       437: iload         23
+       439: if_icmpgt     565
+       442: aload_0
+       443: getfield      #10                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       446: iload         32
+       448: invokevirtual #145                // Method net/minecraft/core/BlockPos$MutableBlockPos.setY:(I)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       451: pop
+       452: aload         7
+       454: aload_0
+       455: getfield      #10                 // Field mutableBlockPos:Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       458: invokevirtual #149                // Method net/minecraft/world/level/Level.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       461: astore        33
+       463: aload         33
+       465: invokevirtual #153                // Method net/minecraft/world/level/block/state/BlockState.isAir:()Z
+       468: ifne          559
+       471: aload         33
+       473: invokevirtual #158                // Method net/minecraft/world/level/block/state/BlockState.getPistonPushReaction:()Lnet/minecraft/world/level/material/PushReaction;
+       476: getstatic     #162                // Field net/minecraft/world/level/material/PushReaction.DESTROY:Lnet/minecraft/world/level/material/PushReaction;
+       479: if_acmpeq     559
+       482: aload         33
+       484: invokevirtual #168                // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       487: instanceof    #172                // class net/minecraft/world/level/block/LiquidBlock
+       490: ifne          559
+       493: aload         33
+       495: getstatic     #174                // Field net/minecraft/tags/BlockTags.LEAVES:Lnet/minecraft/tags/TagKey;
+       498: invokevirtual #180                // Method net/minecraft/world/level/block/state/BlockState.is:(Lnet/minecraft/tags/TagKey;)Z
+       501: ifne          559
+       504: aload_0
+       505: getfield      #29                 // Field transparentCache:Lxaero/map/misc/CachedFunction;
+       508: aload         33
+       510: invokevirtual #184                // Method xaero/map/misc/CachedFunction.apply:(Ljava/lang/Object;)Ljava/lang/Object;
+       513: checkcast     #187                // class java/lang/Boolean
+       516: invokevirtual #189                // Method java/lang/Boolean.booleanValue:()Z
+       519: ifne          559
+       522: aload         33
+       524: invokevirtual #168                // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+       527: getstatic     #192                // Field net/minecraft/world/level/block/Blocks.BARRIER:Lnet/minecraft/world/level/block/Block;
+       530: if_acmpeq     559
+       533: iload         26
+       535: iload         27
+       537: if_icmpne     568
+       540: iload         26
+       542: iload         17
+       544: if_icmpne     568
+       547: iload         32
+       549: iload         13
+       551: invokestatic  #198                // Method java/lang/Math.min:(II)I
+       554: istore        25
+       556: goto          568
+       559: iinc          32, 1
+       562: goto          435
+       565: iload         14
+       567: ireturn
+       568: iinc          27, 1
+       571: goto          175
+       574: iinc          26, 1
+       577: goto          165
+       580: iload         25
+       582: ireturn
+
+  private static java.lang.Boolean lambda$new$0(xaero.map.MapWriter, net.minecraft.world.level.block.state.StateHolder);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: invokevirtual #201                // Method xaero/map/MapWriter.shouldOverlay:(Lnet/minecraft/world/level/block/state/StateHolder;)Z
+         5: invokestatic  #205                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+         8: areturn
+}

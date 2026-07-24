@@ -1,0 +1,778 @@
+﻿Compiled from "MinimapProcessor.java"
+public class xaero.common.minimap.MinimapProcessor {
+  public static final boolean DEBUG = false;
+
+  public static final int FRAME = 9;
+
+  private xaero.common.IXaeroMinimap modMain;
+
+  private xaero.hud.minimap.module.MinimapSession minimapSession;
+
+  private xaero.common.minimap.write.MinimapWriter minimapWriter;
+
+  private xaero.hud.minimap.radar.RadarSession radarSession;
+
+  private xaero.hud.minimap.Minimap minimap;
+
+  private xaero.hud.minimap.radar.category.EntityRadarCategoryManager entityCategoryManager;
+
+  private xaero.hud.minimap.player.tracker.synced.ClientSyncedTrackedPlayerManager syncedTrackedPlayerManager;
+
+  private double minimapZoom;
+
+  private boolean toResetImage;
+
+  private boolean enlargedMap;
+
+  private boolean manualCaveMode;
+
+  private boolean noMinimapMessageReceived;
+
+  private boolean fairPlayOnlyMessageReceived;
+
+  private boolean consideringNetherFairPlayMessage;
+
+  private double lastMapDimensionScale;
+
+  private net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> lastMapDimension;
+
+  private double lastPlayerDimDiv;
+
+  private net.minecraft.world.item.Item minimapItem;
+
+  private final xaero.hud.minimap.render.MinimapPipRenderState renderState;
+
+  private final xaero.hud.minimap.render.MinimapPipRenderState$Enlarged enlargedRenderState;
+
+  public xaero.common.minimap.MinimapProcessor(xaero.common.IXaeroMinimap, xaero.hud.minimap.module.MinimapSession, xaero.common.minimap.write.MinimapWriter, xaero.hud.minimap.radar.RadarSession, xaero.hud.minimap.player.tracker.synced.ClientSyncedTrackedPlayerManager);
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: aload_0
+         5: dconst_1
+         6: putfield      #7                  // Field lastMapDimensionScale:D
+         9: aload_0
+        10: dconst_1
+        11: putfield      #13                 // Field lastPlayerDimDiv:D
+        14: aload_0
+        15: aload_1
+        16: putfield      #16                 // Field modMain:Lxaero/common/IXaeroMinimap;
+        19: aload_0
+        20: aload_2
+        21: putfield      #20                 // Field minimapSession:Lxaero/hud/minimap/module/MinimapSession;
+        24: aload_0
+        25: aload_3
+        26: putfield      #24                 // Field minimapWriter:Lxaero/common/minimap/write/MinimapWriter;
+        29: aload_0
+        30: aload         4
+        32: putfield      #28                 // Field radarSession:Lxaero/hud/minimap/radar/RadarSession;
+        35: aload_0
+        36: dconst_1
+        37: putfield      #32                 // Field minimapZoom:D
+        40: aload_0
+        41: iconst_1
+        42: putfield      #35                 // Field toResetImage:Z
+        45: aload_0
+        46: aload_1
+        47: invokeinterface #39,  1           // InterfaceMethod xaero/common/IXaeroMinimap.getMinimap:()Lxaero/hud/minimap/Minimap;
+        52: putfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        55: aload_0
+        56: aload         5
+        58: putfield      #49                 // Field syncedTrackedPlayerManager:Lxaero/hud/minimap/player/tracker/synced/ClientSyncedTrackedPlayerManager;
+        61: aload_0
+        62: invokevirtual #53                 // Method updateMinimapItem:()V
+        65: aload_0
+        66: new           #56                 // class xaero/hud/minimap/render/MinimapPipRenderState
+        69: dup
+        70: invokespecial #58                 // Method xaero/hud/minimap/render/MinimapPipRenderState."<init>":()V
+        73: putfield      #59                 // Field renderState:Lxaero/hud/minimap/render/MinimapPipRenderState;
+        76: aload_0
+        77: new           #63                 // class xaero/hud/minimap/render/MinimapPipRenderState$Enlarged
+        80: dup
+        81: invokespecial #65                 // Method xaero/hud/minimap/render/MinimapPipRenderState$Enlarged."<init>":()V
+        84: putfield      #66                 // Field enlargedRenderState:Lxaero/hud/minimap/render/MinimapPipRenderState$Enlarged;
+        87: return
+
+  public int getMinimapSize();
+    Code:
+         0: invokestatic  #70                 // Method xaero/hud/minimap/config/util/MinimapConfigClientUtils.getEffectiveMinimapSize:()I
+         3: istore_1
+         4: aload_0
+         5: getfield      #76                 // Field enlargedMap:Z
+         8: ifeq          17
+        11: sipush        500
+        14: goto          20
+        17: iload_1
+        18: iconst_2
+        19: imul
+        20: ireturn
+
+  public int getMinimapBufferSize(int);
+    Code:
+         0: sipush        128
+         3: ldc2_w        #79                 // double 2.0d
+         6: iload_1
+         7: i2d
+         8: ldc2_w        #81                 // double 128.0d
+        11: ddiv
+        12: invokestatic  #83                 // Method java/lang/Math.log:(D)D
+        15: ldc2_w        #79                 // double 2.0d
+        18: invokestatic  #83                 // Method java/lang/Math.log:(D)D
+        21: ddiv
+        22: invokestatic  #89                 // Method java/lang/Math.ceil:(D)D
+        25: invokestatic  #92                 // Method java/lang/Math.pow:(DD)D
+        28: d2i
+        29: imul
+        30: istore_2
+        31: iload_2
+        32: sipush        128
+        35: if_icmpge     42
+        38: sipush        128
+        41: ireturn
+        42: iload_2
+        43: sipush        512
+        46: if_icmple     53
+        49: sipush        512
+        52: ireturn
+        53: iload_2
+        54: ireturn
+
+  public boolean isEnlargedMap();
+    Code:
+         0: aload_0
+         1: getfield      #76                 // Field enlargedMap:Z
+         4: ireturn
+
+  public void setEnlargedMap(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #76                 // Field enlargedMap:Z
+         5: return
+
+  public double getMinimapZoom();
+    Code:
+         0: aload_0
+         1: getfield      #32                 // Field minimapZoom:D
+         4: dreturn
+
+  public boolean isCaveModeDisplayed();
+    Code:
+         0: aload_0
+         1: getfield      #24                 // Field minimapWriter:Lxaero/common/minimap/write/MinimapWriter;
+         4: invokevirtual #96                 // Method xaero/common/minimap/write/MinimapWriter.getLoadedCaving:()I
+         7: ldc           #101                // int 2147483647
+         9: if_icmpeq     16
+        12: iconst_1
+        13: goto          17
+        16: iconst_0
+        17: ireturn
+
+  public double getTargetZoom();
+    Code:
+         0: getstatic     #102                // Field xaero/common/HudMod.INSTANCE:Lxaero/common/HudMod;
+         3: invokevirtual #108                // Method xaero/common/HudMod.getHudConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #112                // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+         9: astore_1
+        10: aload_1
+        11: getstatic     #118                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.ZOOM:Lxaero/lib/common/config/option/RangeConfigOption;
+        14: invokevirtual #124                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        17: checkcast     #130                // class java/lang/Integer
+        20: invokevirtual #132                // Method java/lang/Integer.intValue:()I
+        23: i2f
+        24: fstore_2
+        25: aload_0
+        26: getfield      #76                 // Field enlargedMap:Z
+        29: ifeq          53
+        32: aload_1
+        33: getstatic     #135                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.ZOOM_ENLARGED:Lxaero/lib/common/config/option/RangeConfigOption;
+        36: invokevirtual #124                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        39: checkcast     #130                // class java/lang/Integer
+        42: invokevirtual #132                // Method java/lang/Integer.intValue:()I
+        45: istore_3
+        46: iload_3
+        47: ifle          53
+        50: iload_3
+        51: i2f
+        52: fstore_2
+        53: aload_0
+        54: invokevirtual #138                // Method isCaveModeDisplayed:()Z
+        57: ifeq          77
+        60: fload_2
+        61: aload_1
+        62: getstatic     #142                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.CAVE_ZOOM:Lxaero/lib/common/config/option/RangeConfigOption;
+        65: invokevirtual #124                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        68: checkcast     #130                // class java/lang/Integer
+        71: invokevirtual #132                // Method java/lang/Integer.intValue:()I
+        74: i2f
+        75: fmul
+        76: fstore_2
+        77: fload_2
+        78: ldc           #147                // float 5.0f
+        80: fcmpl
+        81: ifle          87
+        84: ldc           #147                // float 5.0f
+        86: fstore_2
+        87: fload_2
+        88: f2d
+        89: dreturn
+
+  public void instantZoom();
+    Code:
+         0: aload_0
+         1: aload_0
+         2: invokevirtual #148                // Method getTargetZoom:()D
+         5: putfield      #32                 // Field minimapZoom:D
+         8: return
+
+  public void updateZoom();
+    Code:
+         0: aload_0
+         1: invokevirtual #148                // Method getTargetZoom:()D
+         4: dstore_1
+         5: dload_1
+         6: aload_0
+         7: getfield      #32                 // Field minimapZoom:D
+        10: dsub
+        11: dstore_3
+        12: dload_3
+        13: ldc2_w        #152                // double 0.01d
+        16: dcmpl
+        17: ifgt          28
+        20: dload_3
+        21: ldc2_w        #154                // double -0.01d
+        24: dcmpg
+        25: ifge          41
+        28: dload_3
+        29: ldc2_w        #156                // double 0.8d
+        32: invokestatic  #158                // Method xaero/common/anim/MultiplyAnimationHelper.animate:(DD)D
+        35: d2f
+        36: f2d
+        37: dstore_3
+        38: goto          43
+        41: dconst_0
+        42: dstore_3
+        43: aload_0
+        44: dload_1
+        45: dload_3
+        46: dsub
+        47: putfield      #32                 // Field minimapZoom:D
+        50: return
+
+  public xaero.common.minimap.write.MinimapWriter getMinimapWriter();
+    Code:
+         0: aload_0
+         1: getfield      #24                 // Field minimapWriter:Lxaero/common/minimap/write/MinimapWriter;
+         4: areturn
+
+  public boolean canUseFrameBuffer();
+    Code:
+         0: iconst_1
+         1: ireturn
+
+  public int getFBOBufferSize();
+    Code:
+         0: sipush        512
+         3: ireturn
+
+  public void onClientTick();
+    Code:
+         0: aconst_null
+         1: astore_1
+         2: invokestatic  #163                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+         5: getfield      #169                // Field net/minecraft/client/Minecraft.player:Lnet/minecraft/client/player/LocalPlayer;
+         8: astore_2
+         9: aload_2
+        10: ifnull        28
+        13: aload_2
+        14: invokevirtual #173                // Method net/minecraft/world/entity/player/Player.level:()Lnet/minecraft/world/level/Level;
+        17: instanceof    #179                // class net/minecraft/client/multiplayer/ClientLevel
+        20: ifeq          28
+        23: aload_2
+        24: invokevirtual #173                // Method net/minecraft/world/entity/player/Player.level:()Lnet/minecraft/world/level/Level;
+        27: astore_1
+        28: invokestatic  #163                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+        31: invokevirtual #181                // Method net/minecraft/client/Minecraft.getCameraEntity:()Lnet/minecraft/world/entity/Entity;
+        34: astore_3
+        35: aload_0
+        36: getfield      #28                 // Field radarSession:Lxaero/hud/minimap/radar/RadarSession;
+        39: aload_1
+        40: checkcast     #179                // class net/minecraft/client/multiplayer/ClientLevel
+        43: aload_3
+        44: aload_2
+        45: invokevirtual #185                // Method xaero/hud/minimap/radar/RadarSession.update:(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/player/Player;)V
+        48: return
+
+  public void onPlayerTick();
+    Code:
+         0: return
+
+  public void checkFBO();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+         4: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+         7: invokevirtual #197                // Method xaero/common/minimap/render/MinimapFBORenderer.isLoadedFBO:()Z
+        10: ifeq          46
+        13: aload_0
+        14: invokevirtual #202                // Method canUseFrameBuffer:()Z
+        17: ifne          46
+        20: aload_0
+        21: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        24: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+        27: iconst_0
+        28: invokevirtual #205                // Method xaero/common/minimap/render/MinimapFBORenderer.setLoadedFBO:(Z)V
+        31: aload_0
+        32: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        35: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+        38: invokevirtual #209                // Method xaero/common/minimap/render/MinimapFBORenderer.deleteFramebuffers:()V
+        41: aload_0
+        42: iconst_1
+        43: putfield      #35                 // Field toResetImage:Z
+        46: getstatic     #102                // Field xaero/common/HudMod.INSTANCE:Lxaero/common/HudMod;
+        49: invokevirtual #108                // Method xaero/common/HudMod.getHudConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+        52: invokevirtual #112                // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+        55: getstatic     #212                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.SAFE_MODE:Lxaero/lib/common/config/option/BooleanConfigOption;
+        58: invokevirtual #124                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        61: checkcast     #216                // class java/lang/Boolean
+        64: invokevirtual #218                // Method java/lang/Boolean.booleanValue:()Z
+        67: istore_1
+        68: aload_0
+        69: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        72: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+        75: invokevirtual #197                // Method xaero/common/minimap/render/MinimapFBORenderer.isLoadedFBO:()Z
+        78: ifne          122
+        81: iload_1
+        82: ifne          122
+        85: aload_0
+        86: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        89: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+        92: invokevirtual #221                // Method xaero/common/minimap/render/MinimapFBORenderer.isTriedFBO:()Z
+        95: ifne          122
+        98: invokestatic  #163                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+       101: getfield      #224                // Field net/minecraft/client/Minecraft.gui:Lnet/minecraft/client/gui/Gui;
+       104: invokevirtual #228                // Method net/minecraft/client/gui/Gui.overlay:()Lnet/minecraft/client/gui/screens/Overlay;
+       107: ifnull        111
+       110: return
+       111: aload_0
+       112: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       115: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+       118: aload_0
+       119: invokevirtual #234                // Method xaero/common/minimap/render/MinimapFBORenderer.loadFrameBuffer:(Lxaero/common/minimap/MinimapProcessor;)V
+       122: return
+
+  public void onRender(int, int, int, int, double, float, int, int, float, xaero.lib.client.graphics.XaeroBufferProvider, int, int);
+    Code:
+         0: invokestatic  #238                // Method xaero/common/minimap/render/MinimapRendererHelper.restoreDefaultShaderBlendState:()V
+         3: invokestatic  #243                // Method com/mojang/blaze3d/systems/RenderSystem.getModelViewStack:()Lorg/joml/Matrix4fStack;
+         6: invokevirtual #249                // Method org/joml/Matrix4fStack.pushMatrix:()Lorg/joml/Matrix4fStack;
+         9: pop
+        10: invokestatic  #243                // Method com/mojang/blaze3d/systems/RenderSystem.getModelViewStack:()Lorg/joml/Matrix4fStack;
+        13: invokevirtual #254                // Method org/joml/Matrix4fStack.identity:()Lorg/joml/Matrix4f;
+        16: pop
+        17: invokestatic  #243                // Method com/mojang/blaze3d/systems/RenderSystem.getModelViewStack:()Lorg/joml/Matrix4fStack;
+        20: fconst_0
+        21: fconst_0
+        22: ldc_w         #258                // float -11000.0f
+        25: invokevirtual #259                // Method org/joml/Matrix4fStack.translate:(FFF)Lorg/joml/Matrix4f;
+        28: pop
+        29: invokestatic  #163                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+        32: astore        14
+        34: aload         14
+        36: getfield      #263                // Field net/minecraft/client/Minecraft.gameRenderer:Lnet/minecraft/client/renderer/GameRenderer;
+        39: checkcast     #267                // class xaero/lib/client/graphics/IGameRenderer
+        42: invokeinterface #269,  1          // InterfaceMethod xaero/lib/client/graphics/IGameRenderer.xaero_lib_getGuiRenderer:()Lnet/minecraft/client/gui/render/GuiRenderer;
+        47: checkcast     #273                // class xaero/common/core/IGuiRenderer
+        50: astore        15
+        52: aload         15
+        54: invokeinterface #275,  1          // InterfaceMethod xaero/common/core/IGuiRenderer.xaero_mm_getGuiProjectionMatrixBuffer:()Lnet/minecraft/client/renderer/ProjectionMatrixBuffer;
+        59: astore        16
+        61: aload         15
+        63: invokeinterface #279,  1          // InterfaceMethod xaero/common/core/IGuiRenderer.xaero_mm_getGuiProjection:()Lnet/minecraft/client/renderer/Projection;
+        68: astore        17
+        70: aload         17
+        72: invokevirtual #283                // Method net/minecraft/client/renderer/Projection.width:()F
+        75: iload         12
+        77: i2f
+        78: fcmpl
+        79: ifne          94
+        82: aload         17
+        84: invokevirtual #289                // Method net/minecraft/client/renderer/Projection.height:()F
+        87: iload         13
+        89: i2f
+        90: fcmpl
+        91: ifeq          105
+        94: aload         17
+        96: iload         12
+        98: i2f
+        99: iload         13
+       101: i2f
+       102: invokevirtual #292                // Method net/minecraft/client/renderer/Projection.setSize:(FF)V
+       105: aload         16
+       107: aload         17
+       109: invokevirtual #296                // Method net/minecraft/client/renderer/ProjectionMatrixBuffer.getBuffer:(Lnet/minecraft/client/renderer/Projection;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;
+       112: getstatic     #302                // Field com/mojang/blaze3d/ProjectionType.ORTHOGRAPHIC:Lcom/mojang/blaze3d/ProjectionType;
+       115: invokestatic  #308                // Method com/mojang/blaze3d/systems/RenderSystem.setProjectionMatrix:(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/ProjectionType;)V
+       118: aload_0
+       119: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       122: invokevirtual #312                // Method xaero/hud/minimap/Minimap.getMatrixStack:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       125: invokevirtual #316                // Method com/mojang/blaze3d/vertex/PoseStack.pushPose:()V
+       128: aload_0
+       129: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       132: invokevirtual #312                // Method xaero/hud/minimap/Minimap.getMatrixStack:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       135: dconst_0
+       136: dconst_0
+       137: ldc2_w        #152                // double 0.01d
+       140: invokevirtual #321                // Method com/mojang/blaze3d/vertex/PoseStack.translate:(DDD)V
+       143: aload_0
+       144: invokevirtual #324                // Method getRenderer:()Lxaero/common/minimap/render/MinimapRenderer;
+       147: aload_0
+       148: getfield      #20                 // Field minimapSession:Lxaero/hud/minimap/module/MinimapSession;
+       151: aload_0
+       152: iload_1
+       153: iload_2
+       154: iload_3
+       155: iload         4
+       157: dload         5
+       159: fload         7
+       161: iload         8
+       163: fload         10
+       165: aload         11
+       167: invokevirtual #328                // Method xaero/common/minimap/render/MinimapRenderer.renderMinimap:(Lxaero/hud/minimap/module/MinimapSession;Lxaero/common/minimap/MinimapProcessor;IIIIDFIFLxaero/lib/client/graphics/XaeroBufferProvider;)V
+       170: aload_0
+       171: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       174: invokevirtual #312                // Method xaero/hud/minimap/Minimap.getMatrixStack:()Lcom/mojang/blaze3d/vertex/PoseStack;
+       177: invokevirtual #334                // Method com/mojang/blaze3d/vertex/PoseStack.popPose:()V
+       180: goto          194
+       183: astore        14
+       185: aload_0
+       186: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+       189: aload         14
+       191: invokevirtual #339                // Method xaero/hud/minimap/Minimap.setCrashedWith:(Ljava/lang/Throwable;)V
+       194: invokestatic  #243                // Method com/mojang/blaze3d/systems/RenderSystem.getModelViewStack:()Lorg/joml/Matrix4fStack;
+       197: invokevirtual #343                // Method org/joml/Matrix4fStack.popMatrix:()Lorg/joml/Matrix4fStack;
+       200: pop
+       201: invokestatic  #238                // Method xaero/common/minimap/render/MinimapRendererHelper.restoreDefaultShaderBlendState:()V
+       204: return
+      Exception table:
+         from    to  target type
+            29   180   183   Class java/lang/Throwable
+
+  public xaero.common.minimap.render.MinimapRenderer getRenderer();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+         4: invokevirtual #346                // Method xaero/hud/minimap/Minimap.usingFBO:()Z
+         7: ifeq          18
+        10: aload_0
+        11: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        14: invokevirtual #191                // Method xaero/hud/minimap/Minimap.getMinimapFBORenderer:()Lxaero/common/minimap/render/MinimapFBORenderer;
+        17: areturn
+        18: aload_0
+        19: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+        22: invokevirtual #349                // Method xaero/hud/minimap/Minimap.getMinimapSafeModeRenderer:()Lxaero/common/minimap/render/MinimapSafeModeRenderer;
+        25: areturn
+
+  public static boolean hasMinimapItem(net.minecraft.world.entity.player.Player);
+    Code:
+         0: getstatic     #353                // Field xaero/hud/minimap/BuiltInHudModules.MINIMAP:Lxaero/hud/module/HudModule;
+         3: invokevirtual #359                // Method xaero/hud/module/HudModule.getCurrentSession:()Lxaero/hud/module/ModuleSession;
+         6: checkcast     #365                // class xaero/hud/minimap/module/MinimapSession
+         9: astore_1
+        10: aload_1
+        11: ifnonnull     16
+        14: iconst_1
+        15: ireturn
+        16: aload_1
+        17: invokevirtual #367                // Method xaero/hud/minimap/module/MinimapSession.getProcessor:()Lxaero/common/minimap/MinimapProcessor;
+        20: astore_2
+        21: aload_2
+        22: getfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+        25: ifnull        39
+        28: aload_0
+        29: aload_2
+        30: getfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+        33: invokestatic  #375                // Method xaero/common/misc/Misc.hasItem:(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/Item;)Z
+        36: ifeq          43
+        39: iconst_1
+        40: goto          44
+        43: iconst_0
+        44: ireturn
+
+  public boolean isToResetImage();
+    Code:
+         0: aload_0
+         1: getfield      #35                 // Field toResetImage:Z
+         4: ireturn
+
+  public void setToResetImage(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #35                 // Field toResetImage:Z
+         5: return
+
+  public xaero.hud.minimap.radar.RadarSession getRadarSession();
+    Code:
+         0: aload_0
+         1: getfield      #28                 // Field radarSession:Lxaero/hud/minimap/radar/RadarSession;
+         4: areturn
+
+  public void cleanup();
+    Code:
+         0: aload_0
+         1: getfield      #24                 // Field minimapWriter:Lxaero/common/minimap/write/MinimapWriter;
+         4: invokevirtual #381                // Method xaero/common/minimap/write/MinimapWriter.cleanup:()V
+         7: return
+
+  public boolean isManualCaveMode();
+    Code:
+         0: aload_0
+         1: getfield      #384                // Field manualCaveMode:Z
+         4: ifne          42
+         7: aload_0
+         8: getfield      #16                 // Field modMain:Lxaero/common/IXaeroMinimap;
+        11: invokeinterface #387,  1          // InterfaceMethod xaero/common/IXaeroMinimap.getSupportMods:()Lxaero/common/mods/SupportMods;
+        16: invokevirtual #391                // Method xaero/common/mods/SupportMods.shouldUseWorldMapCaveChunks:()Z
+        19: ifeq          46
+        22: aload_0
+        23: getfield      #16                 // Field modMain:Lxaero/common/IXaeroMinimap;
+        26: invokeinterface #387,  1          // InterfaceMethod xaero/common/IXaeroMinimap.getSupportMods:()Lxaero/common/mods/SupportMods;
+        31: getfield      #396                // Field xaero/common/mods/SupportMods.worldmapSupport:Lxaero/common/mods/SupportXaeroWorldmap;
+        34: invokevirtual #400                // Method xaero/common/mods/SupportXaeroWorldmap.getManualCaveStart:()I
+        37: ldc           #101                // int 2147483647
+        39: if_icmpeq     46
+        42: iconst_1
+        43: goto          47
+        46: iconst_0
+        47: ireturn
+
+  public void toggleManualCaveMode();
+    Code:
+         0: aload_0
+         1: aload_0
+         2: invokevirtual #405                // Method isManualCaveMode:()Z
+         5: ifne          12
+         8: iconst_1
+         9: goto          13
+        12: iconst_0
+        13: putfield      #384                // Field manualCaveMode:Z
+        16: return
+
+  public xaero.hud.minimap.Minimap getMinimap();
+    Code:
+         0: aload_0
+         1: getfield      #45                 // Field minimap:Lxaero/hud/minimap/Minimap;
+         4: areturn
+
+  public boolean getNoMinimapMessageReceived();
+    Code:
+         0: getstatic     #102                // Field xaero/common/HudMod.INSTANCE:Lxaero/common/HudMod;
+         3: invokevirtual #108                // Method xaero/common/HudMod.getHudConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #112                // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+         9: invokevirtual #408                // Method xaero/lib/client/config/ClientConfigManager.getServerSynced:()Lxaero/lib/client/config/sync/SyncedConfigManager;
+        12: invokevirtual #412                // Method xaero/lib/client/config/sync/SyncedConfigManager.isChannelPresentOnServer:()Z
+        15: ifeq          20
+        18: iconst_0
+        19: ireturn
+        20: aload_0
+        21: getfield      #417                // Field noMinimapMessageReceived:Z
+        24: ireturn
+
+  public void setNoMinimapMessageReceived(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #417                // Field noMinimapMessageReceived:Z
+         5: return
+
+  public boolean getForcedFairPlay();
+    Code:
+         0: aload_0
+         1: getfield      #420                // Field fairPlayOnlyMessageReceived:Z
+         4: ireturn
+
+  public void setFairPlayOnlyMessageReceived(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #420                // Field fairPlayOnlyMessageReceived:Z
+         5: return
+
+  public xaero.hud.minimap.player.tracker.synced.ClientSyncedTrackedPlayerManager getSyncedTrackedPlayerManager();
+    Code:
+         0: aload_0
+         1: getfield      #49                 // Field syncedTrackedPlayerManager:Lxaero/hud/minimap/player/tracker/synced/ClientSyncedTrackedPlayerManager;
+         4: areturn
+
+  public boolean serverHasMod();
+    Code:
+         0: invokestatic  #423                // Method xaero/common/minimap/mcworld/MinimapClientWorldDataHelper.getCurrentWorldData:()Lxaero/common/minimap/mcworld/MinimapClientWorldData;
+         3: astore_1
+         4: aload_1
+         5: ifnull        19
+         8: aload_1
+         9: getfield      #429                // Field xaero/common/minimap/mcworld/MinimapClientWorldData.serverLevelId:Ljava/lang/Integer;
+        12: ifnull        19
+        15: iconst_1
+        16: goto          20
+        19: iconst_0
+        20: ireturn
+
+  public void setServerModNetworkVersion(int);
+    Code:
+         0: invokestatic  #423                // Method xaero/common/minimap/mcworld/MinimapClientWorldDataHelper.getCurrentWorldData:()Lxaero/common/minimap/mcworld/MinimapClientWorldData;
+         3: astore_2
+         4: aload_2
+         5: ifnonnull     9
+         8: return
+         9: aload_2
+        10: iload_1
+        11: invokevirtual #435                // Method xaero/common/minimap/mcworld/MinimapClientWorldData.setServerModNetworkVersion:(I)V
+        14: return
+
+  public int getServerModNetworkVersion();
+    Code:
+         0: invokestatic  #423                // Method xaero/common/minimap/mcworld/MinimapClientWorldDataHelper.getCurrentWorldData:()Lxaero/common/minimap/mcworld/MinimapClientWorldData;
+         3: astore_1
+         4: aload_1
+         5: ifnonnull     10
+         8: iconst_0
+         9: ireturn
+        10: aload_1
+        11: invokevirtual #439                // Method xaero/common/minimap/mcworld/MinimapClientWorldData.getServerModNetworkVersion:()I
+        14: ireturn
+
+  public double getLastMapDimensionScale();
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field lastMapDimensionScale:D
+         4: dreturn
+
+  public void setLastMapDimensionScale(double);
+    Code:
+         0: aload_0
+         1: dload_1
+         2: putfield      #7                  // Field lastMapDimensionScale:D
+         5: return
+
+  public net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> getLastMapDimension();
+    Code:
+         0: aload_0
+         1: getfield      #442                // Field lastMapDimension:Lnet/minecraft/resources/ResourceKey;
+         4: areturn
+
+  public void setLastMapDimension(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level>);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #442                // Field lastMapDimension:Lnet/minecraft/resources/ResourceKey;
+         5: return
+
+  public xaero.hud.minimap.module.MinimapSession getSession();
+    Code:
+         0: aload_0
+         1: getfield      #20                 // Field minimapSession:Lxaero/hud/minimap/module/MinimapSession;
+         4: areturn
+
+  public void updateMinimapItem();
+    Code:
+         0: getstatic     #102                // Field xaero/common/HudMod.INSTANCE:Lxaero/common/HudMod;
+         3: invokevirtual #108                // Method xaero/common/HudMod.getHudConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         6: invokevirtual #112                // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+         9: getstatic     #446                // Field xaero/hud/minimap/common/config/option/MinimapProfiledConfigOptions.MINIMAP_ITEM:Lxaero/lib/common/config/option/ConfigOption;
+        12: invokevirtual #124                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        15: checkcast     #450                // class java/lang/String
+        18: invokevirtual #452                // Method java/lang/String.trim:()Ljava/lang/String;
+        21: astore_1
+        22: aload_1
+        23: invokevirtual #456                // Method java/lang/String.isEmpty:()Z
+        26: ifne          39
+        29: aload_1
+        30: ldc_w         #459                // String -
+        33: invokevirtual #461                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+        36: ifeq          56
+        39: aload_0
+        40: aconst_null
+        41: putfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+        44: getstatic     #465                // Field xaero/hud/minimap/MinimapLogs.LOGGER:Lorg/apache/logging/log4j/Logger;
+        47: ldc_w         #471                // String Minimap required item set to nothing.
+        50: invokeinterface #473,  2          // InterfaceMethod org/apache/logging/log4j/Logger.info:(Ljava/lang/String;)V
+        55: return
+        56: aload_1
+        57: invokestatic  #479                // Method net/minecraft/resources/Identifier.parse:(Ljava/lang/String;)Lnet/minecraft/resources/Identifier;
+        60: astore_2
+        61: goto          87
+        64: astore_3
+        65: aload_0
+        66: aconst_null
+        67: putfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+        70: getstatic     #465                // Field xaero/hud/minimap/MinimapLogs.LOGGER:Lorg/apache/logging/log4j/Logger;
+        73: ldc_w         #487                // String Tried setting the minimap required item to a misformatted ID: {}; Error: {}
+        76: aload_1
+        77: aload_3
+        78: invokevirtual #489                // Method net/minecraft/IdentifierException.getMessage:()Ljava/lang/String;
+        81: invokeinterface #492,  4          // InterfaceMethod org/apache/logging/log4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+        86: return
+        87: aload_0
+        88: getstatic     #496                // Field net/minecraft/core/registries/BuiltInRegistries.ITEM:Lnet/minecraft/core/DefaultedRegistry;
+        91: aload_2
+        92: invokeinterface #502,  2          // InterfaceMethod net/minecraft/core/DefaultedRegistry.getValue:(Lnet/minecraft/resources/Identifier;)Ljava/lang/Object;
+        97: checkcast     #508                // class net/minecraft/world/item/Item
+       100: putfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+       103: aload_0
+       104: getfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+       107: getstatic     #510                // Field net/minecraft/world/item/Items.AIR:Lnet/minecraft/world/item/Item;
+       110: if_acmpne     131
+       113: aload_0
+       114: aconst_null
+       115: putfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+       118: getstatic     #465                // Field xaero/hud/minimap/MinimapLogs.LOGGER:Lorg/apache/logging/log4j/Logger;
+       121: ldc_w         #515                // String Tried setting the minimap required item to an invalid ID: {}
+       124: aload_1
+       125: invokeinterface #517,  3          // InterfaceMethod org/apache/logging/log4j/Logger.error:(Ljava/lang/String;Ljava/lang/Object;)V
+       130: return
+       131: getstatic     #465                // Field xaero/hud/minimap/MinimapLogs.LOGGER:Lorg/apache/logging/log4j/Logger;
+       134: aload_0
+       135: getfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+       138: invokevirtual #520                // Method net/minecraft/world/item/Item.getDefaultInstance:()Lnet/minecraft/world/item/ItemStack;
+       141: invokevirtual #524                // Method net/minecraft/world/item/ItemStack.getItemName:()Lnet/minecraft/network/chat/Component;
+       144: invokeinterface #530,  1          // InterfaceMethod net/minecraft/network/chat/Component.getString:()Ljava/lang/String;
+       149: invokedynamic #535,  0            // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       154: invokeinterface #473,  2          // InterfaceMethod org/apache/logging/log4j/Logger.info:(Ljava/lang/String;)V
+       159: return
+      Exception table:
+         from    to  target type
+            56    61    64   Class net/minecraft/IdentifierException
+
+  public net.minecraft.world.item.Item getMinimapItem();
+    Code:
+         0: aload_0
+         1: getfield      #371                // Field minimapItem:Lnet/minecraft/world/item/Item;
+         4: areturn
+
+  public void setConsideringNetherFairPlayMessage(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #539                // Field consideringNetherFairPlayMessage:Z
+         5: return
+
+  public boolean isConsideringNetherFairPlayMessage();
+    Code:
+         0: aload_0
+         1: getfield      #539                // Field consideringNetherFairPlayMessage:Z
+         4: ireturn
+
+  public xaero.hud.minimap.render.MinimapPipRenderState getRenderState();
+    Code:
+         0: aload_0
+         1: getfield      #59                 // Field renderState:Lxaero/hud/minimap/render/MinimapPipRenderState;
+         4: areturn
+
+  public xaero.hud.minimap.render.MinimapPipRenderState$Enlarged getEnlargedRenderState();
+    Code:
+         0: aload_0
+         1: getfield      #66                 // Field enlargedRenderState:Lxaero/hud/minimap/render/MinimapPipRenderState$Enlarged;
+         4: areturn
+}

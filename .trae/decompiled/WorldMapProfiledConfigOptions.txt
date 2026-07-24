@@ -1,0 +1,1101 @@
+﻿Compiled from "WorldMapProfiledConfigOptions.java"
+public class xaero.map.common.config.option.WorldMapProfiledConfigOptions {
+  private static final java.util.List<xaero.lib.common.config.option.ConfigOption<?>> ALL;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption LIGHTING;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption BLOCK_COLORS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption LOAD_NEW_CHUNKS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption UPDATE_CHUNKS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption TERRAIN_DEPTH;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption TERRAIN_SLOPES;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption FOOTSTEPS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption COORDINATES;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption WAYPOINTS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption RENDER_WAYPOINTS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption WAYPOINT_BACKGROUNDS;
+
+  public static final xaero.lib.common.config.option.SteppedConfigOption WAYPOINT_SCALE;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption BIOME_BLENDING;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption BIOME_COLORS_IN_VANILLA;
+
+  public static final xaero.lib.common.config.option.SteppedConfigOption MIN_ZOOM_LOCAL_WAYPOINTS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption ADJUST_HEIGHT_FOR_SHORT_BLOCKS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption FLOWERS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption STAINED_GLASS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption CAVE_MODE_ALLOWED;
+
+  public static final xaero.lib.common.config.option.ConfigOption<java.util.Set<net.minecraft.resources.Identifier>> CAVE_MODE_ALLOWED_DIMENSIONS;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption CAVE_MODE_DEPTH;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption LEGIBLE_CAVE_MAPS;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption AUTO_CAVE_MODE;
+
+  public static final xaero.lib.common.config.option.SteppedConfigOption CAVE_MODE_TOGGLE_TIMER;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption DEFAULT_CAVE_MODE_TYPE;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption DISPLAY_CAVE_MODE_START;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption WRITING_DISTANCE;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption ARROW;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption OPENING_ANIMATION;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption ARROW_COLOR;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption DISPLAY_ZOOM;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption DISPLAY_HOVERED_BIOME;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption ZOOM_BUTTONS;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption DETECT_AMBIGUOUS_Y;
+
+  public static final xaero.lib.common.config.option.ConfigOption<java.lang.String> DEFAULT_MAP_TELEPORT_FORMAT;
+
+  public static final xaero.lib.common.config.option.ConfigOption<java.lang.String> DEFAULT_MAP_TELEPORT_DIMENSION_FORMAT;
+
+  public static final xaero.lib.common.config.option.ConfigOption<java.lang.String> DEFAULT_PLAYER_TELEPORT_FORMAT;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption MAP_TELEPORT_ALLOWED;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption PARTIAL_Y_TELEPORT;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption OPAC_CLAIMS;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption OPAC_CLAIMS_BORDER_OPACITY;
+
+  public static final xaero.lib.common.config.option.RangeConfigOption OPAC_CLAIMS_FILL_OPACITY;
+
+  public static final xaero.lib.common.config.option.ConfigOption<java.lang.String> MAP_ITEM;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption MINIMAP_RADAR;
+
+  public static final xaero.lib.common.config.option.BooleanConfigOption DISPLAY_TRACKED_PLAYERS;
+
+  public xaero.map.common.config.option.WorldMapProfiledConfigOptions();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static void registerAll(xaero.lib.common.config.option.ConfigOptionManager);
+    Code:
+         0: getstatic     #7                  // Field ALL:Ljava/util/List;
+         3: invokeinterface #13,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+         8: astore_1
+         9: aload_1
+        10: invokeinterface #19,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+        15: ifeq          36
+        18: aload_1
+        19: invokeinterface #25,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        24: checkcast     #29                 // class xaero/lib/common/config/option/ConfigOption
+        27: astore_2
+        28: aload_0
+        29: aload_2
+        30: invokevirtual #31                 // Method xaero/lib/common/config/option/ConfigOptionManager.register:(Lxaero/lib/common/config/option/ConfigOption;)V
+        33: goto          9
+        36: return
+
+  private static net.minecraft.network.chat.Component lambda$static$6(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: getstatic     #37                 // Field xaero/map/common/config/WorldMapConfigConstants.ARROW_COLOR_NAMES:[Lnet/minecraft/network/chat/Component;
+         3: aload_1
+         4: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         7: iconst_2
+         8: iadd
+         9: aaload
+        10: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$5(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: aload_1
+         1: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         4: ifge          13
+         7: ldc           #49                 // String gui.xaero_map_writing_distance_unlimited
+         9: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        12: areturn
+        13: aload_1
+        14: invokedynamic #57,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/Integer;)Ljava/lang/String;
+        19: invokestatic  #61                 // InterfaceMethod net/minecraft/network/chat/Component.literal:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        22: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$4(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: getstatic     #64                 // Field xaero/map/common/config/WorldMapConfigConstants.DEFAULT_CAVE_MODE_TYPE_NAMES:[Lnet/minecraft/network/chat/Component;
+         3: aload_1
+         4: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         7: aaload
+         8: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$3(xaero.lib.common.config.option.ConfigOption, java.lang.Double);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: getstatic     #67                 // Field xaero/map/common/config/WorldMapConfigConstants.SEC:Lnet/minecraft/network/chat/Component;
+         5: invokestatic  #71                 // Method xaero/lib/common/config/util/ConfigUtils.getDisplayForSimpleNumber:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Number;Lnet/minecraft/network/chat/Component;)Lnet/minecraft/network/chat/Component;
+         8: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$2(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: aload_1
+         1: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         4: ifne          13
+         7: ldc           #77                 // String gui.xaero_off
+         9: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        12: areturn
+        13: aload_1
+        14: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+        17: ifge          26
+        20: ldc           #79                 // String gui.xaero_auto_cave_mode_minimap
+        22: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        25: areturn
+        26: aload_1
+        27: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+        30: iconst_2
+        31: imul
+        32: iconst_1
+        33: isub
+        34: istore_2
+        35: ldc           #81                 // String gui.xaero_wm_ceiling
+        37: iconst_1
+        38: anewarray     #2                  // class java/lang/Object
+        41: dup
+        42: iconst_0
+        43: iload_2
+        44: iload_2
+        45: invokedynamic #83,  0             // InvokeDynamic #1:makeConcatWithConstants:(II)Ljava/lang/String;
+        50: aastore
+        51: invokestatic  #86                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;
+        54: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$1(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: getstatic     #89                 // Field xaero/map/common/config/WorldMapConfigConstants.TERRAIN_SLOPES_NAMES:[Lnet/minecraft/network/chat/Component;
+         3: aload_1
+         4: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         7: aaload
+         8: areturn
+
+  private static net.minecraft.network.chat.Component lambda$static$0(xaero.lib.common.config.option.ConfigOption, java.lang.Integer);
+    Code:
+         0: getstatic     #92                 // Field xaero/map/common/config/WorldMapConfigConstants.BLOCK_COLORS_NAMES:[Lnet/minecraft/network/chat/Component;
+         3: aload_1
+         4: invokevirtual #43                 // Method java/lang/Integer.intValue:()I
+         7: aaload
+         8: areturn
+
+  static {};
+    Code:
+         0: new           #95                 // class java/util/ArrayList
+         3: dup
+         4: invokespecial #97                 // Method java/util/ArrayList."<init>":()V
+         7: putstatic     #7                  // Field ALL:Ljava/util/List;
+        10: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+        13: ldc           #104                // String lighting
+        15: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        18: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+        21: iconst_1
+        22: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+        25: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        28: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+        31: ldc           #120                // String gui.xaero_lighting
+        33: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+        36: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        39: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+        42: getstatic     #7                  // Field ALL:Ljava/util/List;
+        45: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+        48: putstatic     #130                // Field LIGHTING:Lxaero/lib/common/config/option/BooleanConfigOption;
+        51: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+        54: ldc           #139                // String block_colors
+        56: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        59: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+        62: iconst_0
+        63: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        66: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        69: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+        72: iconst_0
+        73: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+        76: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+        79: getstatic     #92                 // Field xaero/map/common/config/WorldMapConfigConstants.BLOCK_COLORS_NAMES:[Lnet/minecraft/network/chat/Component;
+        82: arraylength
+        83: iconst_1
+        84: isub
+        85: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+        88: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+        91: invokedynamic #153,  0            // InvokeDynamic #2:apply:()Ljava/util/function/BiFunction;
+        96: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+        99: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       102: ldc           #161                // String gui.xaero_block_colours
+       104: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       107: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       110: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       113: getstatic     #7                  // Field ALL:Ljava/util/List;
+       116: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+       119: putstatic     #167                // Field BLOCK_COLORS:Lxaero/lib/common/config/option/RangeConfigOption;
+       122: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       125: ldc           #171                // String load_new_chunks
+       127: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       130: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       133: iconst_1
+       134: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       137: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       140: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       143: ldc           #173                // String gui.xaero_load_chunks
+       145: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       148: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       151: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       154: getstatic     #7                  // Field ALL:Ljava/util/List;
+       157: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       160: putstatic     #175                // Field LOAD_NEW_CHUNKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       163: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       166: ldc           #178                // String update_chunks
+       168: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       171: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       174: iconst_1
+       175: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       178: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       181: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       184: ldc           #180                // String gui.xaero_update_chunks
+       186: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       189: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       192: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       195: getstatic     #7                  // Field ALL:Ljava/util/List;
+       198: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       201: putstatic     #182                // Field UPDATE_CHUNKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       204: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       207: ldc           #185                // String terrain_depth
+       209: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       212: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       215: iconst_1
+       216: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       219: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       222: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       225: ldc           #187                // String gui.xaero_terrain_depth
+       227: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       230: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       233: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       236: getstatic     #7                  // Field ALL:Ljava/util/List;
+       239: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       242: putstatic     #189                // Field TERRAIN_DEPTH:Lxaero/lib/common/config/option/BooleanConfigOption;
+       245: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+       248: ldc           #192                // String terrain_slopes
+       250: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       253: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       256: iconst_2
+       257: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       260: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       263: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       266: iconst_0
+       267: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+       270: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       273: getstatic     #89                 // Field xaero/map/common/config/WorldMapConfigConstants.TERRAIN_SLOPES_NAMES:[Lnet/minecraft/network/chat/Component;
+       276: arraylength
+       277: iconst_1
+       278: isub
+       279: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+       282: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       285: invokedynamic #194,  0            // InvokeDynamic #3:apply:()Ljava/util/function/BiFunction;
+       290: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       293: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       296: ldc           #195                // String gui.xaero_terrain_slopes
+       298: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       301: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       304: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+       307: getstatic     #7                  // Field ALL:Ljava/util/List;
+       310: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+       313: putstatic     #197                // Field TERRAIN_SLOPES:Lxaero/lib/common/config/option/RangeConfigOption;
+       316: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       319: ldc           #200                // String footsteps
+       321: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       324: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       327: iconst_1
+       328: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       331: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       334: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       337: ldc           #202                // String gui.xaero_footsteps
+       339: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       342: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       345: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       348: getstatic     #7                  // Field ALL:Ljava/util/List;
+       351: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       354: putstatic     #204                // Field FOOTSTEPS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       357: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       360: ldc           #207                // String display_coordinates
+       362: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       365: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       368: iconst_1
+       369: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       372: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       375: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       378: ldc           #209                // String gui.xaero_wm_coordinates
+       380: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       383: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       386: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       389: getstatic     #7                  // Field ALL:Ljava/util/List;
+       392: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       395: putstatic     #211                // Field COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;
+       398: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       401: ldc           #214                // String waypoints
+       403: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       406: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       409: iconst_1
+       410: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       413: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       416: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       419: ldc           #216                // String gui.xaero_worldmap_waypoints
+       421: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       424: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       427: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       430: getstatic     #7                  // Field ALL:Ljava/util/List;
+       433: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       436: putstatic     #218                // Field WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       439: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       442: ldc           #221                // String render_waypoints
+       444: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       447: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       450: iconst_1
+       451: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       454: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       457: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       460: ldc           #223                // String gui.xaero_render_worldmap_waypoints
+       462: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       465: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       468: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       471: getstatic     #7                  // Field ALL:Ljava/util/List;
+       474: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       477: putstatic     #225                // Field RENDER_WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       480: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       483: ldc           #228                // String waypoint_backgrounds
+       485: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       488: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       491: iconst_1
+       492: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       495: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       498: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       501: ldc           #230                // String gui.xaero_waypoint_backgrounds
+       503: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       506: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       509: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       512: getstatic     #7                  // Field ALL:Ljava/util/List;
+       515: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       518: putstatic     #232                // Field WAYPOINT_BACKGROUNDS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       521: invokestatic  #235                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.begin:()Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       524: ldc           #240                // String waypoint_scale
+       526: invokevirtual #242                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       529: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       532: dconst_1
+       533: invokestatic  #243                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       536: invokevirtual #248                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       539: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       542: ldc2_w        #249                // double 0.5d
+       545: invokevirtual #251                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMinValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       548: ldc2_w        #255                // double 5.0d
+       551: invokevirtual #257                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMaxValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       554: ldc2_w        #249                // double 0.5d
+       557: invokevirtual #260                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setStep:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       560: iconst_1
+       561: invokevirtual #263                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setRangeValidator:(Z)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       564: ldc_w         #267                // String gui.xaero_wm_waypoint_scale
+       567: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       570: invokevirtual #269                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       573: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       576: getstatic     #7                  // Field ALL:Ljava/util/List;
+       579: invokevirtual #270                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/SteppedConfigOption;
+       582: putstatic     #273                // Field WAYPOINT_SCALE:Lxaero/lib/common/config/option/SteppedConfigOption;
+       585: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       588: ldc_w         #277                // String biome_blending
+       591: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       594: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       597: iconst_1
+       598: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       601: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       604: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       607: ldc_w         #279                // String gui.xaero_wm_biome_blending
+       610: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       613: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       616: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       619: ldc_w         #281                // String gui.xaero_wm_box_biome_blending
+       622: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       625: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       628: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       631: getstatic     #7                  // Field ALL:Ljava/util/List;
+       634: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       637: putstatic     #286                // Field BIOME_BLENDING:Lxaero/lib/common/config/option/BooleanConfigOption;
+       640: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       643: ldc_w         #289                // String biome_colors_in_vanilla
+       646: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       649: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       652: iconst_0
+       653: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       656: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       659: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       662: ldc_w         #291                // String gui.xaero_biome_colors
+       665: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       668: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       671: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       674: getstatic     #7                  // Field ALL:Ljava/util/List;
+       677: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       680: putstatic     #293                // Field BIOME_COLORS_IN_VANILLA:Lxaero/lib/common/config/option/BooleanConfigOption;
+       683: invokestatic  #235                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.begin:()Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       686: ldc_w         #296                // String minimum_zoom_for_local_waypoints
+       689: invokevirtual #242                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       692: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       695: dconst_0
+       696: invokestatic  #243                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       699: invokevirtual #248                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       702: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       705: dconst_0
+       706: invokevirtual #251                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMinValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       709: ldc2_w        #298                // double 3.0d
+       712: invokevirtual #257                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMaxValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       715: ldc2_w        #300                // double 0.01d
+       718: invokevirtual #260                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setStep:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       721: iconst_1
+       722: invokevirtual #263                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setRangeValidator:(Z)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+       725: ldc_w         #302                // String gui.xaero_wm_min_zoom_local_waypoints
+       728: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       731: invokevirtual #269                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       734: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+       737: getstatic     #7                  // Field ALL:Ljava/util/List;
+       740: invokevirtual #270                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/SteppedConfigOption;
+       743: putstatic     #304                // Field MIN_ZOOM_LOCAL_WAYPOINTS:Lxaero/lib/common/config/option/SteppedConfigOption;
+       746: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       749: ldc_w         #307                // String adjust_height_for_short_blocks
+       752: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       755: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       758: iconst_1
+       759: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       762: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       765: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       768: ldc_w         #309                // String gui.xaero_wm_adjust_height_for_carpetlike_blocks
+       771: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       774: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       777: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       780: ldc_w         #311                // String gui.xaero_wm_box_adjust_height_for_carpetlike_blocks
+       783: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       786: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       789: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       792: getstatic     #7                  // Field ALL:Ljava/util/List;
+       795: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       798: putstatic     #313                // Field ADJUST_HEIGHT_FOR_SHORT_BLOCKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       801: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       804: ldc_w         #316                // String display_flowers
+       807: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       810: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       813: iconst_1
+       814: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       817: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       820: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       823: ldc_w         #318                // String gui.xaero_flowers
+       826: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       829: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       832: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       835: getstatic     #7                  // Field ALL:Ljava/util/List;
+       838: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       841: putstatic     #320                // Field FLOWERS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       844: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       847: ldc_w         #323                // String display_stained_glass
+       850: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       853: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       856: iconst_1
+       857: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       860: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       863: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       866: ldc_w         #325                // String gui.xaero_wm_display_stained_glass
+       869: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       872: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       875: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       878: getstatic     #7                  // Field ALL:Ljava/util/List;
+       881: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       884: putstatic     #327                // Field STAINED_GLASS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       887: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+       890: ldc_w         #330                // String cave_mode_allowed
+       893: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       896: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       899: iconst_1
+       900: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       903: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       906: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       909: ldc_w         #332                // String gui.xaero_wm_cave_mode_allowed
+       912: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       915: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       918: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       921: ldc_w         #334                // String gui.xaero_wm_box_cave_mode_allowed
+       924: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+       927: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       930: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+       933: getstatic     #7                  // Field ALL:Ljava/util/List;
+       936: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+       939: putstatic     #336                // Field CAVE_MODE_ALLOWED:Lxaero/lib/common/config/option/BooleanConfigOption;
+       942: invokestatic  #339                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.begin:()Lxaero/lib/common/config/option/ConfigOption$FinalBuilder;
+       945: ldc_w         #344                // String cave_mode_allowed_dimensions
+       948: invokevirtual #346                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       951: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+       954: new           #347                // class java/util/LinkedHashSet
+       957: dup
+       958: invokespecial #349                // Method java/util/LinkedHashSet."<init>":()V
+       961: invokestatic  #350                // Method java/util/Collections.unmodifiableSet:(Ljava/util/Set;)Ljava/util/Set;
+       964: invokevirtual #356                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       967: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+       970: invokestatic  #357                // Method xaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder.begin:()Lxaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder;
+       973: getstatic     #362                // Field xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.RESOURCE_LOCATION:Lxaero/lib/common/config/option/value/type/ConfigValueType;
+       976: invokevirtual #368                // Method xaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder.setElementValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder;
+       979: bipush        44
+       981: invokestatic  #372                // Method java/lang/Character.valueOf:(C)Ljava/lang/Character;
+       984: invokevirtual #377                // Method xaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder.setIoCodecSeparator:(Ljava/lang/Character;)Lxaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder;
+       987: invokevirtual #381                // Method xaero/lib/common/config/option/value/type/CollectionConfigValueType$Builder.build:()Lxaero/lib/common/config/option/value/type/ConfigValueType;
+       990: invokevirtual #384                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+       993: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+       996: ldc_w         #388                // String gui.xaero_wm_cave_mode_allowed_dimensions
+       999: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1002: invokevirtual #390                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1005: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1008: ldc_w         #391                // String gui.xaero_wm_box_cave_mode_allowed_dimensions
+      1011: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1014: invokevirtual #393                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1017: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1020: iconst_0
+      1021: invokevirtual #394                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setOverridable:(Z)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1024: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1027: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1030: invokevirtual #398                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/ConfigOption;
+      1033: putstatic     #401                // Field CAVE_MODE_ALLOWED_DIMENSIONS:Lxaero/lib/common/config/option/ConfigOption;
+      1036: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      1039: ldc_w         #405                // String cave_mode_depth
+      1042: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1045: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1048: bipush        30
+      1050: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1053: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1056: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1059: iconst_1
+      1060: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1063: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1066: bipush        64
+      1068: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1071: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1074: ldc_w         #407                // String gui.xaero_wm_cave_mode_depth
+      1077: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1080: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1083: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1086: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1089: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      1092: putstatic     #409                // Field CAVE_MODE_DEPTH:Lxaero/lib/common/config/option/RangeConfigOption;
+      1095: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1098: ldc_w         #412                // String legible_cave_maps
+      1101: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1104: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1107: iconst_0
+      1108: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1111: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1114: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1117: ldc_w         #414                // String gui.xaero_wm_legible_cave_maps
+      1120: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1123: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1126: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1129: ldc_w         #416                // String gui.xaero_wm_box_legible_cave_maps
+      1132: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1135: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1138: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1141: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1144: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1147: putstatic     #418                // Field LEGIBLE_CAVE_MAPS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1150: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      1153: ldc_w         #421                // String auto_cave_mode
+      1156: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1159: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1162: iconst_m1
+      1163: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1166: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1169: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1172: iconst_m1
+      1173: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1176: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1179: iconst_3
+      1180: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1183: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1186: invokedynamic #423,  0            // InvokeDynamic #4:apply:()Ljava/util/function/BiFunction;
+      1191: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1194: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1197: ldc_w         #424                // String gui.xaero_auto_cave_mode
+      1200: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1203: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1206: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1209: ldc_w         #426                // String gui.xaero_box_auto_cave_mode
+      1212: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1215: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1218: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1221: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1224: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      1227: putstatic     #429                // Field AUTO_CAVE_MODE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1230: invokestatic  #235                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.begin:()Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+      1233: ldc_w         #432                // String cave_mode_toggle_timer
+      1236: invokevirtual #242                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1239: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+      1242: dconst_1
+      1243: invokestatic  #243                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+      1246: invokevirtual #248                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1249: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+      1252: dconst_0
+      1253: invokevirtual #251                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMinValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+      1256: ldc2_w        #434                // double 10.0d
+      1259: invokevirtual #257                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setMaxValue:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+      1262: ldc2_w        #436                // double 0.1d
+      1265: invokevirtual #260                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setStep:(D)Lxaero/lib/common/config/option/SteppedConfigOption$Builder;
+      1268: invokedynamic #438,  0            // InvokeDynamic #5:apply:()Ljava/util/function/BiFunction;
+      1273: invokevirtual #439                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1276: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+      1279: ldc_w         #440                // String gui.xaero_wm_cave_mode_toggle_timer
+      1282: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1285: invokevirtual #269                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1288: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+      1291: ldc_w         #442                // String gui.xaero_wm_box_cave_mode_toggle_timer
+      1294: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1297: invokevirtual #444                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1300: checkcast     #236                // class xaero/lib/common/config/option/SteppedConfigOption$Builder
+      1303: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1306: invokevirtual #270                // Method xaero/lib/common/config/option/SteppedConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/SteppedConfigOption;
+      1309: putstatic     #445                // Field CAVE_MODE_TOGGLE_TIMER:Lxaero/lib/common/config/option/SteppedConfigOption;
+      1312: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      1315: ldc_w         #448                // String default_cave_mode_type
+      1318: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1321: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1324: iconst_1
+      1325: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1328: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1331: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1334: iconst_0
+      1335: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1338: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1341: getstatic     #64                 // Field xaero/map/common/config/WorldMapConfigConstants.DEFAULT_CAVE_MODE_TYPE_NAMES:[Lnet/minecraft/network/chat/Component;
+      1344: arraylength
+      1345: iconst_1
+      1346: isub
+      1347: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1350: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1353: invokedynamic #450,  0            // InvokeDynamic #6:apply:()Ljava/util/function/BiFunction;
+      1358: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1361: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1364: ldc_w         #451                // String gui.xaero_wm_default_cave_mode_type
+      1367: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1370: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1373: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1376: ldc_w         #453                // String gui.xaero_wm_box_default_cave_mode_type
+      1379: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1382: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1385: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1388: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1391: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      1394: putstatic     #455                // Field DEFAULT_CAVE_MODE_TYPE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1397: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1400: ldc_w         #458                // String display_cave_mode_start
+      1403: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1406: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1409: iconst_1
+      1410: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1413: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1416: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1419: ldc_w         #460                // String gui.xaero_wm_display_cave_mode_start
+      1422: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1425: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1428: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1431: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1434: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1437: putstatic     #462                // Field DISPLAY_CAVE_MODE_START:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1440: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      1443: ldc_w         #465                // String map_writing_distance
+      1446: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1449: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1452: iconst_m1
+      1453: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1456: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1459: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1462: iconst_m1
+      1463: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1466: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1469: bipush        32
+      1471: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1474: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1477: invokedynamic #467,  0            // InvokeDynamic #7:apply:()Ljava/util/function/BiFunction;
+      1482: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1485: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1488: ldc_w         #468                // String gui.xaero_map_writing_distance
+      1491: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1494: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1497: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1500: ldc_w         #470                // String gui.xaero_box_map_writing_distance
+      1503: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1506: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1509: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1512: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1515: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      1518: putstatic     #472                // Field WRITING_DISTANCE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1521: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1524: ldc_w         #475                // String display_player_as_arrow
+      1527: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1530: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1533: iconst_1
+      1534: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1537: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1540: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1543: ldc_w         #477                // String gui.xaero_render_arrow
+      1546: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1549: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1552: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1555: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1558: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1561: putstatic     #479                // Field ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1564: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1567: ldc_w         #482                // String opening_animation
+      1570: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1573: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1576: iconst_1
+      1577: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1580: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1583: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1586: ldc_w         #484                // String gui.xaero_open_map_animation
+      1589: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1592: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1595: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1598: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1601: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1604: putstatic     #486                // Field OPENING_ANIMATION:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1607: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      1610: ldc_w         #489                // String arrow_color
+      1613: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1616: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1619: bipush        -2
+      1621: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1624: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1627: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1630: bipush        -2
+      1632: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1635: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1638: getstatic     #491                // Field xaero/map/common/config/WorldMapConfigConstants.ARROW_COLORS:[[F
+      1641: arraylength
+      1642: iconst_1
+      1643: isub
+      1644: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      1647: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1650: invokedynamic #495,  0            // InvokeDynamic #8:apply:()Ljava/util/function/BiFunction;
+      1655: invokevirtual #157                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1658: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1661: ldc_w         #496                // String gui.xaero_wm_arrow_colour
+      1664: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1667: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1670: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1673: ldc_w         #498                // String gui.xaero_wm_box_arrow_color
+      1676: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1679: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1682: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      1685: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1688: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      1691: putstatic     #500                // Field ARROW_COLOR:Lxaero/lib/common/config/option/RangeConfigOption;
+      1694: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1697: ldc_w         #503                // String display_zoom
+      1700: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1703: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1706: iconst_1
+      1707: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1710: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1713: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1716: ldc_w         #505                // String gui.xaero_display_zoom
+      1719: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1722: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1725: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1728: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1731: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1734: putstatic     #507                // Field DISPLAY_ZOOM:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1737: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1740: ldc_w         #510                // String display_hovered_biome
+      1743: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1746: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1749: iconst_1
+      1750: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1753: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1756: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1759: ldc_w         #512                // String gui.xaero_wm_hovered_biome
+      1762: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1765: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1768: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1771: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1774: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1777: putstatic     #514                // Field DISPLAY_HOVERED_BIOME:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1780: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1783: ldc_w         #517                // String zoom_buttons
+      1786: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1789: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1792: iconst_1
+      1793: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1796: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1799: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1802: ldc_w         #519                // String gui.xaero_zoom_buttons
+      1805: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1808: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1811: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1814: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1817: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1820: putstatic     #521                // Field ZOOM_BUTTONS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1823: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      1826: ldc_w         #524                // String detect_ambiguous_y
+      1829: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1832: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1835: iconst_1
+      1836: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1839: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1842: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1845: ldc_w         #526                // String gui.xaero_wm_detect_ambiguous_y
+      1848: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1851: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1854: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1857: ldc_w         #528                // String gui.xaero_wm_box_detect_ambiguous_y
+      1860: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1863: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1866: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      1869: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1872: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      1875: putstatic     #530                // Field DETECT_AMBIGUOUS_Y:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1878: invokestatic  #339                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.begin:()Lxaero/lib/common/config/option/ConfigOption$FinalBuilder;
+      1881: ldc_w         #533                // String default_map_teleport_command_format
+      1884: invokevirtual #346                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1887: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1890: ldc_w         #535                // String /tp @s {x} {y} {z}
+      1893: invokevirtual #356                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1896: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1899: sipush        500
+      1902: invokestatic  #537                // Method xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.getString:(I)Lxaero/lib/common/config/option/value/type/ConfigValueType;
+      1905: invokevirtual #384                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1908: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1911: ldc_w         #541                // String gui.xaero_wm_default_teleport_command
+      1914: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1917: invokevirtual #390                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1920: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1923: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1926: invokevirtual #398                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/ConfigOption;
+      1929: putstatic     #543                // Field DEFAULT_MAP_TELEPORT_FORMAT:Lxaero/lib/common/config/option/ConfigOption;
+      1932: invokestatic  #339                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.begin:()Lxaero/lib/common/config/option/ConfigOption$FinalBuilder;
+      1935: ldc_w         #546                // String default_map_teleport_command_dimension_format
+      1938: invokevirtual #346                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1941: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1944: ldc_w         #548                // String /execute as @s in {d} run tp {x} {y} {z}
+      1947: invokevirtual #356                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1950: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1953: sipush        500
+      1956: invokestatic  #537                // Method xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.getString:(I)Lxaero/lib/common/config/option/value/type/ConfigValueType;
+      1959: invokevirtual #384                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1962: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1965: ldc_w         #550                // String gui.xaero_wm_default_teleport_command_dimension
+      1968: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      1971: invokevirtual #390                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1974: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1977: getstatic     #7                  // Field ALL:Ljava/util/List;
+      1980: invokevirtual #398                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/ConfigOption;
+      1983: putstatic     #552                // Field DEFAULT_MAP_TELEPORT_DIMENSION_FORMAT:Lxaero/lib/common/config/option/ConfigOption;
+      1986: invokestatic  #339                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.begin:()Lxaero/lib/common/config/option/ConfigOption$FinalBuilder;
+      1989: ldc_w         #555                // String default_player_teleport_command_format
+      1992: invokevirtual #346                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      1995: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      1998: ldc_w         #557                // String /tp @s {name}
+      2001: invokevirtual #356                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2004: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2007: sipush        500
+      2010: invokestatic  #537                // Method xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.getString:(I)Lxaero/lib/common/config/option/value/type/ConfigValueType;
+      2013: invokevirtual #384                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2016: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2019: ldc_w         #559                // String gui.xaero_wm_default_player_teleport_command
+      2022: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2025: invokevirtual #390                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2028: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2031: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2034: invokevirtual #398                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/ConfigOption;
+      2037: putstatic     #561                // Field DEFAULT_PLAYER_TELEPORT_FORMAT:Lxaero/lib/common/config/option/ConfigOption;
+      2040: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      2043: ldc_w         #564                // String map_teleport_allowed
+      2046: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2049: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2052: iconst_1
+      2053: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2056: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2059: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2062: ldc_w         #566                // String gui.xaero_wm_teleport_allowed
+      2065: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2068: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2071: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2074: ldc_w         #568                // String gui.xaero_wm_teleport_allowed_tooltip
+      2077: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2080: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2083: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2086: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2089: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      2092: putstatic     #570                // Field MAP_TELEPORT_ALLOWED:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2095: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      2098: ldc_w         #573                // String partial_y_teleport
+      2101: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2104: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2107: iconst_1
+      2108: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2111: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2114: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2117: ldc_w         #575                // String gui.xaero_wm_partial_y_teleportation
+      2120: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2123: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2126: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2129: ldc_w         #577                // String gui.xaero_wm_box_partial_y_teleportation
+      2132: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2135: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2138: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2141: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2144: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      2147: putstatic     #579                // Field PARTIAL_Y_TELEPORT:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2150: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      2153: ldc_w         #582                // String display_opac_claims
+      2156: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2159: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2162: iconst_1
+      2163: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2166: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2169: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2172: ldc_w         #584                // String gui.xaero_wm_pac_claims
+      2175: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2178: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2181: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2184: ldc_w         #586                // String gui.xaero_wm_box_pac_claims
+      2187: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2190: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2193: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2196: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2199: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      2202: putstatic     #588                // Field OPAC_CLAIMS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2205: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      2208: ldc_w         #591                // String opac_claims_border_opacity
+      2211: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2214: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2217: bipush        80
+      2219: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2222: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2225: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2228: iconst_1
+      2229: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      2232: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2235: bipush        100
+      2237: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      2240: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2243: ldc_w         #593                // String gui.xaero_wm_pac_claims_border_opacity
+      2246: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2249: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2252: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2255: ldc_w         #595                // String gui.xaero_wm_box_pac_claims_border_opacity
+      2258: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2261: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2264: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2267: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2270: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      2273: putstatic     #597                // Field OPAC_CLAIMS_BORDER_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2276: invokestatic  #134                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.begin:()Lxaero/lib/common/config/option/RangeConfigOption$Builder;
+      2279: ldc_w         #600                // String opac_claims_fill_opacity
+      2282: invokevirtual #141                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2285: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2288: bipush        46
+      2290: invokestatic  #142                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2293: invokevirtual #145                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2296: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2299: iconst_1
+      2300: invokevirtual #146                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMinIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      2303: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2306: bipush        100
+      2308: invokevirtual #150                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setMaxIndex:(I)Lxaero/lib/common/config/option/IndexedConfigOption$Builder;
+      2311: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2314: ldc_w         #602                // String gui.xaero_wm_pac_claims_fill_opacity
+      2317: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2320: invokevirtual #163                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2323: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2326: ldc_w         #604                // String gui.xaero_wm_box_pac_claims_fill_opacity
+      2329: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2332: invokevirtual #428                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2335: checkcast     #135                // class xaero/lib/common/config/option/RangeConfigOption$Builder
+      2338: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2341: invokevirtual #164                // Method xaero/lib/common/config/option/RangeConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/RangeConfigOption;
+      2344: putstatic     #606                // Field OPAC_CLAIMS_FILL_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2347: invokestatic  #339                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.begin:()Lxaero/lib/common/config/option/ConfigOption$FinalBuilder;
+      2350: ldc_w         #609                // String map_item
+      2353: invokevirtual #346                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2356: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2359: ldc_w         #611                // String -
+      2362: invokevirtual #356                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2365: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2368: getstatic     #362                // Field xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.RESOURCE_LOCATION:Lxaero/lib/common/config/option/value/type/ConfigValueType;
+      2371: invokevirtual #613                // Method xaero/lib/common/config/option/value/type/ConfigValueType.getIoCodec:()Lxaero/lib/common/config/option/value/io/serialization/ConfigValueIOCodec;
+      2374: invokevirtual #619                // Method xaero/lib/common/config/option/value/io/serialization/ConfigValueIOCodec.getMaxStringLength:()I
+      2377: invokestatic  #537                // Method xaero/lib/common/config/option/value/type/BuiltInConfigValueTypes.getString:(I)Lxaero/lib/common/config/option/value/type/ConfigValueType;
+      2380: invokevirtual #384                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setValueType:(Lxaero/lib/common/config/option/value/type/ConfigValueType;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2383: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2386: invokedynamic #624,  0            // InvokeDynamic #9:apply:()Ljava/util/function/BiFunction;
+      2391: invokevirtual #625                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayGetter:(Ljava/util/function/BiFunction;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2394: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2397: ldc_w         #626                // String gui.xaero_map_item
+      2400: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2403: invokevirtual #390                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2406: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2409: ldc_w         #628                // String gui.xaero_box_map_item
+      2412: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2415: invokevirtual #393                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2418: checkcast     #340                // class xaero/lib/common/config/option/ConfigOption$FinalBuilder
+      2421: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2424: invokevirtual #398                // Method xaero/lib/common/config/option/ConfigOption$FinalBuilder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/ConfigOption;
+      2427: putstatic     #630                // Field MAP_ITEM:Lxaero/lib/common/config/option/ConfigOption;
+      2430: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      2433: ldc_w         #633                // String display_minimap_radar
+      2436: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2439: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2442: iconst_1
+      2443: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2446: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2449: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2452: ldc_w         #635                // String gui.xaero_wm_display_minimap_radar
+      2455: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2458: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2461: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2464: ldc_w         #637                // String gui.xaero_wm_box_display_minimap_radar
+      2467: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2470: invokevirtual #283                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setTooltip:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2473: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2476: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2479: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      2482: putstatic     #639                // Field MINIMAP_RADAR:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2485: invokestatic  #98                 // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.begin:()Lxaero/lib/common/config/option/BooleanConfigOption$Builder;
+      2488: ldc_w         #642                // String display_tracked_players
+      2491: invokevirtual #106                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setId:(Ljava/lang/String;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2494: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2497: iconst_1
+      2498: invokestatic  #110                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2501: invokevirtual #116                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDefaultValue:(Ljava/lang/Object;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2504: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2507: ldc_w         #644                // String gui.xaero_wm_display_tracked_players
+      2510: invokestatic  #51                 // InterfaceMethod net/minecraft/network/chat/Component.translatable:(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;
+      2513: invokevirtual #122                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.setDisplayName:(Lnet/minecraft/network/chat/Component;)Lxaero/lib/common/config/option/ConfigOption$Builder;
+      2516: checkcast     #99                 // class xaero/lib/common/config/option/BooleanConfigOption$Builder
+      2519: getstatic     #7                  // Field ALL:Ljava/util/List;
+      2522: invokevirtual #126                // Method xaero/lib/common/config/option/BooleanConfigOption$Builder.build:(Ljava/util/List;)Lxaero/lib/common/config/option/BooleanConfigOption;
+      2525: putstatic     #646                // Field DISPLAY_TRACKED_PLAYERS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2528: return
+}

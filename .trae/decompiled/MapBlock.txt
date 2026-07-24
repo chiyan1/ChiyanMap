@@ -1,0 +1,746 @@
+﻿Compiled from "MapBlock.java"
+public class xaero.map.region.MapBlock extends xaero.map.region.MapPixel {
+  protected boolean slopeUnknown;
+
+  private byte verticalSlope;
+
+  private byte diagonalSlope;
+
+  private short height;
+
+  private short topHeight;
+
+  private java.util.ArrayList<xaero.map.region.Overlay> overlays;
+
+  private net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome> biome;
+
+  public xaero.map.region.MapBlock();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method xaero/map/region/MapPixel."<init>":()V
+         4: aload_0
+         5: iconst_1
+         6: putfield      #7                  // Field slopeUnknown:Z
+         9: aload_0
+        10: aconst_null
+        11: putfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        14: return
+
+  public boolean isGrass();
+    Code:
+         0: aload_0
+         1: getfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+         4: invokevirtual #21                 // Method net/minecraft/world/level/block/state/BlockState.getBlock:()Lnet/minecraft/world/level/block/Block;
+         7: getstatic     #27                 // Field net/minecraft/world/level/block/Blocks.GRASS_BLOCK:Lnet/minecraft/world/level/block/Block;
+        10: if_acmpne     17
+        13: iconst_1
+        14: goto          18
+        17: iconst_0
+        18: ireturn
+
+  public int getParametres();
+    Code:
+         0: iconst_0
+         1: istore_1
+         2: iload_1
+         3: aload_0
+         4: invokevirtual #33                 // Method isGrass:()Z
+         7: ifne          14
+        10: iconst_1
+        11: goto          15
+        14: iconst_0
+        15: ior
+        16: istore_1
+        17: iload_1
+        18: aload_0
+        19: invokevirtual #37                 // Method getNumberOfOverlays:()I
+        22: ifeq          29
+        25: iconst_2
+        26: goto          30
+        29: iconst_0
+        30: ior
+        31: istore_1
+        32: iload_1
+        33: aload_0
+        34: getfield      #41                 // Field light:B
+        37: bipush        8
+        39: ishl
+        40: ior
+        41: istore_1
+        42: iload_1
+        43: aload_0
+        44: invokevirtual #45                 // Method getHeight:()I
+        47: sipush        255
+        50: iand
+        51: bipush        12
+        53: ishl
+        54: ior
+        55: istore_1
+        56: iload_1
+        57: aload_0
+        58: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        61: ifnull        69
+        64: ldc           #48                 // int 1048576
+        66: goto          70
+        69: iconst_0
+        70: ior
+        71: istore_1
+        72: iload_1
+        73: aload_0
+        74: getfield      #49                 // Field height:S
+        77: aload_0
+        78: getfield      #53                 // Field topHeight:S
+        81: if_icmpeq     89
+        84: ldc           #56                 // int 16777216
+        86: goto          90
+        89: iconst_0
+        90: ior
+        91: istore_1
+        92: iload_1
+        93: aload_0
+        94: invokevirtual #45                 // Method getHeight:()I
+        97: bipush        8
+        99: ishr
+       100: bipush        15
+       102: iand
+       103: bipush        25
+       105: ishl
+       106: ior
+       107: istore_1
+       108: iload_1
+       109: ireturn
+
+  public void getPixelColour(int[], xaero.map.MapWriter, net.minecraft.client.multiplayer.ClientLevel, xaero.map.world.MapDimension, net.minecraft.core.Registry<net.minecraft.world.level.block.Block>, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTile, int, int, int, int, net.minecraft.core.BlockPos$MutableBlockPos, net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome>, net.minecraft.core.Registry<net.minecraft.world.level.dimension.DimensionType>, float, float, float, xaero.map.biome.BlockTintProvider, xaero.map.MapProcessor, xaero.map.region.OverlayManager, int, int, xaero.map.cache.BlockStateShortShapeCache, xaero.map.region.MapUpdateFastConfig);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: aload_3
+         4: aload         4
+         6: aload         5
+         8: aload         6
+        10: aload         7
+        12: aload         8
+        14: aload         9
+        16: aload         10
+        18: iload         11
+        20: iload         12
+        22: aload_0
+        23: iload         24
+        25: iload         25
+        27: iload         13
+        29: iload         14
+        31: aload_0
+        32: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        35: aload         15
+        37: aload         16
+        39: aload         17
+        41: fload         18
+        43: fload         19
+        45: fload         20
+        47: aload         21
+        49: aload         22
+        51: aload         23
+        53: aload         26
+        55: aload         27
+        57: invokespecial #61                 // Method xaero/map/region/MapPixel.getPixelColours:([ILxaero/map/MapWriter;Lnet/minecraft/client/multiplayer/ClientLevel;Lxaero/map/world/MapDimension;Lnet/minecraft/core/Registry;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTile;IILxaero/map/region/MapBlock;IIIILjava/util/ArrayList;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/core/Registry;Lnet/minecraft/core/Registry;FFFLxaero/map/biome/BlockTintProvider;Lxaero/map/MapProcessor;Lxaero/map/region/OverlayManager;Lxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/region/MapUpdateFastConfig;)V
+        60: return
+
+  public java.lang.String toRenderString(net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome>);
+    Code:
+         0: getstatic     #65                 // Field net/minecraft/world/level/block/Block.BLOCK_STATE_REGISTRY:Lnet/minecraft/core/IdMapper;
+         3: getstatic     #65                 // Field net/minecraft/world/level/block/Block.BLOCK_STATE_REGISTRY:Lnet/minecraft/core/IdMapper;
+         6: aload_0
+         7: invokevirtual #71                 // Method getState:()Lnet/minecraft/world/level/block/state/BlockState;
+        10: invokevirtual #75                 // Method net/minecraft/core/IdMapper.getId:(Ljava/lang/Object;)I
+        13: invokevirtual #81                 // Method net/minecraft/core/IdMapper.byId:(I)Ljava/lang/Object;
+        16: aload_0
+        17: invokevirtual #71                 // Method getState:()Lnet/minecraft/world/level/block/state/BlockState;
+        20: if_acmpne     27
+        23: iconst_1
+        24: goto          28
+        27: iconst_0
+        28: aload_0
+        29: invokevirtual #71                 // Method getState:()Lnet/minecraft/world/level/block/state/BlockState;
+        32: invokestatic  #85                 // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+        35: aload_0
+        36: getfield      #91                 // Field verticalSlope:B
+        39: aload_0
+        40: getfield      #94                 // Field diagonalSlope:B
+        43: aload_0
+        44: getfield      #7                  // Field slopeUnknown:Z
+        47: aload_0
+        48: invokevirtual #45                 // Method getHeight:()I
+        51: aload_0
+        52: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        55: ifnonnull     63
+        58: ldc           #97                 // String null
+        60: goto          70
+        63: aload_0
+        64: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        67: invokevirtual #99                 // Method net/minecraft/resources/ResourceKey.identifier:()Lnet/minecraft/resources/Identifier;
+        70: invokestatic  #85                 // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+        73: aload_0
+        74: getfield      #41                 // Field light:B
+        77: aload_0
+        78: getfield      #105                // Field glowing:Z
+        81: aload_0
+        82: invokevirtual #37                 // Method getNumberOfOverlays:()I
+        85: invokedynamic #108,  0            // InvokeDynamic #0:makeConcatWithConstants:(ZLjava/lang/String;BBZILjava/lang/String;BZI)Ljava/lang/String;
+        90: areturn
+
+  public boolean equalsSlopesExcluded(xaero.map.region.MapBlock);
+    Code:
+         0: aload_1
+         1: ifnull        74
+         4: aload_0
+         5: getfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+         8: aload_1
+         9: getfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+        12: if_acmpne     74
+        15: aload_0
+        16: getfield      #41                 // Field light:B
+        19: aload_1
+        20: getfield      #41                 // Field light:B
+        23: if_icmpne     74
+        26: aload_0
+        27: getfield      #49                 // Field height:S
+        30: aload_1
+        31: getfield      #49                 // Field height:S
+        34: if_icmpne     74
+        37: aload_0
+        38: getfield      #53                 // Field topHeight:S
+        41: aload_1
+        42: getfield      #53                 // Field topHeight:S
+        45: if_icmpne     74
+        48: aload_0
+        49: invokevirtual #37                 // Method getNumberOfOverlays:()I
+        52: aload_1
+        53: invokevirtual #37                 // Method getNumberOfOverlays:()I
+        56: if_icmpne     74
+        59: aload_0
+        60: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        63: aload_1
+        64: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        67: if_acmpne     74
+        70: iconst_1
+        71: goto          75
+        74: iconst_0
+        75: istore_2
+        76: iload_2
+        77: ifeq          136
+        80: aload_0
+        81: invokevirtual #37                 // Method getNumberOfOverlays:()I
+        84: ifeq          136
+        87: iconst_0
+        88: istore_3
+        89: iload_3
+        90: aload_0
+        91: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        94: invokevirtual #112                // Method java/util/ArrayList.size:()I
+        97: if_icmpge     136
+       100: aload_0
+       101: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+       104: iload_3
+       105: invokevirtual #117                // Method java/util/ArrayList.get:(I)Ljava/lang/Object;
+       108: checkcast     #120                // class xaero/map/region/Overlay
+       111: aload_1
+       112: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+       115: iload_3
+       116: invokevirtual #117                // Method java/util/ArrayList.get:(I)Ljava/lang/Object;
+       119: checkcast     #120                // class xaero/map/region/Overlay
+       122: invokevirtual #122                // Method xaero/map/region/Overlay.equals:(Lxaero/map/region/Overlay;)Z
+       125: ifne          130
+       128: iconst_0
+       129: ireturn
+       130: iinc          3, 1
+       133: goto          89
+       136: iload_2
+       137: ireturn
+
+  public boolean equals(xaero.map.region.MapBlock, boolean);
+    Code:
+         0: aload_1
+         1: ifnull        45
+         4: aload_0
+         5: getfield      #91                 // Field verticalSlope:B
+         8: aload_1
+         9: getfield      #91                 // Field verticalSlope:B
+        12: if_icmpne     45
+        15: aload_0
+        16: getfield      #94                 // Field diagonalSlope:B
+        19: aload_1
+        20: getfield      #94                 // Field diagonalSlope:B
+        23: if_icmpne     45
+        26: aload_0
+        27: getfield      #7                  // Field slopeUnknown:Z
+        30: aload_1
+        31: getfield      #7                  // Field slopeUnknown:Z
+        34: if_icmpne     45
+        37: iload_2
+        38: ifeq          45
+        41: iconst_1
+        42: goto          46
+        45: iconst_0
+        46: ireturn
+
+  public void fixHeightType(int, int, xaero.map.region.MapTile, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, xaero.map.region.MapTileChunk, int, boolean, xaero.map.cache.BlockStateShortShapeCache, xaero.map.region.MapUpdateFastConfig);
+    Code:
+         0: sipush        32767
+         3: istore        12
+         5: sipush        32767
+         8: istore        13
+        10: iload         9
+        12: ifeq          59
+        15: iload_2
+        16: ifle          59
+        19: aload_3
+        20: iload_1
+        21: iload_2
+        22: iconst_1
+        23: isub
+        24: invokevirtual #128                // Method xaero/map/region/MapTile.getBlock:(II)Lxaero/map/region/MapBlock;
+        27: aload         10
+        29: aload         11
+        31: invokevirtual #133                // Method getEffectiveHeight:(Lxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/region/MapUpdateFastConfig;)I
+        34: istore        12
+        36: iload_1
+        37: ifle          59
+        40: aload_3
+        41: iload_1
+        42: iconst_1
+        43: isub
+        44: iload_2
+        45: iconst_1
+        46: isub
+        47: invokevirtual #128                // Method xaero/map/region/MapTile.getBlock:(II)Lxaero/map/region/MapBlock;
+        50: aload         10
+        52: aload         11
+        54: invokevirtual #133                // Method getEffectiveHeight:(Lxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/region/MapUpdateFastConfig;)I
+        57: istore        13
+        59: iload         12
+        61: sipush        32767
+        64: if_icmpeq     75
+        67: iload         13
+        69: sipush        32767
+        72: if_icmpne     408
+        75: aload_3
+        76: invokevirtual #137                // Method xaero/map/region/MapTile.getChunkX:()I
+        79: iconst_3
+        80: iand
+        81: iconst_4
+        82: ishl
+        83: iload_1
+        84: iadd
+        85: istore        14
+        87: aload_3
+        88: invokevirtual #140                // Method xaero/map/region/MapTile.getChunkZ:()I
+        91: iconst_3
+        92: iand
+        93: iconst_4
+        94: ishl
+        95: iload_2
+        96: iadd
+        97: istore        15
+        99: iload         14
+       101: iconst_1
+       102: isub
+       103: istore        16
+       105: iload         15
+       107: iconst_1
+       108: isub
+       109: istore        17
+       111: aload         4
+       113: astore        18
+       115: aload         4
+       117: astore        19
+       119: iload         17
+       121: ifge          128
+       124: iconst_1
+       125: goto          129
+       128: iconst_0
+       129: istore        20
+       131: iload         16
+       133: ifge          140
+       136: iconst_1
+       137: goto          141
+       140: iconst_0
+       141: istore        21
+       143: iload         20
+       145: ifeq          159
+       148: aload         5
+       150: dup
+       151: astore        19
+       153: astore        18
+       155: bipush        63
+       157: istore        17
+       159: iload         21
+       161: ifeq          182
+       164: bipush        63
+       166: istore        16
+       168: iload         20
+       170: ifeq          178
+       173: aload         6
+       175: goto          180
+       178: aload         7
+       180: astore        19
+       182: iload         12
+       184: sipush        32767
+       187: if_icmpne     218
+       190: aload         18
+       192: ifnull        218
+       195: aload         18
+       197: invokevirtual #143                // Method xaero/map/region/MapTileChunk.getLoadState:()I
+       200: iconst_2
+       201: if_icmplt     218
+       204: aload         18
+       206: invokevirtual #148                // Method xaero/map/region/MapTileChunk.getLeafTexture:()Lxaero/map/region/texture/LeafRegionTexture;
+       209: iload         14
+       211: iload         17
+       213: invokevirtual #152                // Method xaero/map/region/texture/LeafRegionTexture.getHeight:(II)I
+       216: istore        12
+       218: iload         13
+       220: sipush        32767
+       223: if_icmpne     254
+       226: aload         19
+       228: ifnull        254
+       231: aload         19
+       233: invokevirtual #143                // Method xaero/map/region/MapTileChunk.getLoadState:()I
+       236: iconst_2
+       237: if_icmplt     254
+       240: aload         19
+       242: invokevirtual #148                // Method xaero/map/region/MapTileChunk.getLeafTexture:()Lxaero/map/region/texture/LeafRegionTexture;
+       245: iload         16
+       247: iload         17
+       249: invokevirtual #152                // Method xaero/map/region/texture/LeafRegionTexture.getHeight:(II)I
+       252: istore        13
+       254: iload         12
+       256: sipush        32767
+       259: if_icmpeq     270
+       262: iload         13
+       264: sipush        32767
+       267: if_icmpne     408
+       270: iload         9
+       272: ifeq          276
+       275: return
+       276: iload_1
+       277: bipush        15
+       279: if_icmpge     288
+       282: iload_1
+       283: iconst_1
+       284: iadd
+       285: goto          289
+       288: iload_1
+       289: istore        22
+       291: iload_2
+       292: bipush        15
+       294: if_icmpge     303
+       297: iload_2
+       298: iconst_1
+       299: iadd
+       300: goto          304
+       303: iload_2
+       304: istore        23
+       306: iload         22
+       308: iload_1
+       309: if_icmpne     334
+       312: iload         23
+       314: iload_2
+       315: if_icmpne     334
+       318: aload_0
+       319: iconst_0
+       320: putfield      #91                 // Field verticalSlope:B
+       323: aload_0
+       324: iconst_0
+       325: putfield      #94                 // Field diagonalSlope:B
+       328: aload_0
+       329: iconst_0
+       330: putfield      #7                  // Field slopeUnknown:Z
+       333: return
+       334: aload_3
+       335: invokevirtual #137                // Method xaero/map/region/MapTile.getChunkX:()I
+       338: iconst_3
+       339: iand
+       340: iconst_4
+       341: ishl
+       342: iload         22
+       344: iadd
+       345: istore        24
+       347: aload_3
+       348: invokevirtual #140                // Method xaero/map/region/MapTile.getChunkZ:()I
+       351: iconst_3
+       352: iand
+       353: iconst_4
+       354: ishl
+       355: iload         23
+       357: iadd
+       358: istore        25
+       360: aload         4
+       362: invokevirtual #148                // Method xaero/map/region/MapTileChunk.getLeafTexture:()Lxaero/map/region/texture/LeafRegionTexture;
+       365: iload         24
+       367: iload         25
+       369: invokevirtual #152                // Method xaero/map/region/texture/LeafRegionTexture.getHeight:(II)I
+       372: istore        26
+       374: iload         26
+       376: sipush        32767
+       379: if_icmpeq     407
+       382: aload_0
+       383: iload         22
+       385: iload         23
+       387: aload_3
+       388: aload         4
+       390: aload         5
+       392: aload         6
+       394: aload         7
+       396: iload         26
+       398: iload         9
+       400: aload         10
+       402: aload         11
+       404: invokevirtual #157                // Method fixHeightType:(IILxaero/map/region/MapTile;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;Lxaero/map/region/MapTileChunk;IZLxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/region/MapUpdateFastConfig;)V
+       407: return
+       408: aload_0
+       409: bipush        -128
+       411: bipush        127
+       413: iload         8
+       415: iload         12
+       417: isub
+       418: invokestatic  #161                // Method java/lang/Math.min:(II)I
+       421: invokestatic  #166                // Method java/lang/Math.max:(II)I
+       424: i2b
+       425: putfield      #91                 // Field verticalSlope:B
+       428: aload_0
+       429: bipush        -128
+       431: bipush        127
+       433: iload         8
+       435: iload         13
+       437: isub
+       438: invokestatic  #161                // Method java/lang/Math.min:(II)I
+       441: invokestatic  #166                // Method java/lang/Math.max:(II)I
+       444: i2b
+       445: putfield      #94                 // Field diagonalSlope:B
+       448: aload_0
+       449: iconst_0
+       450: putfield      #7                  // Field slopeUnknown:Z
+       453: return
+
+  public void prepareForWriting(int);
+    Code:
+         0: aload_0
+         1: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+         4: ifnull        14
+         7: aload_0
+         8: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        11: invokevirtual #169                // Method java/util/ArrayList.clear:()V
+        14: aload_0
+        15: aconst_null
+        16: putfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        19: aload_0
+        20: getstatic     #172                // Field net/minecraft/world/level/block/Blocks.AIR:Lnet/minecraft/world/level/block/Block;
+        23: invokevirtual #175                // Method net/minecraft/world/level/block/Block.defaultBlockState:()Lnet/minecraft/world/level/block/state/BlockState;
+        26: putfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+        29: aload_0
+        30: iconst_1
+        31: putfield      #7                  // Field slopeUnknown:Z
+        34: aload_0
+        35: iconst_0
+        36: putfield      #41                 // Field light:B
+        39: aload_0
+        40: iconst_0
+        41: putfield      #105                // Field glowing:Z
+        44: aload_0
+        45: iload_1
+        46: i2s
+        47: putfield      #49                 // Field height:S
+        50: aload_0
+        51: iload_1
+        52: i2s
+        53: putfield      #53                 // Field topHeight:S
+        56: return
+
+  public void write(net.minecraft.world.level.block.state.BlockState, int, int, net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome>, byte, boolean, boolean);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+         5: aload_0
+         6: iload_2
+         7: invokevirtual #178                // Method setHeight:(I)V
+        10: aload_0
+        11: iload_3
+        12: invokevirtual #182                // Method setTopHeight:(I)V
+        15: aload         4
+        17: ifnull        26
+        20: aload_0
+        21: aload         4
+        23: putfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+        26: aload_0
+        27: iload         5
+        29: putfield      #41                 // Field light:B
+        32: aload_0
+        33: iload         6
+        35: putfield      #105                // Field glowing:Z
+        38: aload_0
+        39: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        42: ifnull        60
+        45: aload_0
+        46: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        49: invokevirtual #185                // Method java/util/ArrayList.isEmpty:()Z
+        52: ifeq          60
+        55: aload_0
+        56: aconst_null
+        57: putfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        60: return
+
+  public void addOverlay(xaero.map.region.Overlay);
+    Code:
+         0: aload_0
+         1: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+         4: ifnonnull     18
+         7: aload_0
+         8: new           #113                // class java/util/ArrayList
+        11: dup
+        12: invokespecial #188                // Method java/util/ArrayList."<init>":()V
+        15: putfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        18: aload_0
+        19: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        22: aload_1
+        23: invokevirtual #189                // Method java/util/ArrayList.add:(Ljava/lang/Object;)Z
+        26: pop
+        27: return
+
+  public int getHeight();
+    Code:
+         0: aload_0
+         1: getfield      #49                 // Field height:S
+         4: ireturn
+
+  public void setHeight(int);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: i2s
+         3: putfield      #49                 // Field height:S
+         6: return
+
+  public int getTopHeight();
+    Code:
+         0: aload_0
+         1: getfield      #53                 // Field topHeight:S
+         4: ireturn
+
+  public void setTopHeight(int);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: i2s
+         3: putfield      #53                 // Field topHeight:S
+         6: return
+
+  public int getEffectiveHeight(xaero.map.cache.BlockStateShortShapeCache, xaero.map.region.MapUpdateFastConfig);
+    Code:
+         0: aload_0
+         1: aload_2
+         2: getfield      #193                // Field xaero/map/region/MapUpdateFastConfig.adjustHeightForShortBlocks:Z
+         5: ifeq          23
+         8: aload_1
+         9: aload_0
+        10: getfield      #17                 // Field state:Lnet/minecraft/world/level/block/state/BlockState;
+        13: invokevirtual #198                // Method xaero/map/cache/BlockStateShortShapeCache.isShort:(Lnet/minecraft/world/level/block/state/BlockState;)Z
+        16: ifeq          23
+        19: iconst_1
+        20: goto          24
+        23: iconst_0
+        24: invokevirtual #204                // Method getEffectiveHeight:(Z)I
+        27: ireturn
+
+  public int getEffectiveHeight(boolean);
+    Code:
+         0: aload_0
+         1: invokevirtual #45                 // Method getHeight:()I
+         4: istore_2
+         5: iload_1
+         6: ifeq          12
+         9: iinc          2, -1
+        12: iload_2
+        13: ireturn
+
+  public int getEffectiveTopHeight(boolean);
+    Code:
+         0: aload_0
+         1: invokevirtual #207                // Method getTopHeight:()I
+         4: istore_2
+         5: iload_1
+         6: ifeq          20
+         9: iload_2
+        10: aload_0
+        11: invokevirtual #45                 // Method getHeight:()I
+        14: if_icmpne     20
+        17: iinc          2, -1
+        20: iload_2
+        21: ireturn
+
+  public net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome> getBiome();
+    Code:
+         0: aload_0
+         1: getfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+         4: areturn
+
+  public void setBiome(net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome>);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: putfield      #13                 // Field biome:Lnet/minecraft/resources/ResourceKey;
+         5: return
+
+  public java.util.ArrayList<xaero.map.region.Overlay> getOverlays();
+    Code:
+         0: aload_0
+         1: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+         4: areturn
+
+  public byte getVerticalSlope();
+    Code:
+         0: aload_0
+         1: getfield      #91                 // Field verticalSlope:B
+         4: ireturn
+
+  public void setVerticalSlope(byte);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #91                 // Field verticalSlope:B
+         5: return
+
+  public byte getDiagonalSlope();
+    Code:
+         0: aload_0
+         1: getfield      #94                 // Field diagonalSlope:B
+         4: ireturn
+
+  public void setDiagonalSlope(byte);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #94                 // Field diagonalSlope:B
+         5: return
+
+  public void setSlopeUnknown(boolean);
+    Code:
+         0: aload_0
+         1: iload_1
+         2: putfield      #7                  // Field slopeUnknown:Z
+         5: return
+
+  public int getNumberOfOverlays();
+    Code:
+         0: aload_0
+         1: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+         4: ifnonnull     11
+         7: iconst_0
+         8: goto          18
+        11: aload_0
+        12: getfield      #57                 // Field overlays:Ljava/util/ArrayList;
+        15: invokevirtual #112                // Method java/util/ArrayList.size:()I
+        18: ireturn
+}
+

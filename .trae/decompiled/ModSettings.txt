@@ -1,0 +1,1297 @@
+﻿Compiled from "ModSettings.java"
+public class xaero.map.settings.ModSettings {
+  public static final java.lang.String format = "\u00a7";
+
+  private int regionCacheHashCode;
+
+  public xaero.map.settings.ModSettings();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  private void loadDefaultSettings() throws java.io.IOException;
+    Code:
+         0: getstatic     #7                  // Field xaero/map/WorldMap.optionsFile:Ljava/io/File;
+         3: astore_1
+         4: aload_1
+         5: invokevirtual #13                 // Method java/io/File.toPath:()Ljava/nio/file/Path;
+         8: invokeinterface #19,  1           // InterfaceMethod java/nio/file/Path.getParent:()Ljava/nio/file/Path;
+        13: ldc           #24                 // String defaultconfigs
+        15: invokeinterface #26,  2           // InterfaceMethod java/nio/file/Path.resolveSibling:(Ljava/lang/String;)Ljava/nio/file/Path;
+        20: aload_1
+        21: invokevirtual #30                 // Method java/io/File.getName:()Ljava/lang/String;
+        24: invokeinterface #34,  2           // InterfaceMethod java/nio/file/Path.resolve:(Ljava/lang/String;)Ljava/nio/file/Path;
+        29: invokeinterface #37,  1           // InterfaceMethod java/nio/file/Path.toFile:()Ljava/io/File;
+        34: astore_2
+        35: aload_2
+        36: invokevirtual #41                 // Method java/io/File.exists:()Z
+        39: ifeq          47
+        42: aload_0
+        43: aload_2
+        44: invokevirtual #45                 // Method loadSettingsFile:(Ljava/io/File;)V
+        47: return
+
+  public void loadSettings() throws java.io.IOException;
+    Code:
+         0: aload_0
+         1: invokevirtual #51                 // Method loadDefaultSettings:()V
+         4: getstatic     #7                  // Field xaero/map/WorldMap.optionsFile:Ljava/io/File;
+         7: astore_1
+         8: aload_1
+         9: invokevirtual #13                 // Method java/io/File.toPath:()Ljava/nio/file/Path;
+        12: invokeinterface #19,  1           // InterfaceMethod java/nio/file/Path.getParent:()Ljava/nio/file/Path;
+        17: astore_2
+        18: aload_2
+        19: iconst_0
+        20: anewarray     #54                 // class java/nio/file/LinkOption
+        23: invokestatic  #56                 // Method java/nio/file/Files.exists:(Ljava/nio/file/Path;[Ljava/nio/file/LinkOption;)Z
+        26: ifne          38
+        29: aload_2
+        30: iconst_0
+        31: anewarray     #61                 // class java/nio/file/attribute/FileAttribute
+        34: invokestatic  #63                 // Method java/nio/file/Files.createDirectories:(Ljava/nio/file/Path;[Ljava/nio/file/attribute/FileAttribute;)Ljava/nio/file/Path;
+        37: pop
+        38: aload_1
+        39: invokevirtual #41                 // Method java/io/File.exists:()Z
+        42: ifeq          58
+        45: aload_0
+        46: aload_1
+        47: invokevirtual #45                 // Method loadSettingsFile:(Ljava/io/File;)V
+        50: aload_1
+        51: invokevirtual #13                 // Method java/io/File.toPath:()Ljava/nio/file/Path;
+        54: invokestatic  #67                 // Method xaero/lib/common/util/IOUtils.quickFileBackupMove:(Ljava/nio/file/Path;)Ljava/nio/file/Path;
+        57: pop
+        58: return
+
+  private void loadSettingsFile(java.io.File) throws java.io.IOException;
+    Code:
+         0: aconst_null
+         1: astore_2
+         2: getstatic     #73                 // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+         5: invokevirtual #77                 // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+         8: invokevirtual #81                 // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+        11: astore_3
+        12: aload_3
+        13: invokevirtual #87                 // Method xaero/lib/client/config/ClientConfigManager.getCurrentProfile:()Lxaero/lib/common/config/profile/ConfigProfile;
+        16: astore        4
+        18: aload_3
+        19: invokevirtual #93                 // Method xaero/lib/client/config/ClientConfigManager.getPrimaryConfigManager:()Lxaero/lib/common/config/single/SingleConfigManager;
+        22: invokevirtual #97                 // Method xaero/lib/common/config/single/SingleConfigManager.getConfig:()Lxaero/lib/common/config/Config;
+        25: astore        5
+        27: new           #103                // class java/io/BufferedReader
+        30: dup
+        31: new           #105                // class java/io/FileReader
+        34: dup
+        35: aload_1
+        36: invokespecial #107                // Method java/io/FileReader."<init>":(Ljava/io/File;)V
+        39: invokespecial #109                // Method java/io/BufferedReader."<init>":(Ljava/io/Reader;)V
+        42: astore_2
+        43: aload_2
+        44: invokevirtual #112                // Method java/io/BufferedReader.readLine:()Ljava/lang/String;
+        47: dup
+        48: astore        6
+        50: ifnull        2262
+        53: aload         6
+        55: ldc           #115                // String :
+        57: invokevirtual #117                // Method java/lang/String.split:(Ljava/lang/String;)[Ljava/lang/String;
+        60: astore        7
+        62: aload         7
+        64: iconst_0
+        65: aaload
+        66: ldc           #123                // String ignoreUpdate
+        68: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+        71: ifeq          96
+        74: aload         5
+        76: getstatic     #129                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.IGNORED_UPDATE:Lxaero/lib/common/config/option/ConfigOption;
+        79: aload         7
+        81: iconst_1
+        82: aaload
+        83: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+        86: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        89: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+        92: pop
+        93: goto          2237
+        96: aload         7
+        98: iconst_0
+        99: aaload
+       100: ldc           #151                // String updateNotification
+       102: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       105: ifeq          132
+       108: aload         5
+       110: getstatic     #153                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.UPDATE_NOTIFICATIONS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       113: aload         7
+       115: iconst_1
+       116: aaload
+       117: ldc           #157                // String true
+       119: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       122: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       125: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       128: pop
+       129: goto          2237
+       132: aload         7
+       134: iconst_0
+       135: aaload
+       136: ldc           #168                // String allowInternetAccess
+       138: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       141: ifeq          198
+       144: aload         7
+       146: iconst_1
+       147: aaload
+       148: ldc           #157                // String true
+       150: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       153: istore        8
+       155: iload         8
+       157: ifne          195
+       160: getstatic     #170                // Field xaero/lib/XaeroLib.INSTANCE:Lxaero/lib/XaeroLib;
+       163: invokevirtual #175                // Method xaero/lib/XaeroLib.getLibConfigChannel:()Lxaero/lib/common/config/channel/ConfigChannel;
+       166: invokevirtual #178                // Method xaero/lib/common/config/channel/ConfigChannel.getPrimaryCommonConfigManager:()Lxaero/lib/common/config/single/SingleConfigManager;
+       169: invokevirtual #97                 // Method xaero/lib/common/config/single/SingleConfigManager.getConfig:()Lxaero/lib/common/config/Config;
+       172: getstatic     #181                // Field xaero/lib/common/config/primary/option/LibPrimaryCommonConfigOptions.ALLOW_INTERNET:Lxaero/lib/common/config/option/BooleanConfigOption;
+       175: iconst_0
+       176: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       179: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       182: pop
+       183: getstatic     #170                // Field xaero/lib/XaeroLib.INSTANCE:Lxaero/lib/XaeroLib;
+       186: invokevirtual #175                // Method xaero/lib/XaeroLib.getLibConfigChannel:()Lxaero/lib/common/config/channel/ConfigChannel;
+       189: invokevirtual #186                // Method xaero/lib/common/config/channel/ConfigChannel.getPrimaryCommonConfigManagerIO:()Lxaero/lib/common/config/single/io/SingleConfigManagerIO;
+       192: invokevirtual #190                // Method xaero/lib/common/config/single/io/SingleConfigManagerIO.save:()V
+       195: goto          2237
+       198: aload         7
+       200: iconst_0
+       201: aaload
+       202: ldc           #195                // String differentiateByServerAddress
+       204: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       207: ifeq          234
+       210: aload         5
+       212: getstatic     #197                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.DIFFERENTIATE_BY_SERVER_ADDRESS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       215: aload         7
+       217: iconst_1
+       218: aaload
+       219: ldc           #157                // String true
+       221: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       224: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       227: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       230: pop
+       231: goto          2237
+       234: aload         7
+       236: iconst_0
+       237: aaload
+       238: ldc           #200                // String caveMapsAllowed
+       240: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       243: ifeq          270
+       246: aload         4
+       248: getstatic     #202                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.CAVE_MODE_ALLOWED:Lxaero/lib/common/config/option/BooleanConfigOption;
+       251: aload         7
+       253: iconst_1
+       254: aaload
+       255: ldc           #157                // String true
+       257: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       260: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       263: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       266: pop
+       267: goto          2237
+       270: aload         7
+       272: iconst_0
+       273: aaload
+       274: ldc           #210                // String debug
+       276: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       279: ifeq          306
+       282: aload         5
+       284: getstatic     #212                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.DEBUG:Lxaero/lib/common/config/option/BooleanConfigOption;
+       287: aload         7
+       289: iconst_1
+       290: aaload
+       291: ldc           #157                // String true
+       293: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       296: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       299: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       302: pop
+       303: goto          2237
+       306: aload         7
+       308: iconst_0
+       309: aaload
+       310: ldc           #215                // String lighting
+       312: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       315: ifeq          342
+       318: aload         4
+       320: getstatic     #217                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.LIGHTING:Lxaero/lib/common/config/option/BooleanConfigOption;
+       323: aload         7
+       325: iconst_1
+       326: aaload
+       327: ldc           #157                // String true
+       329: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       332: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       335: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       338: pop
+       339: goto          2237
+       342: aload         7
+       344: iconst_0
+       345: aaload
+       346: ldc           #220                // String colours
+       348: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       351: ifeq          376
+       354: aload         4
+       356: getstatic     #222                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BLOCK_COLORS:Lxaero/lib/common/config/option/RangeConfigOption;
+       359: aload         7
+       361: iconst_1
+       362: aaload
+       363: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+       366: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       369: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       372: pop
+       373: goto          2237
+       376: aload         7
+       378: iconst_0
+       379: aaload
+       380: ldc           #226                // String loadChunks
+       382: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       385: ifeq          412
+       388: aload         4
+       390: getstatic     #228                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.LOAD_NEW_CHUNKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       393: aload         7
+       395: iconst_1
+       396: aaload
+       397: ldc           #157                // String true
+       399: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       402: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       405: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       408: pop
+       409: goto          2237
+       412: aload         7
+       414: iconst_0
+       415: aaload
+       416: ldc           #231                // String updateChunks
+       418: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       421: ifeq          448
+       424: aload         4
+       426: getstatic     #233                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.UPDATE_CHUNKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       429: aload         7
+       431: iconst_1
+       432: aaload
+       433: ldc           #157                // String true
+       435: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       438: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       441: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       444: pop
+       445: goto          2237
+       448: aload         7
+       450: iconst_0
+       451: aaload
+       452: ldc           #236                // String terrainSlopes
+       454: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       457: ifeq          514
+       460: aload         4
+       462: getstatic     #238                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.TERRAIN_SLOPES:Lxaero/lib/common/config/option/RangeConfigOption;
+       465: aload         7
+       467: iconst_1
+       468: aaload
+       469: ldc           #157                // String true
+       471: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       474: ifeq          481
+       477: iconst_2
+       478: goto          504
+       481: aload         7
+       483: iconst_1
+       484: aaload
+       485: ldc           #241                // String false
+       487: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       490: ifeq          497
+       493: iconst_0
+       494: goto          504
+       497: aload         7
+       499: iconst_1
+       500: aaload
+       501: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+       504: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       507: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       510: pop
+       511: goto          2237
+       514: aload         7
+       516: iconst_0
+       517: aaload
+       518: ldc           #243                // String terrainDepth
+       520: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       523: ifeq          550
+       526: aload         4
+       528: getstatic     #245                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.TERRAIN_DEPTH:Lxaero/lib/common/config/option/BooleanConfigOption;
+       531: aload         7
+       533: iconst_1
+       534: aaload
+       535: ldc           #157                // String true
+       537: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       540: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       543: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       546: pop
+       547: goto          2237
+       550: aload         7
+       552: iconst_0
+       553: aaload
+       554: ldc           #248                // String footsteps
+       556: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       559: ifeq          586
+       562: aload         4
+       564: getstatic     #250                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.FOOTSTEPS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       567: aload         7
+       569: iconst_1
+       570: aaload
+       571: ldc           #157                // String true
+       573: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       576: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       579: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       582: pop
+       583: goto          2237
+       586: aload         7
+       588: iconst_0
+       589: aaload
+       590: ldc           #253                // String flowers
+       592: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       595: ifeq          622
+       598: aload         4
+       600: getstatic     #255                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.FLOWERS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       603: aload         7
+       605: iconst_1
+       606: aaload
+       607: ldc           #157                // String true
+       609: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       612: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       615: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       618: pop
+       619: goto          2237
+       622: aload         7
+       624: iconst_0
+       625: aaload
+       626: ldc_w         #258                // String coordinates
+       629: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       632: ifeq          659
+       635: aload         4
+       637: getstatic     #260                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.COORDINATES:Lxaero/lib/common/config/option/BooleanConfigOption;
+       640: aload         7
+       642: iconst_1
+       643: aaload
+       644: ldc           #157                // String true
+       646: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       649: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       652: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       655: pop
+       656: goto          2237
+       659: aload         7
+       661: iconst_0
+       662: aaload
+       663: ldc_w         #263                // String hoveredBiome
+       666: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       669: ifeq          696
+       672: aload         4
+       674: getstatic     #265                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DISPLAY_HOVERED_BIOME:Lxaero/lib/common/config/option/BooleanConfigOption;
+       677: aload         7
+       679: iconst_1
+       680: aaload
+       681: ldc           #157                // String true
+       683: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       686: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       689: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       692: pop
+       693: goto          2237
+       696: aload         7
+       698: iconst_0
+       699: aaload
+       700: ldc_w         #268                // String biomeColorsVanillaMode
+       703: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       706: ifeq          733
+       709: aload         4
+       711: getstatic     #270                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BIOME_COLORS_IN_VANILLA:Lxaero/lib/common/config/option/BooleanConfigOption;
+       714: aload         7
+       716: iconst_1
+       717: aaload
+       718: ldc           #157                // String true
+       720: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       723: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       726: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       729: pop
+       730: goto          2237
+       733: aload         7
+       735: iconst_0
+       736: aaload
+       737: ldc_w         #273                // String waypoints
+       740: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       743: ifeq          770
+       746: aload         4
+       748: getstatic     #275                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       751: aload         7
+       753: iconst_1
+       754: aaload
+       755: ldc           #157                // String true
+       757: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       760: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       763: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       766: pop
+       767: goto          2237
+       770: aload         7
+       772: iconst_0
+       773: aaload
+       774: ldc_w         #278                // String renderArrow
+       777: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       780: ifeq          807
+       783: aload         4
+       785: getstatic     #280                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.ARROW:Lxaero/lib/common/config/option/BooleanConfigOption;
+       788: aload         7
+       790: iconst_1
+       791: aaload
+       792: ldc           #157                // String true
+       794: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       797: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       800: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       803: pop
+       804: goto          2237
+       807: aload         7
+       809: iconst_0
+       810: aaload
+       811: ldc_w         #283                // String displayZoom
+       814: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       817: ifeq          844
+       820: aload         4
+       822: getstatic     #285                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DISPLAY_ZOOM:Lxaero/lib/common/config/option/BooleanConfigOption;
+       825: aload         7
+       827: iconst_1
+       828: aaload
+       829: ldc           #157                // String true
+       831: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       834: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       837: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       840: pop
+       841: goto          2237
+       844: aload         7
+       846: iconst_0
+       847: aaload
+       848: ldc_w         #288                // String worldmapWaypointsScale
+       851: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       854: ifeq          880
+       857: aload         4
+       859: getstatic     #290                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.WAYPOINT_SCALE:Lxaero/lib/common/config/option/SteppedConfigOption;
+       862: aload         7
+       864: iconst_1
+       865: aaload
+       866: invokestatic  #294                // Method java/lang/Float.parseFloat:(Ljava/lang/String;)F
+       869: f2d
+       870: invokestatic  #300                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+       873: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       876: pop
+       877: goto          2237
+       880: aload         7
+       882: iconst_0
+       883: aaload
+       884: ldc_w         #305                // String openMapAnimation
+       887: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       890: ifeq          917
+       893: aload         4
+       895: getstatic     #307                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPENING_ANIMATION:Lxaero/lib/common/config/option/BooleanConfigOption;
+       898: aload         7
+       900: iconst_1
+       901: aaload
+       902: ldc           #157                // String true
+       904: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       907: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       910: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       913: pop
+       914: goto          2237
+       917: aload         7
+       919: iconst_0
+       920: aaload
+       921: ldc_w         #310                // String reloadVersion
+       924: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       927: ifeq          952
+       930: aload         5
+       932: getstatic     #312                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.RELOAD_VIEWED_VERSION:Lxaero/lib/common/config/option/ConfigOption;
+       935: aload         7
+       937: iconst_1
+       938: aaload
+       939: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+       942: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+       945: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       948: pop
+       949: goto          2237
+       952: aload         7
+       954: iconst_0
+       955: aaload
+       956: ldc_w         #315                // String reloadEverything
+       959: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       962: ifeq          989
+       965: aload         5
+       967: getstatic     #317                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.RELOAD_VIEWED:Lxaero/lib/common/config/option/BooleanConfigOption;
+       970: aload         7
+       972: iconst_1
+       973: aaload
+       974: ldc           #157                // String true
+       976: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       979: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+       982: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+       985: pop
+       986: goto          2237
+       989: aload         7
+       991: iconst_0
+       992: aaload
+       993: ldc_w         #320                // String zoomButtons
+       996: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+       999: ifeq          1026
+      1002: aload         4
+      1004: getstatic     #322                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.ZOOM_BUTTONS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1007: aload         7
+      1009: iconst_1
+      1010: aaload
+      1011: ldc           #157                // String true
+      1013: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1016: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1019: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1022: pop
+      1023: goto          2237
+      1026: aload         7
+      1028: iconst_0
+      1029: aaload
+      1030: ldc_w         #325                // String waypointBackgrounds
+      1033: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1036: ifeq          1063
+      1039: aload         4
+      1041: getstatic     #327                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.WAYPOINT_BACKGROUNDS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1044: aload         7
+      1046: iconst_1
+      1047: aaload
+      1048: ldc           #157                // String true
+      1050: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1053: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1056: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1059: pop
+      1060: goto          2237
+      1063: aload         7
+      1065: iconst_0
+      1066: aaload
+      1067: ldc_w         #330                // String mapItemId
+      1070: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1073: ifeq          1101
+      1076: aload         4
+      1078: getstatic     #332                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.MAP_ITEM:Lxaero/lib/common/config/option/ConfigOption;
+      1081: aload         7
+      1083: iconst_1
+      1084: aaload
+      1085: aload         7
+      1087: iconst_2
+      1088: aaload
+      1089: invokedynamic #335,  0            // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+      1094: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1097: pop
+      1098: goto          2237
+      1101: aload         7
+      1103: iconst_0
+      1104: aaload
+      1105: ldc_w         #339                // String detectAmbiguousY
+      1108: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1111: ifeq          1138
+      1114: aload         4
+      1116: getstatic     #341                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DETECT_AMBIGUOUS_Y:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1119: aload         7
+      1121: iconst_1
+      1122: aaload
+      1123: ldc           #157                // String true
+      1125: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1128: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1131: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1134: pop
+      1135: goto          2237
+      1138: aload         7
+      1140: iconst_0
+      1141: aaload
+      1142: ldc_w         #344                // String showDisabledWaypoints
+      1145: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1148: ifeq          1175
+      1151: aload         5
+      1153: getstatic     #346                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.DISPLAY_DISABLED_WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1156: aload         7
+      1158: iconst_1
+      1159: aaload
+      1160: ldc           #157                // String true
+      1162: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1165: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1168: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1171: pop
+      1172: goto          2237
+      1175: aload         7
+      1177: iconst_0
+      1178: aaload
+      1179: ldc_w         #349                // String closeWaypointsWhenHopping
+      1182: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1185: ifeq          1212
+      1188: aload         5
+      1190: getstatic     #351                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.CLOSE_WAYPOINTS_AFTER_HOP:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1193: aload         7
+      1195: iconst_1
+      1196: aaload
+      1197: ldc           #157                // String true
+      1199: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1202: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1205: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1208: pop
+      1209: goto          2237
+      1212: aload         7
+      1214: iconst_0
+      1215: aaload
+      1216: ldc_w         #354                // String adjustHeightForCarpetLikeBlocks
+      1219: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1222: ifeq          1249
+      1225: aload         4
+      1227: getstatic     #356                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.ADJUST_HEIGHT_FOR_SHORT_BLOCKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1230: aload         7
+      1232: iconst_1
+      1233: aaload
+      1234: ldc           #157                // String true
+      1236: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1239: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1242: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1245: pop
+      1246: goto          2237
+      1249: aload         7
+      1251: iconst_0
+      1252: aaload
+      1253: ldc_w         #359                // String onlyCurrentMapWaypoints
+      1256: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1259: ifeq          1286
+      1262: aload         5
+      1264: getstatic     #361                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.ONLY_CURRENT_MAP_WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1267: aload         7
+      1269: iconst_1
+      1270: aaload
+      1271: ldc           #157                // String true
+      1273: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1276: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1279: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1282: pop
+      1283: goto          2237
+      1286: aload         7
+      1288: iconst_0
+      1289: aaload
+      1290: ldc_w         #364                // String minZoomForLocalWaypoints
+      1293: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1296: ifeq          1321
+      1299: aload         4
+      1301: getstatic     #366                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.MIN_ZOOM_LOCAL_WAYPOINTS:Lxaero/lib/common/config/option/SteppedConfigOption;
+      1304: aload         7
+      1306: iconst_1
+      1307: aaload
+      1308: invokestatic  #369                // Method java/lang/Double.parseDouble:(Ljava/lang/String;)D
+      1311: invokestatic  #300                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+      1314: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1317: pop
+      1318: goto          2237
+      1321: aload         7
+      1323: iconst_0
+      1324: aaload
+      1325: ldc_w         #373                // String arrowColour
+      1328: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1331: ifeq          1356
+      1334: aload         4
+      1336: getstatic     #375                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.ARROW_COLOR:Lxaero/lib/common/config/option/RangeConfigOption;
+      1339: aload         7
+      1341: iconst_1
+      1342: aaload
+      1343: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1346: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1349: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1352: pop
+      1353: goto          2237
+      1356: aload         7
+      1358: iconst_0
+      1359: aaload
+      1360: ldc_w         #378                // String minimapRadar
+      1363: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1366: ifeq          1393
+      1369: aload         4
+      1371: getstatic     #380                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.MINIMAP_RADAR:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1374: aload         7
+      1376: iconst_1
+      1377: aaload
+      1378: ldc           #157                // String true
+      1380: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1383: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1386: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1389: pop
+      1390: goto          2237
+      1393: aload         7
+      1395: iconst_0
+      1396: aaload
+      1397: ldc_w         #383                // String renderWaypoints
+      1400: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1403: ifeq          1430
+      1406: aload         4
+      1408: getstatic     #385                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.RENDER_WAYPOINTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1411: aload         7
+      1413: iconst_1
+      1414: aaload
+      1415: ldc           #157                // String true
+      1417: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1420: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1423: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1426: pop
+      1427: goto          2237
+      1430: aload         7
+      1432: iconst_0
+      1433: aaload
+      1434: ldc_w         #388                // String partialYTeleportation
+      1437: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1440: ifeq          1467
+      1443: aload         4
+      1445: getstatic     #390                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.PARTIAL_Y_TELEPORT:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1448: aload         7
+      1450: iconst_1
+      1451: aaload
+      1452: ldc           #157                // String true
+      1454: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1457: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1460: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1463: pop
+      1464: goto          2237
+      1467: aload         7
+      1469: iconst_0
+      1470: aaload
+      1471: ldc_w         #393                // String displayStainedGlass
+      1474: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1477: ifeq          1504
+      1480: aload         4
+      1482: getstatic     #395                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.STAINED_GLASS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1485: aload         7
+      1487: iconst_1
+      1488: aaload
+      1489: ldc           #157                // String true
+      1491: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1494: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1497: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1500: pop
+      1501: goto          2237
+      1504: aload         7
+      1506: iconst_0
+      1507: aaload
+      1508: ldc_w         #398                // String caveModeDepth
+      1511: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1514: ifeq          1539
+      1517: aload         4
+      1519: getstatic     #400                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.CAVE_MODE_DEPTH:Lxaero/lib/common/config/option/RangeConfigOption;
+      1522: aload         7
+      1524: iconst_1
+      1525: aaload
+      1526: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1529: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1532: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1535: pop
+      1536: goto          2237
+      1539: aload         7
+      1541: iconst_0
+      1542: aaload
+      1543: ldc_w         #403                // String caveModeStart
+      1546: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1549: ifeq          1574
+      1552: aload         5
+      1554: getstatic     #405                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.CAVE_MODE_START:Lxaero/lib/common/config/option/ConfigOption;
+      1557: aload         7
+      1559: iconst_1
+      1560: aaload
+      1561: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1564: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1567: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1570: pop
+      1571: goto          2237
+      1574: aload         7
+      1576: iconst_0
+      1577: aaload
+      1578: ldc_w         #408                // String autoCaveMode
+      1581: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1584: ifeq          1609
+      1587: aload         4
+      1589: getstatic     #410                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.AUTO_CAVE_MODE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1592: aload         7
+      1594: iconst_1
+      1595: aaload
+      1596: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1599: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1602: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1605: pop
+      1606: goto          2237
+      1609: aload         7
+      1611: iconst_0
+      1612: aaload
+      1613: ldc_w         #413                // String legibleCaveMaps
+      1616: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1619: ifeq          1646
+      1622: aload         4
+      1624: getstatic     #415                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.LEGIBLE_CAVE_MAPS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1627: aload         7
+      1629: iconst_1
+      1630: aaload
+      1631: ldc           #157                // String true
+      1633: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1636: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1639: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1642: pop
+      1643: goto          2237
+      1646: aload         7
+      1648: iconst_0
+      1649: aaload
+      1650: ldc_w         #418                // String displayCaveModeStart
+      1653: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1656: ifeq          1683
+      1659: aload         4
+      1661: getstatic     #420                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DISPLAY_CAVE_MODE_START:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1664: aload         7
+      1666: iconst_1
+      1667: aaload
+      1668: ldc           #157                // String true
+      1670: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1673: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1676: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1679: pop
+      1680: goto          2237
+      1683: aload         7
+      1685: iconst_0
+      1686: aaload
+      1687: ldc_w         #423                // String caveModeToggleTimer
+      1690: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1693: ifeq          1723
+      1696: aload         4
+      1698: getstatic     #425                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.CAVE_MODE_TOGGLE_TIMER:Lxaero/lib/common/config/option/SteppedConfigOption;
+      1701: aload         7
+      1703: iconst_1
+      1704: aaload
+      1705: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1708: i2d
+      1709: ldc2_w        #428                // double 1000.0d
+      1712: ddiv
+      1713: invokestatic  #300                // Method java/lang/Double.valueOf:(D)Ljava/lang/Double;
+      1716: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1719: pop
+      1720: goto          2237
+      1723: aload         7
+      1725: iconst_0
+      1726: aaload
+      1727: ldc_w         #430                // String defaultCaveModeType
+      1730: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1733: ifeq          1758
+      1736: aload         4
+      1738: getstatic     #432                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DEFAULT_CAVE_MODE_TYPE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1741: aload         7
+      1743: iconst_1
+      1744: aaload
+      1745: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1748: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1751: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1754: pop
+      1755: goto          2237
+      1758: aload         7
+      1760: iconst_0
+      1761: aaload
+      1762: ldc_w         #435                // String biomeBlending
+      1765: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1768: ifeq          1795
+      1771: aload         4
+      1773: getstatic     #437                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BIOME_BLENDING:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1776: aload         7
+      1778: iconst_1
+      1779: aaload
+      1780: ldc           #157                // String true
+      1782: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1785: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1788: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1791: pop
+      1792: goto          2237
+      1795: aload         7
+      1797: iconst_0
+      1798: aaload
+      1799: ldc_w         #440                // String trackedPlayers
+      1802: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1805: ifne          1821
+      1808: aload         7
+      1810: iconst_0
+      1811: aaload
+      1812: ldc_w         #442                // String pacPlayers
+      1815: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1818: ifeq          1845
+      1821: aload         4
+      1823: getstatic     #444                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.DISPLAY_TRACKED_PLAYERS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1826: aload         7
+      1828: iconst_1
+      1829: aaload
+      1830: ldc           #157                // String true
+      1832: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1835: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1838: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1841: pop
+      1842: goto          2237
+      1845: aload         7
+      1847: iconst_0
+      1848: aaload
+      1849: ldc_w         #447                // String multipleImagesExport
+      1852: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1855: ifeq          1882
+      1858: aload         5
+      1860: getstatic     #449                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.EXPORT_MULTIPLE_IMAGES:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1863: aload         7
+      1865: iconst_1
+      1866: aaload
+      1867: ldc           #157                // String true
+      1869: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1872: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1875: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1878: pop
+      1879: goto          2237
+      1882: aload         7
+      1884: iconst_0
+      1885: aaload
+      1886: ldc_w         #452                // String nightExport
+      1889: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1892: ifeq          1919
+      1895: aload         5
+      1897: getstatic     #454                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.NIGHT_EXPORT:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1900: aload         7
+      1902: iconst_1
+      1903: aaload
+      1904: ldc           #157                // String true
+      1906: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1909: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1912: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1915: pop
+      1916: goto          2237
+      1919: aload         7
+      1921: iconst_0
+      1922: aaload
+      1923: ldc_w         #457                // String highlightsExport
+      1926: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1929: ifeq          1956
+      1932: aload         5
+      1934: getstatic     #459                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.EXPORT_HIGHLIGHTS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      1937: aload         7
+      1939: iconst_1
+      1940: aaload
+      1941: ldc           #157                // String true
+      1943: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      1946: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      1949: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1952: pop
+      1953: goto          2237
+      1956: aload         7
+      1958: iconst_0
+      1959: aaload
+      1960: ldc_w         #462                // String exportScaleDownSquare
+      1963: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      1966: ifeq          1991
+      1969: aload         5
+      1971: getstatic     #464                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.EXPORT_SCALE_DOWN_SQUARE:Lxaero/lib/common/config/option/RangeConfigOption;
+      1974: aload         7
+      1976: iconst_1
+      1977: aaload
+      1978: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      1981: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      1984: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      1987: pop
+      1988: goto          2237
+      1991: aload         7
+      1993: iconst_0
+      1994: aaload
+      1995: ldc_w         #467                // String mapWritingDistance
+      1998: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2001: ifeq          2026
+      2004: aload         4
+      2006: getstatic     #469                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.WRITING_DISTANCE:Lxaero/lib/common/config/option/RangeConfigOption;
+      2009: aload         7
+      2011: iconst_1
+      2012: aaload
+      2013: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      2016: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2019: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2022: pop
+      2023: goto          2237
+      2026: aload         7
+      2028: iconst_0
+      2029: aaload
+      2030: ldc_w         #472                // String displayClaims
+      2033: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2036: ifeq          2063
+      2039: aload         4
+      2041: getstatic     #474                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPAC_CLAIMS:Lxaero/lib/common/config/option/BooleanConfigOption;
+      2044: aload         7
+      2046: iconst_1
+      2047: aaload
+      2048: ldc           #157                // String true
+      2050: invokevirtual #159                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      2053: invokestatic  #163                // Method java/lang/Boolean.valueOf:(Z)Ljava/lang/Boolean;
+      2056: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2059: pop
+      2060: goto          2237
+      2063: aload         7
+      2065: iconst_0
+      2066: aaload
+      2067: ldc_w         #477                // String claimsOpacity
+      2070: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2073: ifeq          2135
+      2076: bipush        100
+      2078: iconst_0
+      2079: aload         7
+      2081: iconst_1
+      2082: aaload
+      2083: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      2086: invokestatic  #479                // Method java/lang/Math.max:(II)I
+      2089: invokestatic  #485                // Method java/lang/Math.min:(II)I
+      2092: istore        8
+      2094: iload         8
+      2096: bipush        58
+      2098: imul
+      2099: bipush        100
+      2101: idiv
+      2102: istore        9
+      2104: aload         4
+      2106: getstatic     #488                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPAC_CLAIMS_BORDER_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2109: iload         8
+      2111: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2114: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2117: pop
+      2118: aload         4
+      2120: getstatic     #491                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPAC_CLAIMS_FILL_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2123: iload         9
+      2125: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2128: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2131: pop
+      2132: goto          2237
+      2135: aload         7
+      2137: iconst_0
+      2138: aaload
+      2139: ldc_w         #494                // String claimsBorderOpacity
+      2142: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2145: ifeq          2170
+      2148: aload         4
+      2150: getstatic     #488                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPAC_CLAIMS_BORDER_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2153: aload         7
+      2155: iconst_1
+      2156: aaload
+      2157: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      2160: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2163: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2166: pop
+      2167: goto          2237
+      2170: aload         7
+      2172: iconst_0
+      2173: aaload
+      2174: ldc_w         #496                // String claimsFillOpacity
+      2177: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2180: ifeq          2205
+      2183: aload         4
+      2185: getstatic     #491                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.OPAC_CLAIMS_FILL_OPACITY:Lxaero/lib/common/config/option/RangeConfigOption;
+      2188: aload         7
+      2190: iconst_1
+      2191: aaload
+      2192: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      2195: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2198: invokevirtual #207                // Method xaero/lib/common/config/profile/ConfigProfile.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2201: pop
+      2202: goto          2237
+      2205: aload         7
+      2207: iconst_0
+      2208: aaload
+      2209: ldc_w         #498                // String globalVersion
+      2212: invokevirtual #125                // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      2215: ifeq          2237
+      2218: aload         5
+      2220: getstatic     #500                // Field xaero/map/config/primary/option/WorldMapPrimaryClientConfigOptions.GLOBAL_VERSION:Lxaero/lib/common/config/option/ConfigOption;
+      2223: aload         7
+      2225: iconst_1
+      2226: aaload
+      2227: invokestatic  #135                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      2230: invokestatic  #141                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      2233: invokevirtual #145                // Method xaero/lib/common/config/Config.set:(Lxaero/lib/common/config/option/ConfigOption;Ljava/lang/Object;)Ljava/lang/Object;
+      2236: pop
+      2237: goto          2259
+      2240: astore        8
+      2242: getstatic     #505                // Field xaero/map/WorldMap.LOGGER:Lorg/apache/logging/log4j/Logger;
+      2245: aload         7
+      2247: iconst_0
+      2248: aaload
+      2249: invokedynamic #509,  0            // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+      2254: invokeinterface #512,  2          // InterfaceMethod org/apache/logging/log4j/Logger.info:(Ljava/lang/String;)V
+      2259: goto          43
+      2262: aload_2
+      2263: ifnull        2286
+      2266: aload_2
+      2267: invokevirtual #518                // Method java/io/BufferedReader.close:()V
+      2270: goto          2286
+      2273: astore        10
+      2275: aload_2
+      2276: ifnull        2283
+      2279: aload_2
+      2280: invokevirtual #518                // Method java/io/BufferedReader.close:()V
+      2283: aload         10
+      2285: athrow
+      2286: return
+      Exception table:
+         from    to  target type
+            62  2237  2240   Class java/lang/Exception
+            27  2262  2273   any
+          2273  2275  2273   any
+
+  public int getRegionCacheHashCode();
+    Code:
+         0: aload_0
+         1: getfield      #521                // Field regionCacheHashCode:I
+         4: ireturn
+
+  public void updateRegionCacheHashCode();
+    Code:
+         0: aload_0
+         1: getfield      #521                // Field regionCacheHashCode:I
+         4: istore_1
+         5: invokestatic  #525                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+         8: invokevirtual #531                // Method net/minecraft/client/Minecraft.isSameThread:()Z
+        11: ifne          25
+        14: new           #534                // class java/lang/RuntimeException
+        17: dup
+        18: ldc_w         #536                // String Wrong thread!
+        21: invokespecial #538                // Method java/lang/RuntimeException."<init>":(Ljava/lang/String;)V
+        24: athrow
+        25: getstatic     #73                 // Field xaero/map/WorldMap.INSTANCE:Lxaero/map/WorldMap;
+        28: invokevirtual #77                 // Method xaero/map/WorldMap.getConfigs:()Lxaero/lib/common/config/channel/ConfigChannel;
+        31: invokevirtual #81                 // Method xaero/lib/common/config/channel/ConfigChannel.getClientConfigManager:()Lxaero/lib/client/config/ClientConfigManager;
+        34: astore_2
+        35: aload_2
+        36: getstatic     #222                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BLOCK_COLORS:Lxaero/lib/common/config/option/RangeConfigOption;
+        39: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        42: checkcast     #136                // class java/lang/Integer
+        45: invokevirtual #544                // Method java/lang/Integer.intValue:()I
+        48: istore_3
+        49: aload_2
+        50: getstatic     #245                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.TERRAIN_DEPTH:Lxaero/lib/common/config/option/BooleanConfigOption;
+        53: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        56: checkcast     #164                // class java/lang/Boolean
+        59: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+        62: istore        4
+        64: aload_2
+        65: getstatic     #238                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.TERRAIN_SLOPES:Lxaero/lib/common/config/option/RangeConfigOption;
+        68: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        71: checkcast     #136                // class java/lang/Integer
+        74: invokevirtual #544                // Method java/lang/Integer.intValue:()I
+        77: istore        5
+        79: aload_2
+        80: getstatic     #437                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BIOME_BLENDING:Lxaero/lib/common/config/option/BooleanConfigOption;
+        83: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+        86: checkcast     #164                // class java/lang/Boolean
+        89: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+        92: istore        6
+        94: aload_2
+        95: getstatic     #270                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.BIOME_COLORS_IN_VANILLA:Lxaero/lib/common/config/option/BooleanConfigOption;
+        98: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       101: checkcast     #164                // class java/lang/Boolean
+       104: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+       107: istore        7
+       109: aload_2
+       110: getstatic     #356                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.ADJUST_HEIGHT_FOR_SHORT_BLOCKS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       113: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       116: checkcast     #164                // class java/lang/Boolean
+       119: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+       122: istore        8
+       124: aload_2
+       125: getstatic     #395                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.STAINED_GLASS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       128: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       131: checkcast     #164                // class java/lang/Boolean
+       134: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+       137: istore        9
+       139: aload_2
+       140: getstatic     #415                // Field xaero/map/common/config/option/WorldMapProfiledConfigOptions.LEGIBLE_CAVE_MAPS:Lxaero/lib/common/config/option/BooleanConfigOption;
+       143: invokevirtual #540                // Method xaero/lib/client/config/ClientConfigManager.getEffective:(Lxaero/lib/common/config/option/ConfigOption;)Ljava/lang/Object;
+       146: checkcast     #164                // class java/lang/Boolean
+       149: invokevirtual #548                // Method java/lang/Boolean.booleanValue:()Z
+       152: istore        10
+       154: iconst_0
+       155: istore        11
+       157: invokestatic  #551                // Method xaero/map/WorldMapSession.getCurrentSession:()Lxaero/map/WorldMapSession;
+       160: astore        12
+       162: aload         12
+       164: ifnull        180
+       167: aload         12
+       169: invokevirtual #557                // Method xaero/map/WorldMapSession.getMapProcessor:()Lxaero/map/MapProcessor;
+       172: invokevirtual #561                // Method xaero/map/MapProcessor.getMapWorld:()Lxaero/map/world/MapWorld;
+       175: invokevirtual #567                // Method xaero/map/world/MapWorld.isIgnoreHeightmaps:()Z
+       178: istore        11
+       180: new           #572                // class org/apache/commons/lang3/builder/HashCodeBuilder
+       183: dup
+       184: invokespecial #574                // Method org/apache/commons/lang3/builder/HashCodeBuilder."<init>":()V
+       187: astore        13
+       189: aload         13
+       191: iload_3
+       192: invokevirtual #575                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(I)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       195: iload         4
+       197: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       200: iload         5
+       202: invokevirtual #575                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(I)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       205: iconst_0
+       206: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       209: iload_3
+       210: iconst_1
+       211: if_icmpne     223
+       214: iload         7
+       216: ifeq          223
+       219: iconst_1
+       220: goto          224
+       223: iconst_0
+       224: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       227: iload         11
+       229: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       232: iload         8
+       234: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       237: iload         9
+       239: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       242: iload         10
+       244: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       247: iload         6
+       249: invokevirtual #579                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Z)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       252: pop
+       253: invokestatic  #525                // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+       256: invokevirtual #582                // Method net/minecraft/client/Minecraft.getResourcePackRepository:()Lnet/minecraft/server/packs/repository/PackRepository;
+       259: invokevirtual #586                // Method net/minecraft/server/packs/repository/PackRepository.getSelectedPacks:()Ljava/util/Collection;
+       262: astore        14
+       264: aload         14
+       266: invokeinterface #592,  1          // InterfaceMethod java/util/Collection.iterator:()Ljava/util/Iterator;
+       271: astore        15
+       273: aload         15
+       275: invokeinterface #598,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+       280: ifeq          309
+       283: aload         15
+       285: invokeinterface #603,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       290: checkcast     #607                // class net/minecraft/server/packs/repository/Pack
+       293: astore        16
+       295: aload         13
+       297: aload         16
+       299: invokevirtual #609                // Method net/minecraft/server/packs/repository/Pack.getId:()Ljava/lang/String;
+       302: invokevirtual #612                // Method org/apache/commons/lang3/builder/HashCodeBuilder.append:(Ljava/lang/Object;)Lorg/apache/commons/lang3/builder/HashCodeBuilder;
+       305: pop
+       306: goto          273
+       309: aload_0
+       310: aload         13
+       312: invokevirtual #615                // Method org/apache/commons/lang3/builder/HashCodeBuilder.toHashCode:()I
+       315: putfield      #521                // Field regionCacheHashCode:I
+       318: iload_1
+       319: aload_0
+       320: getfield      #521                // Field regionCacheHashCode:I
+       323: if_icmpeq     343
+       326: getstatic     #505                // Field xaero/map/WorldMap.LOGGER:Lorg/apache/logging/log4j/Logger;
+       329: aload_0
+       330: getfield      #521                // Field regionCacheHashCode:I
+       333: invokedynamic #618,  0            // InvokeDynamic #2:makeConcatWithConstants:(I)Ljava/lang/String;
+       338: invokeinterface #512,  2          // InterfaceMethod org/apache/logging/log4j/Logger.info:(Ljava/lang/String;)V
+       343: return
+
+  public static boolean canEditIngameSettings();
+    Code:
+         0: invokestatic  #551                // Method xaero/map/WorldMapSession.getCurrentSession:()Lxaero/map/WorldMapSession;
+         3: astore_0
+         4: aload_0
+         5: ifnull        22
+         8: aload_0
+         9: invokevirtual #557                // Method xaero/map/WorldMapSession.getMapProcessor:()Lxaero/map/MapProcessor;
+        12: invokevirtual #561                // Method xaero/map/MapProcessor.getMapWorld:()Lxaero/map/world/MapWorld;
+        15: ifnull        22
+        18: iconst_1
+        19: goto          23
+        22: iconst_0
+        23: ireturn
+}

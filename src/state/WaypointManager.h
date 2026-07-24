@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <set>
 #include <mutex>
 #include <mc/deps/core/math/Color.h>
 
@@ -28,6 +29,7 @@ namespace WaypointManager {
     // 增删查改接口
     void AddWaypoint(const std::string& name, int x, int y, int z, float r, float g, float b);
     void RemoveWaypoint(const std::string& id);
+    void RemoveWaypoints(const std::set<std::string>& ids);
     void ToggleWaypoint(const std::string& id);
     
     // [新增] 跨界热重载引擎

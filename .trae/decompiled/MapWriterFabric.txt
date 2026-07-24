@@ -1,0 +1,131 @@
+﻿Compiled from "MapWriterFabric.java"
+public class xaero.map.MapWriterFabric extends xaero.map.MapWriter {
+  public xaero.map.MapWriterFabric(xaero.map.region.OverlayManager, xaero.map.cache.BlockStateShortShapeCache, xaero.map.biome.BiomeGetter);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: aload_3
+         4: invokespecial #1                  // Method xaero/map/MapWriter."<init>":(Lxaero/map/region/OverlayManager;Lxaero/map/cache/BlockStateShortShapeCache;Lxaero/map/biome/BiomeGetter;)V
+         7: return
+
+  protected boolean blockStateHasTranslucentRenderType(net.minecraft.world.level.block.state.BlockState);
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field threadRandomSource:Ljava/lang/ThreadLocal;
+         4: invokevirtual #13                 // Method java/lang/ThreadLocal.get:()Ljava/lang/Object;
+         7: checkcast     #19                 // class net/minecraft/util/RandomSource
+        10: astore_2
+        11: aload_0
+        12: getfield      #21                 // Field threadReusableBlockModelPartList:Ljava/lang/ThreadLocal;
+        15: invokevirtual #13                 // Method java/lang/ThreadLocal.get:()Ljava/lang/Object;
+        18: checkcast     #24                 // class java/util/List
+        21: astore_3
+        22: invokestatic  #26                 // Method net/minecraft/client/Minecraft.getInstance:()Lnet/minecraft/client/Minecraft;
+        25: invokevirtual #32                 // Method net/minecraft/client/Minecraft.getModelManager:()Lnet/minecraft/client/resources/model/ModelManager;
+        28: invokevirtual #36                 // Method net/minecraft/client/resources/model/ModelManager.getBlockStateModelSet:()Lnet/minecraft/client/renderer/block/BlockStateModelSet;
+        31: astore        4
+        33: aload         4
+        35: aload_1
+        36: invokevirtual #42                 // Method net/minecraft/client/renderer/block/BlockStateModelSet.get:(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;
+        39: astore        5
+        41: aload_3
+        42: invokeinterface #47,  1           // InterfaceMethod java/util/List.clear:()V
+        47: aload         5
+        49: aload_2
+        50: aload_3
+        51: invokeinterface #51,  3           // InterfaceMethod net/minecraft/client/renderer/block/dispatch/BlockStateModel.collectParts:(Lnet/minecraft/util/RandomSource;Ljava/util/List;)V
+        56: aload_3
+        57: invokeinterface #57,  1           // InterfaceMethod java/util/List.isEmpty:()Z
+        62: ifeq          67
+        65: iconst_0
+        66: ireturn
+        67: aload_3
+        68: invokeinterface #61,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        73: astore        6
+        75: aload         6
+        77: invokeinterface #65,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+        82: ifeq          183
+        85: aload         6
+        87: invokeinterface #70,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        92: checkcast     #73                 // class net/minecraft/client/renderer/block/dispatch/BlockStateModelPart
+        95: astore        7
+        97: iconst_0
+        98: istore        8
+       100: iconst_1
+       101: istore        9
+       103: aload         7
+       105: getstatic     #75                 // Field net/minecraft/core/Direction.UP:Lnet/minecraft/core/Direction;
+       108: invokeinterface #81,  2           // InterfaceMethod net/minecraft/client/renderer/block/dispatch/BlockStateModelPart.getQuads:(Lnet/minecraft/core/Direction;)Ljava/util/List;
+       113: invokeinterface #61,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+       118: astore        10
+       120: aload         10
+       122: invokeinterface #65,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+       127: ifeq          168
+       130: aload         10
+       132: invokeinterface #70,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+       137: checkcast     #85                 // class net/minecraft/client/resources/model/geometry/BakedQuad
+       140: astore        11
+       142: iconst_1
+       143: istore        8
+       145: aload         11
+       147: invokevirtual #87                 // Method net/minecraft/client/resources/model/geometry/BakedQuad.materialInfo:()Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;
+       150: invokevirtual #91                 // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.layer:()Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;
+       153: invokevirtual #97                 // Method net/minecraft/client/renderer/chunk/ChunkSectionLayer.translucent:()Z
+       156: ifne          165
+       159: iconst_0
+       160: istore        9
+       162: goto          168
+       165: goto          120
+       168: iload         8
+       170: ifeq          180
+       173: iload         9
+       175: ifeq          180
+       178: iconst_1
+       179: ireturn
+       180: goto          75
+       183: iconst_0
+       184: ireturn
+
+  protected java.util.List<net.minecraft.client.resources.model.geometry.BakedQuad> getQuads(net.minecraft.client.renderer.block.dispatch.BlockStateModel, net.minecraft.client.multiplayer.ClientLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction);
+    Code:
+         0: aload_0
+         1: getfield      #7                  // Field threadRandomSource:Ljava/lang/ThreadLocal;
+         4: invokevirtual #13                 // Method java/lang/ThreadLocal.get:()Ljava/lang/Object;
+         7: checkcast     #19                 // class net/minecraft/util/RandomSource
+        10: astore        6
+        12: aload_0
+        13: getfield      #21                 // Field threadReusableBlockModelPartList:Ljava/lang/ThreadLocal;
+        16: invokevirtual #13                 // Method java/lang/ThreadLocal.get:()Ljava/lang/Object;
+        19: checkcast     #24                 // class java/util/List
+        22: astore        7
+        24: aload         7
+        26: invokeinterface #47,  1           // InterfaceMethod java/util/List.clear:()V
+        31: aload_1
+        32: aload         6
+        34: aload         7
+        36: invokeinterface #51,  3           // InterfaceMethod net/minecraft/client/renderer/block/dispatch/BlockStateModel.collectParts:(Lnet/minecraft/util/RandomSource;Ljava/util/List;)V
+        41: aload         7
+        43: invokeinterface #57,  1           // InterfaceMethod java/util/List.isEmpty:()Z
+        48: ifeq          53
+        51: aconst_null
+        52: areturn
+        53: aload         7
+        55: invokeinterface #102,  1          // InterfaceMethod java/util/List.getFirst:()Ljava/lang/Object;
+        60: checkcast     #73                 // class net/minecraft/client/renderer/block/dispatch/BlockStateModelPart
+        63: aload         5
+        65: invokeinterface #81,  2           // InterfaceMethod net/minecraft/client/renderer/block/dispatch/BlockStateModelPart.getQuads:(Lnet/minecraft/core/Direction;)Ljava/util/List;
+        70: areturn
+
+  protected net.minecraft.client.renderer.texture.TextureAtlasSprite getParticleIcon(net.minecraft.client.renderer.block.BlockStateModelSet, net.minecraft.client.renderer.block.dispatch.BlockStateModel, net.minecraft.client.multiplayer.ClientLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+    Code:
+         0: aload_2
+         1: aload_3
+         2: aload         4
+         4: aload         5
+         6: invokeinterface #105,  4          // InterfaceMethod net/minecraft/client/renderer/block/dispatch/BlockStateModel.particleMaterial:(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/sprite/Material$Baked;
+        11: astore        6
+        13: aload         6
+        15: invokevirtual #109                // Method net/minecraft/client/resources/model/sprite/Material$Baked.sprite:()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        18: areturn
+}

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <filesystem>
 #include <random>
+#include <algorithm>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -122,6 +123,23 @@ namespace WaypointManager {
             }
         }
         // 在锁外执行持久化，避免底层死锁
+        if (changed) SaveWaypoints();
+    }
+
+    void RemoveWaypoints(const std::set<std::string>& ids) {
+        if (ids.empty()) return;
+        bool changed = false;
+        {
+            std::lock_guard<std::mutex> lock(g_wpMutex);
+            auto it = std::remove_if(g_waypoints.begin(), g_waypoints.end(),
+                [&](const Waypoint& w) {
+                    return std::find(ids.begin(), ids.end(), w.id) != ids.end();
+                });
+            if (it != g_waypoints.end()) {
+                g_waypoints.erase(it, g_waypoints.end());
+                changed = true;
+            }
+        }
         if (changed) SaveWaypoints();
     }
 
