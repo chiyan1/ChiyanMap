@@ -1278,6 +1278,7 @@ namespace DX11Hook {
             static char nameBuf[256] = "";
             static int  pos[3]      = {0, 0, 0};
             static float col[3]     = {1.0f, 1.0f, 1.0f};
+            static int  rgb[3]      = {255, 255, 255};
             static bool showOnMap   = true;
             static bool initialized = false;
 
@@ -1297,6 +1298,9 @@ namespace DX11Hook {
                     snprintf(nameBuf, sizeof(nameBuf), "%s", targetWp.name.c_str());
                     pos[0] = targetWp.x; pos[1] = targetWp.y; pos[2] = targetWp.z;
                     col[0] = targetWp.r; col[1] = targetWp.g; col[2] = targetWp.b;
+                    rgb[0] = (int)(col[0] * 255.0f);
+                    rgb[1] = (int)(col[1] * 255.0f);
+                    rgb[2] = (int)(col[2] * 255.0f);
                     showOnMap = targetWp.enabled;
                     initialized = true;
                 }
@@ -1313,7 +1317,19 @@ namespace DX11Hook {
                 ImGui::Text("%s", LanguageManager::GetText("WP_NAME"));
 
                 ImGui::InputInt3("X / Y / Z", pos);
-                ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col);
+                if (ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col)) {
+                    rgb[0] = (int)(col[0] * 255.0f);
+                    rgb[1] = (int)(col[1] * 255.0f);
+                    rgb[2] = (int)(col[2] * 255.0f);
+                }
+                if (ImGui::InputInt3("R / G / B", rgb)) {
+                    rgb[0] = rgb[0] < 0 ? 0 : (rgb[0] > 255 ? 255 : rgb[0]);
+                    rgb[1] = rgb[1] < 0 ? 0 : (rgb[1] > 255 ? 255 : rgb[1]);
+                    rgb[2] = rgb[2] < 0 ? 0 : (rgb[2] > 255 ? 255 : rgb[2]);
+                    col[0] = (float)rgb[0] / 255.0f;
+                    col[1] = (float)rgb[1] / 255.0f;
+                    col[2] = (float)rgb[2] / 255.0f;
+                }
                 ImGui::Checkbox(LanguageManager::GetText("WP_SHOW_ON_MAP"), &showOnMap);
 
                 ImGui::Spacing();
@@ -2456,6 +2472,7 @@ namespace DX11Hook {
                 static char nameBuf[256] = "";
                 static int pos[3] = {0, 0, 0};
                 static float col[3] = {1.0f, 0.3f, 0.3f};
+                static int  rgb[3] = {255, 76, 76};
                 
                 if (ImGui::IsWindowAppearing()) {
                     nameBuf[0] = '\0'; 
@@ -2466,6 +2483,10 @@ namespace DX11Hook {
                     MapRenderState::addWaypointX = -999999;
                     MapRenderState::addWaypointY = -999999;
                     MapRenderState::addWaypointZ = -999999;
+
+                    rgb[0] = (int)(col[0] * 255.0f);
+                    rgb[1] = (int)(col[1] * 255.0f);
+                    rgb[2] = (int)(col[2] * 255.0f);
                 }
 
                 ImGui::PushItemWidth(180);
@@ -2480,7 +2501,19 @@ namespace DX11Hook {
                 ImGui::Text("%s", LanguageManager::GetText("WP_NAME"));
                 
                 ImGui::InputInt3("X / Y / Z", pos);
-                ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col);
+                if (ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col)) {
+                    rgb[0] = (int)(col[0] * 255.0f);
+                    rgb[1] = (int)(col[1] * 255.0f);
+                    rgb[2] = (int)(col[2] * 255.0f);
+                }
+                if (ImGui::InputInt3("R / G / B", rgb)) {
+                    rgb[0] = rgb[0] < 0 ? 0 : (rgb[0] > 255 ? 255 : rgb[0]);
+                    rgb[1] = rgb[1] < 0 ? 0 : (rgb[1] > 255 ? 255 : rgb[1]);
+                    rgb[2] = rgb[2] < 0 ? 0 : (rgb[2] > 255 ? 255 : rgb[2]);
+                    col[0] = (float)rgb[0] / 255.0f;
+                    col[1] = (float)rgb[1] / 255.0f;
+                    col[2] = (float)rgb[2] / 255.0f;
+                }
                 
                 ImGui::Spacing();
                 if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
