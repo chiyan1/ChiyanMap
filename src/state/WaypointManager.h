@@ -31,6 +31,7 @@ namespace WaypointManager {
     void RemoveWaypoint(const std::string& id);
     void RemoveWaypoints(const std::set<std::string>& ids);
     void ToggleWaypoint(const std::string& id);
+    void UpdateWaypoint(const std::string& id, const std::string& name, int x, int y, int z, float r, float g, float b, bool enabled);
     
     // [新增] 跨界热重载引擎
     void SwitchWorld(const std::string& worldId, int dimensionId);

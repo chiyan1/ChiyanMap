@@ -1266,58 +1266,59 @@ namespace DX11Hook {
         ImGui::End();
     }
 
-    inline void RenderRenameModal(const char* modalId, std::string& wpId, bool& trigger) {
+    inline void RenderEditModal(const char* modalId, std::string& wpId, bool& trigger) {
         if (trigger) {
             ImGui::OpenPopup(modalId);
             trigger = false;
         }
-        
+
         bool isOpen = true;
         // 传入 &isOpen 以在右上角渲染出打叉关闭按钮
         if (ImGui::BeginPopupModal(modalId, &isOpen, ImGuiWindowFlags_AlwaysAutoResize)) {
-            static char renameBuf[256] = "";
+            static char nameBuf[256] = "";
+            static int  pos[3]      = {0, 0, 0};
+            static float col[3]     = {1.0f, 1.0f, 1.0f};
+            static bool showOnMap   = true;
             static bool initialized = false;
-            
+
             Waypoint targetWp;
             bool found = false;
             {
                 std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
-                for(auto& w : WaypointManager::g_waypoints) {
-                    if(w.id == wpId) { targetWp = w; found = true; break; }
+                for (auto& w : WaypointManager::g_waypoints) {
+                    if (w.id == wpId) { targetWp = w; found = true; break; }
                 }
             }
-            
+
             if (!found) {
                 ImGui::CloseCurrentPopup();
             } else {
                 if (!initialized) {
-                    snprintf(renameBuf, sizeof(renameBuf), "%s", targetWp.name.c_str());
+                    snprintf(nameBuf, sizeof(nameBuf), "%s", targetWp.name.c_str());
+                    pos[0] = targetWp.x; pos[1] = targetWp.y; pos[2] = targetWp.z;
+                    col[0] = targetWp.r; col[1] = targetWp.g; col[2] = targetWp.b;
+                    showOnMap = targetWp.enabled;
                     initialized = true;
                 }
-                
+
                 ImGui::PushItemWidth(180);
-                ImGui::InputText("##RenInput", renameBuf, sizeof(renameBuf));
+                ImGui::InputText("##EditWPInput", nameBuf, sizeof(nameBuf));
                 ImGui::PopItemWidth();
                 ImGui::SameLine();
-                if (ImGui::Button("\xe2\x9c\x8e##Ren")) { // U+270E Edit
-                    NativeIME::Open(renameBuf, sizeof(renameBuf), LanguageManager::GetText("WP_NAME"));
+                if (ImGui::Button("\xe2\x9c\x8e##EditWP")) { // U+270E Edit
+                    NativeIME::Open(nameBuf, sizeof(nameBuf), LanguageManager::GetText("WP_NAME"));
                 }
                 if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("NATIVE_IME_TOOLTIP"));
                 ImGui::SameLine();
                 ImGui::Text("%s", LanguageManager::GetText("WP_NAME"));
+
+                ImGui::InputInt3("X / Y / Z", pos);
+                ImGui::ColorEdit3(LanguageManager::GetText("WP_COLOR"), col);
+                ImGui::Checkbox(LanguageManager::GetText("WP_SHOW_ON_MAP"), &showOnMap);
+
                 ImGui::Spacing();
-                
                 if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
-                    {
-                        std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
-                        for(auto& w : WaypointManager::g_waypoints) {
-                            if(w.id == wpId) { 
-                                w.name = renameBuf; 
-                                break; 
-                            }
-                        }
-                    }
-                    WaypointManager::SaveWaypoints();
+                    WaypointManager::UpdateWaypoint(wpId, nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], showOnMap);
                     ImGui::CloseCurrentPopup();
                     initialized = false;
                     NativeIME::Close();
@@ -1329,14 +1330,14 @@ namespace DX11Hook {
                     NativeIME::Close();
                 }
             }
-            
+
             // 状态联动：如果玩家点击了右上角的 [X] 打叉按钮
             if (!isOpen) {
                 ImGui::CloseCurrentPopup();
                 initialized = false;
                 NativeIME::Close();
             }
-            
+
             ImGui::EndPopup();
         }
     }
@@ -1861,8 +1862,8 @@ namespace DX11Hook {
             triggerWpMenu = false;
         }
 
-        static std::string bigMapRenameId = "";
-        static bool bigMapTriggerRename = false;
+        static std::string bigMapEditId = "";
+        static bool bigMapTriggerEdit = false;
 
         ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.12f, 0.12f, 0.12f, 0.95f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
@@ -1899,9 +1900,9 @@ namespace DX11Hook {
                     MapRenderState::showBigMap = false;
                 }
                 
-                if (ImGui::Selectable(LanguageManager::GetText("RENAME_WP"))) {
-                    bigMapRenameId = selectedWpId;
-                    bigMapTriggerRename = true;
+                if (ImGui::Selectable(LanguageManager::GetText("EDIT_WP"))) {
+                    bigMapEditId = selectedWpId;
+                    bigMapTriggerEdit = true;
                 }
                 
                 ImGui::Separator();
@@ -1919,7 +1920,7 @@ namespace DX11Hook {
         ImGui::PopStyleColor(2);
 
         // 调用大地图右键地标重命名弹窗模块
-        RenderRenameModal((std::string(LanguageManager::GetText("RENAME_WP")) + "##ModalBigMap").c_str(), bigMapRenameId, bigMapTriggerRename);
+        RenderEditModal((std::string(LanguageManager::GetText("EDIT_WP_TITLE")) + "##ModalBigMapEdit").c_str(), bigMapEditId, bigMapTriggerEdit);
 
         ImGui::End();
         ImGui::PopStyleVar(2);
@@ -2292,8 +2293,8 @@ namespace DX11Hook {
             bool toggled = false;
             bool triggerTp = false;
 
-            static std::string uiRenameId = "";
-            static bool uiTriggerRename = false;
+            static std::string uiEditId = "";
+            static bool uiTriggerEdit = false;
 
             // [新增] 路径点多选状态
             static std::set<std::string> selectedIds;
@@ -2389,9 +2390,9 @@ namespace DX11Hook {
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.6f, 0.2f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.7f, 0.3f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.5f, 0.1f, 1.0f));
-                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_RENAME"), ImVec2(55, 0))) {
-                        uiRenameId = wp.id;
-                        uiTriggerRename = true;
+                    if (ImGui::Button(LanguageManager::GetText("EDIT_WP"), ImVec2(55, 0))) {
+                        uiEditId = wp.id;
+                        uiTriggerEdit = true;
                     }
                     ImGui::PopStyleColor(3);
 
@@ -2442,7 +2443,7 @@ namespace DX11Hook {
             ImGui::EndChild();
 
             // 调用 UI 列表专属重命名弹窗模块
-            RenderRenameModal((std::string(LanguageManager::GetText("RENAME_WP")) + "##ModalUI").c_str(), uiRenameId, uiTriggerRename);
+            RenderEditModal((std::string(LanguageManager::GetText("EDIT_WP_TITLE")) + "##ModalUIEdit").c_str(), uiEditId, uiTriggerEdit);
 
             if (MapRenderState::triggerAddWaypoint) {
                 showAddPopup = true;

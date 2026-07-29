@@ -152,4 +152,18 @@ namespace WaypointManager {
             }
         }
     }
+
+    void UpdateWaypoint(const std::string& id, const std::string& name, int x, int y, int z, float r, float g, float b, bool enabled) {
+        {
+            std::lock_guard<std::mutex> lock(g_wpMutex);
+            auto it = std::find_if(g_waypoints.begin(), g_waypoints.end(),
+                [&](const Waypoint& w) { return w.id == id; });
+            if (it == g_waypoints.end()) return;
+            it->name = name;
+            it->x = x; it->y = y; it->z = z;
+            it->r = r; it->g = g; it->b = b;
+            it->enabled = enabled;
+        }
+        SaveWaypoints();
+    }
 }
