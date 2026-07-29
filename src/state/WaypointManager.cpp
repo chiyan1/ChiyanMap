@@ -11,7 +11,8 @@ namespace WaypointManager {
     std::vector<Waypoint> g_waypoints;
     std::mutex g_wpMutex;
     
-    std::string g_waypointFile = "";
+    std::string g_worldId = "";
+    int g_currentDim = -999; // 玩家当前所处维度 (0=主世界 1=下界 2=末地)
 
     std::string GenerateID() {
         static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -25,11 +26,46 @@ namespace WaypointManager {
         return tmp_s;
     }
 
+    // 生成某维度的路径点存档文件名
+    std::string DimensionFile(int dim) {
+        return "mods/ChiyanMap/waypoints/" + g_worldId + "_dim" + std::to_string(dim) + ".json";
+    }
+
+    // 读取单个维度的路径点并标记所属维度
+    void LoadDimension(int dim) {
+        std::string f = DimensionFile(dim);
+        if (!std::filesystem::exists(f)) return;
+        std::ifstream in(f);
+        if (!in.is_open()) return;
+        try {
+            json j;
+            in >> j;
+            for (const auto& item : j) {
+                Waypoint wp;
+                wp.id = item.value("id", GenerateID());
+                wp.name = item.value("name", "New Waypoint");
+                wp.x = item.value("x", 0);
+                wp.y = item.value("y", 0);
+                wp.z = item.value("z", 0);
+                wp.r = item.value("r", 1.0f);
+                wp.g = item.value("g", 1.0f);
+                wp.b = item.value("b", 1.0f);
+                wp.enabled = item.value("enabled", true);
+                wp.dimId = dim; // 旧存档无 dimId 字段，按文件所属维度补齐
+                g_waypoints.push_back(wp);
+            }
+        } catch (...) {
+            // 防止因 json 损坏导致游戏崩溃
+            printf("[ChiyanMap] Waypoints JSON 解析失败！\n");
+        }
+    }
+
     void SaveWaypoints() {
         std::lock_guard<std::mutex> lock(g_wpMutex);
-        if (g_waypointFile.empty()) return;
-        json j = json::array();
-        
+        if (g_worldId.empty()) return;
+        // 按维度分组后分别写入对应文件
+        std::vector<json> groups(3);
+        for (int d = 0; d < 3; ++d) groups[d] = json::array();
         for (const auto& wp : g_waypoints) {
             json obj;
             obj["id"] = wp.id;
@@ -41,46 +77,24 @@ namespace WaypointManager {
             obj["g"] = wp.g;
             obj["b"] = wp.b;
             obj["enabled"] = wp.enabled;
-            j.push_back(obj);
+            int d = (wp.dimId >= 0 && wp.dimId < 3) ? wp.dimId : g_currentDim;
+            groups[d].push_back(obj);
         }
 
-        std::ofstream out(g_waypointFile);
-        if (out.is_open()) {
-            out << j.dump(4); // 格式化为带有 4 个空格缩进的漂亮 JSON
-            out.close();
+        for (int d = 0; d < 3; ++d) {
+            std::ofstream out(DimensionFile(d));
+            if (out.is_open()) {
+                out << groups[d].dump(4); // 格式化为带有 4 个空格缩进的漂亮 JSON
+                out.close();
+            }
         }
     }
 
     void LoadWaypoints() {
         std::lock_guard<std::mutex> lock(g_wpMutex);
         g_waypoints.clear();
-        if (g_waypointFile.empty()) return;
-
-        if (!std::filesystem::exists(g_waypointFile)) return;
-
-        std::ifstream in(g_waypointFile);
-        if (in.is_open()) {
-            try {
-                json j;
-                in >> j;
-                for (const auto& item : j) {
-                    Waypoint wp;
-                    wp.id = item.value("id", GenerateID());
-                    wp.name = item.value("name", "New Waypoint");
-                    wp.x = item.value("x", 0);
-                    wp.y = item.value("y", 0);
-                    wp.z = item.value("z", 0);
-                    wp.r = item.value("r", 1.0f);
-                    wp.g = item.value("g", 1.0f);
-                    wp.b = item.value("b", 1.0f);
-                    wp.enabled = item.value("enabled", true);
-                    g_waypoints.push_back(wp);
-                }
-            } catch (...) {
-                // 防止因 json 损坏导致游戏崩溃
-                printf("[ChiyanMap] Waypoints JSON 解析失败！\n");
-            }
-        }
+        // 一次性载入全部三个维度，由 UI 标签筛选显示
+        for (int d = 0; d < 3; ++d) LoadDimension(d);
     }
 
     void Init() {
@@ -91,19 +105,21 @@ namespace WaypointManager {
         {
             std::lock_guard<std::mutex> lock(g_wpMutex);
             std::filesystem::create_directories("mods/ChiyanMap/waypoints");
-            g_waypointFile = "mods/ChiyanMap/waypoints/" + worldId + "_dim" + std::to_string(dimensionId) + ".json";
+            g_worldId = worldId;
+            g_currentDim = dimensionId; // 记录“玩家当前所处维度”，用于新路径点归属
         }
         LoadWaypoints();
     }
 
-    void AddWaypoint(const std::string& name, int x, int y, int z, float r, float g, float b) {
+    void AddWaypoint(const std::string& name, int x, int y, int z, float r, float g, float b, int dimId) {
         Waypoint wp;
         wp.id = GenerateID();
         wp.name = name;
         wp.x = x; wp.y = y; wp.z = z;
         wp.r = r; wp.g = g; wp.b = b;
         wp.enabled = true;
-        
+        wp.dimId = (dimId >= 0 && dimId < 3) ? dimId : g_currentDim; // 默认归属玩家当前维度
+
         {
             std::lock_guard<std::mutex> lock(g_wpMutex);
             g_waypoints.push_back(wp);

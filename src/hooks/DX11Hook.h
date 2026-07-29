@@ -1011,6 +1011,7 @@ namespace DX11Hook {
         if (MapRenderState::showWaypointsOnMinimap) {
             std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
             for (const auto& wp : WaypointManager::g_waypoints) {
+                if (wp.dimId != MapRenderState::currentDimensionId) continue; // 仅显示当前维度路径点
                 if (!wp.enabled) continue;
                 
                 float wDx = wp.x - pX;
@@ -1501,6 +1502,7 @@ namespace DX11Hook {
         {
             std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
             for (const auto& wp : WaypointManager::g_waypoints) {
+                if (wp.dimId != MapRenderState::currentDimensionId) continue; // 仅显示当前维度路径点
                 if (!wp.enabled) continue;
                 
                 float wx = cx + (wp.x - g_smoothPX) * MapRenderState::bigMapZoom + MapRenderState::bigMapOffsetX;
@@ -2288,6 +2290,7 @@ namespace DX11Hook {
             // 记录新建窗口当前帧的开启状态
             bool lastShowAddPopup = showAddPopup;
             static char searchBuf[256] = "";
+            static int wpTab = -1; // 维度标签: -1=全部, 0=主世界, 1=下界, 2=末地
             
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - 190);
             ImGui::InputTextWithHint("##WPSearch", LanguageManager::GetText("SEARCH_HINT"), searchBuf, sizeof(searchBuf));
@@ -2304,6 +2307,27 @@ namespace DX11Hook {
                 NativeIME::Close();
                 showAddPopup = true;
             }
+            // [新增] 维度标签筛选：全部 / 主世界 / 下界 / 末地
+            {
+                if (!lastShowWPUI) wpTab = MapRenderState::currentDimensionId; // 打开管理器时默认选中当前维度
+                const char* tabLabels[4] = {
+                    LanguageManager::GetText("WP_TAB_ALL"),
+                    LanguageManager::GetText("WP_TAB_OVERWORLD"),
+                    LanguageManager::GetText("WP_TAB_NETHER"),
+                    LanguageManager::GetText("WP_TAB_END")
+                };
+                int tabValues[4] = { -1, 0, 1, 2 };
+                for (int i = 0; i < 4; ++i) {
+                    if (i > 0) ImGui::SameLine();
+                    bool active = (wpTab == tabValues[i]);
+                    ImGui::PushStyleColor(ImGuiCol_Button, active ? ImVec4(0.25f, 0.55f, 0.9f, 1.0f) : ImVec4(0.25f, 0.32f, 0.38f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.45f, 0.52f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.28f, 0.34f, 1.0f));
+                    if (ImGui::Button(tabLabels[i], ImVec2(150, 0))) wpTab = tabValues[i];
+                    ImGui::PopStyleColor(3);
+                }
+            }
+
             ImGui::Separator();
 
             ImGui::BeginChild("WPList", ImVec2(0, 0), true);
@@ -2329,6 +2353,7 @@ namespace DX11Hook {
                 if (ImGui::Button(LanguageManager::GetText("WP_SELECT_ALL"), ImVec2(90, 0))) {
                     std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
                     for (const auto& wp : WaypointManager::g_waypoints) {
+                        if (wpTab != -1 && wp.dimId != wpTab) continue; // 维度标签筛选
                         if (!query.empty()) {
                             std::string lowerName = wp.name;
                             for (char& c : lowerName) { if (c >= 'A' && c <= 'Z') c += 32; }
@@ -2367,6 +2392,7 @@ namespace DX11Hook {
                 std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
                 for (auto& wp : WaypointManager::g_waypoints) {
                     
+                    if (wpTab != -1 && wp.dimId != wpTab) continue; // 维度标签筛选
                     if (!query.empty()) {
                         std::string lowerName = wp.name;
                         for (char& c : lowerName) { if (c >= 'A' && c <= 'Z') c += 32; }
@@ -2519,7 +2545,7 @@ namespace DX11Hook {
                 
                 ImGui::Spacing();
                 if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
-                    WaypointManager::AddWaypoint(nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2]);
+                    WaypointManager::AddWaypoint(nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], wpTab);
                     showAddPopup = false;
                     ImGui::CloseCurrentPopup();
                     NativeIME::Close();
