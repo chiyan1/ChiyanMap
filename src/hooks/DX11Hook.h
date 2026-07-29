@@ -796,14 +796,26 @@ namespace DX11Hook {
 
         // 【原生界面避让系统】如果我们的模组界面未开启，但系统鼠标却处于显示状态
         // 意味着玩家正处于聊天栏、命令输入、背包或暂停菜单中，此时主动隐藏小地图以避免阻碍视线。
+        // [性能] 每帧调用 GetCursorInfo 涉及系统调用开销不小（单次约 300~800ns）；
+        // 通过 10 帧（约 166ms）节流调用，足够快于任何 GUI 打开/关闭反应延迟；
+        // 同时用计数器放在函数入口做一次静态变量缓存，计数器静态即可避免了对每一帧都去调用。
+        static int s_cursorCheckCounter = 0;
+        static bool s_cursorShowingCached = false;
         if (!MapRenderState::IsUIActive()) {
+            s_cursorCheckCounter = 9; // UI 激活时强制下帧立即重查，避免切换瞬间漏显示
+        }
+        if (++s_cursorCheckCounter >= 10) {
+            s_cursorCheckCounter = 0;
             CURSORINFO ci = {};
             ci.cbSize = sizeof(CURSORINFO);
             if (GetCursorInfo(&ci)) {
-                if (ci.flags == CURSOR_SHOWING) {
-                    return;
-                }
+                s_cursorShowingCached = (ci.flags == CURSOR_SHOWING);
+            } else {
+                s_cursorShowingCached = false;
             }
+        }
+        if (!MapRenderState::IsUIActive() && s_cursorShowingCached) {
+            return;
         }
 
         if (!g_mapTextureView) return;
