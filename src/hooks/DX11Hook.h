@@ -1222,7 +1222,9 @@ namespace DX11Hook {
             drawRow(LanguageManager::GetText("MINIMAP_SCALE"), "##ScaleSlider", "##ScaleSub", "##ScaleInput", "##ScaleAdd", "\u21BA##ScaleReset", MapRenderState::miniMapScale, 0.2f, 2.5f, 0.1f, "%.2f", 1.0f);
             drawRow(LanguageManager::GetText("MINIMAP_ZOOM_RADIUS"), "##ZoomSlider", "##ZoomSub", "##ZoomInput", "##ZoomAdd", "\u21BA##ZoomReset", MapRenderState::miniMapZoomRadius, 10.0f, 200.0f, 5.0f, "%.0f", 50.0f);
 
+            // 输入框/箭头按钮不受 Slider 边界限制，手动夹取为安全区间防御越界
             if (MapRenderState::miniMapScale < 0.2f) MapRenderState::miniMapScale = 0.2f;
+            if (MapRenderState::miniMapScale > 2.5f) MapRenderState::miniMapScale = 2.5f;
             if (MapRenderState::miniMapZoomRadius < 10.0f) MapRenderState::miniMapZoomRadius = 10.0f;
             if (MapRenderState::miniMapZoomRadius > 200.0f) MapRenderState::miniMapZoomRadius = 200.0f;
 
