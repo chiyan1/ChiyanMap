@@ -60,6 +60,14 @@ namespace MapCacheManager {
     extern std::binary_semaphore g_ioDone;
     extern std::string g_cacheDir;
 
+    // 构造 region 文件所在子目录：
+    //   - 所有维度的地表 (非 cave): 直接存放在 dim_<n>/ 下 (region_*.bin 位于 dim_<n>/)
+    //     主世界历史文件即已按此布局，迁移/读取统一走 dim_<n>/ 以避免旧地表地图失效
+    //   - 洞穴: 存放在 dim_<n>/cave/ 下
+    inline std::string GetRegionSubdir(bool isCave) {
+        return isCave ? "cave/" : "";
+    }
+
     void Init();
     void Shutdown();
     void UpdateFromScan(int centerX, int centerZ, mce::Color scanColors[MAP_DATA_SIZE][MAP_DATA_SIZE], float scanHeights[MAP_DATA_SIZE][MAP_DATA_SIZE], bool isCave = false);

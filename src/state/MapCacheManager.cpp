@@ -72,10 +72,10 @@ namespace MapCacheManager {
                 }
             }
 
-            // 通道 1：极速读取（地表/洞穴按子目录区分）
+            // 通道 1：极速读取（地表直接存放在 dim_<n>/ 下，洞穴在 cave/ 子目录）
             for (uint64_t hash : toLoad) {
                 int rx, rz; DecodeRegionHash(hash, rx, rz);
-                std::string dir = g_cacheDir + (IsCaveHash(hash) ? "cave/" : "surface/");
+                std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(hash));
                 std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
 
                 RegionData* newRegion = new RegionData();
@@ -117,7 +117,7 @@ namespace MapCacheManager {
                 }
                 for (auto& item : regionsToSave) {
                     int rx, rz; DecodeRegionHash(item.first, rx, rz);
-                    std::string dir = g_cacheDir + (IsCaveHash(item.first) ? "cave/" : "surface/");
+                    std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(item.first));
                     std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
                     std::ofstream out(filePath, std::ios::binary);
                     if (out) {
@@ -139,7 +139,7 @@ namespace MapCacheManager {
             for (auto& pair : g_loadedRegions) {
                 if (pair.second && pair.second->dirty) {
                     int rx, rz; DecodeRegionHash(pair.first, rx, rz);
-                    std::string dir = g_cacheDir + (IsCaveHash(pair.first) ? "cave/" : "surface/");
+                    std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(pair.first));
                     std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
                     std::ofstream out(filePath, std::ios::binary);
                     if (out) {
@@ -156,10 +156,38 @@ namespace MapCacheManager {
         g_loadedRegions.clear();
         g_loadQueue.clear();
 
-        // 路径示例：mods/ChiyanMap/data/cache/<worldId>/dim_<n>/surface/ 与 .../cave/
+        // 路径示例：mods/ChiyanMap/data/cache/<worldId>/dim_<n>/
+        // 地表 (region_*.bin) 直接存放于 dim_<n>/ 下；洞穴存放于 dim_<n>/cave/ 下
         auto cacheDir = chiyan_map::ChiyanMap::getInstance().getSelf().getDataDir() / "cache" / worldId / ("dim_" + std::to_string(dimensionId));
-        std::filesystem::create_directories(cacheDir / "surface");
+        std::filesystem::create_directories(cacheDir);
         std::filesystem::create_directories(cacheDir / "cave");
+
+        // [向后兼容] 迁移旧版主世界地表缓存：
+        //   旧布局: dim_<n>/surface/region_*.bin
+        //   新布局: dim_<n>/region_*.bin
+        // 将 surface/ 目录下的 region_*.bin 移动到 dim_<n>/ 下，避免老玩家的地表地图失效。
+        std::error_code ec;
+        auto oldSurfaceDir = cacheDir / "surface";
+        if (std::filesystem::is_directory(oldSurfaceDir, ec)) {
+            for (auto const& entry : std::filesystem::directory_iterator(oldSurfaceDir, ec)) {
+                if (!entry.is_regular_file()) continue;
+                std::string filename = entry.path().filename().string();
+                if (filename.rfind("region_", 0) != 0) continue;
+                auto target = cacheDir / filename;
+                // 若新位置已存在同名文件则保留新文件，仅在不存在时移动
+                if (!std::filesystem::exists(target)) {
+                    std::filesystem::rename(entry.path(), target, ec);
+                    if (ec) {
+                        // rename 失败（跨分区等）则回退到 copy + remove
+                        std::filesystem::copy_file(entry.path(), target, std::filesystem::copy_options::overwrite_existing, ec);
+                        if (!ec) std::filesystem::remove(entry.path(), ec);
+                    }
+                }
+            }
+            // 尝试清理空的 surface 目录
+            std::filesystem::remove(oldSurfaceDir, ec);
+        }
+
         // 末尾保留分隔符以兼容现有 currentDir + "region_..." 字符串拼接
         g_cacheDir = cacheDir.string() + "/";
     }
@@ -183,7 +211,7 @@ namespace MapCacheManager {
             for (auto& pair : g_loadedRegions) {
                 if (pair.second && pair.second->dirty) {
                     int rx, rz; DecodeRegionHash(pair.first, rx, rz);
-                    std::string dir = g_cacheDir + (IsCaveHash(pair.first) ? "cave/" : "surface/");
+                    std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(pair.first));
                     std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
                     std::ofstream out(filePath, std::ios::binary);
                     if (out) {
@@ -217,7 +245,7 @@ namespace MapCacheManager {
                 
                 if (g_loadedRegions.find(hash) == g_loadedRegions.end() || g_loadedRegions[hash] == nullptr) {
                     RegionData* newRegion = new RegionData();
-                    std::string dir = g_cacheDir + (isCave ? "cave/" : "surface/");
+                    std::string dir = g_cacheDir + GetRegionSubdir(isCave);
                     std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
                     std::ifstream in(filePath, std::ios::binary | std::ios::ate);
                     if (in) {
