@@ -75,7 +75,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Off",
         "CAVE_MODE_LAYERED": "On",
         "CAVE_MODE_TYPE": "Cave Mode",
-        "CAVE_MODE_DESC": "Select the cave map rendering mode",
+        "CAVE_MODE_DESC": "Enable/Disable Cave Map",
         "CAVE_ACTIVE": "Cave mode: ON",
         "CAVE_DEPTH": "Render depth",
         "CAVE_DEPTH_DESC": "Number of layers rendered downward",
@@ -175,7 +175,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "关闭",
         "CAVE_MODE_LAYERED": "开启",
         "CAVE_MODE_TYPE": "洞穴模式",
-        "CAVE_MODE_DESC": "选择洞穴地图的渲染模式",
+        "CAVE_MODE_DESC": "开启/关闭洞穴地图",
         "CAVE_ACTIVE": "洞穴模式：开启",
         "CAVE_DEPTH": "显示深度",
         "CAVE_DEPTH_DESC": "向下渲染的层数",
@@ -275,7 +275,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "關閉",
         "CAVE_MODE_LAYERED": "開啟",
         "CAVE_MODE_TYPE": "洞穴模式",
-        "CAVE_MODE_DESC": "選擇洞穴地圖的渲染模式",
+        "CAVE_MODE_DESC": "開啟/關閉洞穴地圖",
         "CAVE_ACTIVE": "洞穴模式：開啟",
         "CAVE_DEPTH": "顯示深度",
         "CAVE_DEPTH_DESC": "向下渲染的層數",
@@ -368,7 +368,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Aus",
         "CAVE_MODE_LAYERED": "AN",
         "CAVE_MODE_TYPE": "Höhlenmodus",
-        "CAVE_MODE_DESC": "Wählen Sie den Render-Modus der Höhlenkarte",
+        "CAVE_MODE_DESC": "Höhlenkarte aktivieren/deaktivieren",
         "CAVE_ACTIVE": "Höhlenmodus: AN",
         "CAVE_DEPTH": "Render-Tiefe",
         "CAVE_DEPTH_DESC": "Anzahl der nach unten gerenderten Ebenen",
@@ -461,7 +461,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Désactivé",
         "CAVE_MODE_LAYERED": "ACTIVÉ",
         "CAVE_MODE_TYPE": "Mode grotte",
-        "CAVE_MODE_DESC": "Sélectionnez le mode de rendu de la carte des grottes",
+        "CAVE_MODE_DESC": "Activer/Désactiver la carte des grottes",
         "CAVE_ACTIVE": "Mode grotte : ACTIVÉ",
         "CAVE_DEPTH": "Profondeur de rendu",
         "CAVE_DEPTH_DESC": "Nombre de couches rendues vers le bas",
@@ -554,7 +554,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Mati",
         "CAVE_MODE_LAYERED": "HIDUP",
         "CAVE_MODE_TYPE": "Mode gua",
-        "CAVE_MODE_DESC": "Pilih mode render peta gua",
+        "CAVE_MODE_DESC": "Aktifkan/Nonaktifkan Peta Gua",
         "CAVE_ACTIVE": "Mode gua: HIDUP",
         "CAVE_DEPTH": "Kedalaman render",
         "CAVE_DEPTH_DESC": "Jumlah lapisan yang dirender ke bawah",
@@ -647,7 +647,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Disattivato",
         "CAVE_MODE_LAYERED": "ATTIVA",
         "CAVE_MODE_TYPE": "Modalità grotta",
-        "CAVE_MODE_DESC": "Seleziona la modalità di rendering della mappa delle grotte",
+        "CAVE_MODE_DESC": "Attiva/Disattiva Mappa delle Grotte",
         "CAVE_ACTIVE": "Modalità caverna: ATTIVA",
         "CAVE_DEPTH": "Profondità di rendering",
         "CAVE_DEPTH_DESC": "Numero di livelli renderizzati verso il basso",
@@ -740,7 +740,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "オフ",
         "CAVE_MODE_LAYERED": "オン",
         "CAVE_MODE_TYPE": "洞窟モード",
-        "CAVE_MODE_DESC": "洞窟マップの描画モードを選択",
+        "CAVE_MODE_DESC": "洞窟マップをオン/オフ",
         "CAVE_ACTIVE": "洞穴モード：オン",
         "CAVE_DEPTH": "描画深度",
         "CAVE_DEPTH_DESC": "下方向に描画する層数",
@@ -833,7 +833,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "끄기",
         "CAVE_MODE_LAYERED": "켜짐",
         "CAVE_MODE_TYPE": "동굴 모드",
-        "CAVE_MODE_DESC": "동굴 지도 렌더링 모드 선택",
+        "CAVE_MODE_DESC": "동굴 지도 켜기/끄기",
         "CAVE_ACTIVE": "동굴 모드: 켜짐",
         "CAVE_DEPTH": "표시 깊이",
         "CAVE_DEPTH_DESC": "아래로 렌더링되는 층 수",
@@ -926,7 +926,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Desativado",
         "CAVE_MODE_LAYERED": "LIGADO",
         "CAVE_MODE_TYPE": "Modo caverna",
-        "CAVE_MODE_DESC": "Selecione o modo de renderização do mapa de cavernas",
+        "CAVE_MODE_DESC": "Ativar/Desativar Mapa de Cavernas",
         "CAVE_ACTIVE": "Modo caverna: LIGADO",
         "CAVE_DEPTH": "Profundidade de renderização",
         "CAVE_DEPTH_DESC": "Número de camadas renderizadas para baixo",
@@ -1019,7 +1019,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Выкл.",
         "CAVE_MODE_LAYERED": "ВКЛ",
         "CAVE_MODE_TYPE": "Режим пещеры",
-        "CAVE_MODE_DESC": "Выберите режим отрисовки карты пещер",
+        "CAVE_MODE_DESC": "Включить/выключить карту пещер",
         "CAVE_ACTIVE": "Режим пещеры: ВКЛ",
         "CAVE_DEPTH": "Глубина отрисовки",
         "CAVE_DEPTH_DESC": "Количество слоёв, отрисовываемых вниз",
@@ -1112,7 +1112,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "ปิด",
         "CAVE_MODE_LAYERED": "เปิด",
         "CAVE_MODE_TYPE": "โหมดถ้ำ",
-        "CAVE_MODE_DESC": "เลือกโหมดการแสดงผลแผนที่ถ้ำ",
+        "CAVE_MODE_DESC": "เปิด/ปิดแผนที่ถ้ำ",
         "CAVE_ACTIVE": "โหมดถ้ำ: เปิด",
         "CAVE_DEPTH": "ความลึกการเรนเดอร์",
         "CAVE_DEPTH_DESC": "จำนวนชั้นที่เรนเดอร์ลงไปด้านล่าง",
@@ -1205,7 +1205,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Kapalı",
         "CAVE_MODE_LAYERED": "AÇIK",
         "CAVE_MODE_TYPE": "Mağara modu",
-        "CAVE_MODE_DESC": "Mağara haritası işleme modunu seçin",
+        "CAVE_MODE_DESC": "Mağara Haritasını Aç/Kapat",
         "CAVE_ACTIVE": "Mağara modu: AÇIK",
         "CAVE_DEPTH": "İşleme derinliği",
         "CAVE_DEPTH_DESC": "Aşağı doğru işlenen katman sayısı",
@@ -1298,7 +1298,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Вимк.",
         "CAVE_MODE_LAYERED": "УВІМК.",
         "CAVE_MODE_TYPE": "Режим печери",
-        "CAVE_MODE_DESC": "Виберіть режим відображення карти печер",
+        "CAVE_MODE_DESC": "Увімкнути/Вимкнути карту печер",
         "CAVE_ACTIVE": "Режим печери: УВІМК.",
         "CAVE_DEPTH": "Глибина відображення",
         "CAVE_DEPTH_DESC": "Кількість шарів, що відображаються вниз",
@@ -1391,7 +1391,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Tắt",
         "CAVE_MODE_LAYERED": "BẬT",
         "CAVE_MODE_TYPE": "Chế độ hang động",
-        "CAVE_MODE_DESC": "Chọn chế độ hiển thị bản đồ hang động",
+        "CAVE_MODE_DESC": "Bật/Tắt bản đồ hang động",
         "CAVE_ACTIVE": "Chế độ hang động: BẬT",
         "CAVE_DEPTH": "Độ sâu hiển thị",
         "CAVE_DEPTH_DESC": "Số lớp được hiển thị xuống dưới",
@@ -1484,7 +1484,7 @@ namespace LanguageManager {
         "CAVE_MODE_OFF": "Apagado",
         "CAVE_MODE_LAYERED": "ACTIVADO",
         "CAVE_MODE_TYPE": "Modo cueva",
-        "CAVE_MODE_DESC": "Selecciona el modo de renderizado del mapa de cuevas",
+        "CAVE_MODE_DESC": "Activar/Desactivar mapa de cuevas",
         "CAVE_ACTIVE": "Modo cueva: ACTIVADO",
         "CAVE_DEPTH": "Profundidad de renderizado",
         "CAVE_DEPTH_DESC": "Número de capas renderizadas hacia abajo",
@@ -1645,6 +1645,11 @@ namespace LanguageManager {
                 MapRenderState::miniMapScale = j.value("miniMapScale", 1.0f);
                 MapRenderState::miniMapOffsetX = j.value("miniMapOffsetX", 0.0f);
                 MapRenderState::miniMapOffsetY = j.value("miniMapOffsetY", 0.0f);
+                MapRenderState::g_caveModeType = j.value("caveModeType", (int)MapRenderState::CaveModeType::Layered);
+                MapRenderState::g_caveTopYAuto = j.value("caveTopYAuto", true);
+                MapRenderState::g_caveTopY = j.value("caveTopY", 64);
+                MapRenderState::g_caveDepth = j.value("caveDepth", 30);
+                MapRenderState::g_legibleCaveMaps = j.value("legibleCaveMaps", false);
             } catch (...) {
                 g_currentLanguage = "en";
             }
@@ -1664,6 +1669,11 @@ namespace LanguageManager {
         j["miniMapScale"] = MapRenderState::miniMapScale;
         j["miniMapOffsetX"] = MapRenderState::miniMapOffsetX;
         j["miniMapOffsetY"] = MapRenderState::miniMapOffsetY;
+        j["caveModeType"] = MapRenderState::g_caveModeType;
+        j["caveTopYAuto"] = MapRenderState::g_caveTopYAuto;
+        j["caveTopY"] = MapRenderState::g_caveTopY;
+        j["caveDepth"] = MapRenderState::g_caveDepth;
+        j["legibleCaveMaps"] = MapRenderState::g_legibleCaveMaps;
 
         std::ofstream out(filePath);
         if (out.is_open()) {

@@ -20,7 +20,16 @@
 #include <mc/deps/core/math/Color.h>
 #include <mc/world/level/BlockSource.h>
 #include <mc/world/level/block/Block.h>
+#include <mc/world/level/block/BlockType.h>
 #include <mc/world/level/biome/Biome.h>
+#include <mc/world/level/material/Material.h>
+#if __has_include(<mc/world/level/material/MaterialType.h>)
+#include <mc/world/level/material/MaterialType.h>
+using ChiyanMapMaterialType = ::MaterialType;
+#else
+#include <mc/deps/shared_types/v1_26_20/block/MaterialType.h>
+using ChiyanMapMaterialType = ::SharedTypes::v1_26_20::MaterialType;
+#endif
 #include "state/WaypointManager.h"
 #include <mc/world/level/BlockPos.h>
 #include <mc/deps/core/math/Vec3.h>
@@ -781,6 +790,70 @@ inline bool SafeGetBlockName(BlockSource& region, int x, int y, int z, std::stri
     }
 }
 
+// ==================== 洞穴材质判定 (汲取 0.3.4 优势: Material枚举精准识别通道/水体) ====================
+// Xaero 风格洞穴分层投影：所有列从同一个 Top Y 向下解析，避免相邻列跳到不同高度层。
+inline constexpr int kCaveLayerTopOffset = 3;
+inline constexpr int kCaveLayerAirSearchDepth = 64;
+inline constexpr int kCaveLayerFloorSearchDepth = 64;
+
+inline ChiyanMapMaterialType GetCaveMaterialType(Block const& block) {
+    return block.getBlockType().mMaterial.mType;
+}
+
+inline bool IsCaveWaterBlock(Block const& block) {
+    if (block.isAir()) return false;
+    ChiyanMapMaterialType material = GetCaveMaterialType(block);
+    return material == ChiyanMapMaterialType::Water || material == ChiyanMapMaterialType::Bubble;
+}
+
+inline constexpr float kWaterOverlayAlpha = 0.65f;
+inline constexpr mce::Color kDefaultWaterTint(0.18f, 0.38f, 0.85f, 1.0f);
+
+// 水色叠加在洞底颜色之上；避免液体单独饱和色显得突兀。
+inline mce::Color BlendWaterOverFloor(mce::Color floorColor, mce::Color waterTint) {
+    if (waterTint.a <= 0.01f) waterTint = kDefaultWaterTint;
+    return mce::Color(
+        floorColor.r + (waterTint.r - floorColor.r) * kWaterOverlayAlpha,
+        floorColor.g + (waterTint.g - floorColor.g) * kWaterOverlayAlpha,
+        floorColor.b + (waterTint.b - floorColor.b) * kWaterOverlayAlpha,
+        floorColor.a
+    );
+}
+
+// 洞穴投影和自动判定共享此规则：流体、植被与透明方块都不形成洞穴墙体。
+// 相比字符串匹配，Material 枚举更精准，避免漏判新方块导致黑灰/红块。
+inline bool IsCavePassableBlock(Block const& block) {
+    if (block.isAir()) return true;
+    ChiyanMapMaterialType material = GetCaveMaterialType(block);
+    switch (material) {
+    case ChiyanMapMaterialType::Air:
+    case ChiyanMapMaterialType::Water:
+    case ChiyanMapMaterialType::Bubble:
+    case ChiyanMapMaterialType::Plant:
+    case ChiyanMapMaterialType::SolidPlant:
+    case ChiyanMapMaterialType::Leaves:
+    case ChiyanMapMaterialType::Glass:
+    case ChiyanMapMaterialType::Ice:
+    case ChiyanMapMaterialType::PowderSnow:
+    case ChiyanMapMaterialType::Cactus:
+    case ChiyanMapMaterialType::Fire:
+    case ChiyanMapMaterialType::Portal:
+    case ChiyanMapMaterialType::Grate:
+    case ChiyanMapMaterialType::StoneDecoration:
+    case ChiyanMapMaterialType::DecorationSolid:
+    case ChiyanMapMaterialType::NonSolid:
+    case ChiyanMapMaterialType::StructureVoid:
+        return true;
+    default:
+        break;
+    }
+    if (material == ChiyanMapMaterialType::Wood) {
+        std::string const& name = block.getTypeName();
+        return name.find("log") != std::string::npos || name.find("stem") != std::string::npos;
+    }
+    return false;
+}
+
 // ==================== 洞穴地图系统 (Xaero's Cave Map 1:1 复刻) ====================
 
 // [洞穴辅助] 判断方块是否为"覆盖层"（透明/非实心），在洞穴列扫描中跳过
@@ -890,48 +963,51 @@ inline float ComputeCaveBrightness(int depth, int caveDepth) noexcept {
 // 返回值: true=找到洞穴方块, false=列内无洞穴 (纯实心石头, 渲染为透明)
 inline bool ScanColumnCave(BlockSource& region, int x, int z, int startY, int caveDepth,
                            std::string& outBlockName, int& outBlockY, int& outDepth) noexcept {
+    // 汲取0.3.4: 分阶段投影 — 先从统一TopY向下找空气通道，再向下找地板。
+    // 用 Material 枚举(IsCavePassableBlock)精准识别通道，避免字符串匹配漏判导致黑灰/红块。
+    int topY = startY;
     int bottomY = startY - caveDepth;
     if (bottomY < -64) bottomY = -64;
+    if (topY < -64) return false;
 
-    bool seenAir = false;  // 是否已遇到空气 (洞穴空腔)
-    int depth = 0;
-    for (int y = startY; y >= bottomY; y--, depth++) {
-        std::string name;
-        if (!SafeGetBlockName(region, x, y, z, name)) continue;
-
-        // 空气: 标记已进入洞穴空腔
-        if (IsAirLikeName(name)) {
-            seenAir = true;
-            continue;
-        }
-
-        // 液体方块: 仅在空气下方返回 (熔岩湖/水池表面)
-        if (IsLiquidBlockName(name)) {
-            if (seenAir) {
-                outBlockName = name;
-                outBlockY = y;
-                outDepth = depth;
-                return true;
+    // 阶段一: 从 topY 向下找第一个"通道"方块(空气/水/植被等可穿透)
+    int channelY = -99999;
+    int airSearchBottom = std::max(bottomY, topY - kCaveLayerAirSearchDepth);
+    for (int y = topY; y >= airSearchBottom; y--) {
+        try {
+            Block const& block = region.getBlock(BlockPos(x, y, z));
+            if (IsCavePassableBlock(block)) {
+                channelY = y;
+                break;
             }
-            continue;  // 液体上方无空气, 跳过
-        }
-
-        // 其他覆盖层方块 (玻璃/火把/草/叶子等): 视为空气 (可穿透)
-        if (IsCaveOverlayBlockName(name)) {
-            seenAir = true;
+        } catch (...) {
             continue;
         }
+    }
+    if (channelY == -99999) return false;  // 纯实体列 = 透明(黑色背景)
 
-        // 实心方块: 仅在空气下方返回 (洞穴地板/墙壁)
-        if (seenAir) {
-            outBlockName = name;
+    // 阶段二: 从通道Y向下找第一个非穿透方块(地板)
+    int floorSearchBottom = std::max(bottomY, channelY - kCaveLayerFloorSearchDepth);
+    int depth = 0;
+    for (int y = channelY; y >= floorSearchBottom; y--, depth++) {
+        try {
+            Block const& block = region.getBlock(BlockPos(x, y, z));
+            if (IsCavePassableBlock(block)) continue;  // 通道内的可穿透方块
+            // 命中地板/墙壁方块
+            outBlockName = block.getTypeName();
             outBlockY = y;
             outDepth = depth;
             return true;
+        } catch (...) {
+            continue;
         }
-        // 实心方块上方无空气 = 纯石头区域, 跳过 (不渲染)
     }
-    return false;  // 列内无洞穴空腔 = 透明 (黑色背景)
+
+    // 有通道但 kCaveLayerFloorSearchDepth 内无地板 = 深洞，渲染深灰而非泄露地表色
+    outBlockName = "__CAVE_DEEPHOLE__";
+    outBlockY = std::max(channelY - kCaveLayerFloorSearchDepth, -64);
+    outDepth = kCaveLayerFloorSearchDepth;
+    return true;
 }
 
 // [洞穴特殊方块颜色] 液体方块在洞穴中使用饱和颜色 (不受深度衰减)
@@ -2103,6 +2179,21 @@ LL_TYPE_INSTANCE_HOOK(
                     // 洞穴扫描深度
                     int caveDepth = MapRenderState::g_caveDepth;
 
+                    // 汲取0.3.4: 统一 Top Y 投影 — 所有列从同一个高度向下解析，
+                    // 避免逐列 SafeGetSurfaceY 在部分加载区块返回洞穴天花板Y → 读取石头/netherrack → 黑灰/红块。
+                    int currentCaveTopY;
+                    int currentCaveScanDepth;
+                    if (MapRenderState::currentDimensionId == 1) {
+                        currentCaveTopY = std::clamp((int)g_playerY + kCaveLayerTopOffset, -64, 120);
+                        currentCaveScanDepth = 80;
+                    } else if (!MapRenderState::g_caveTopYAuto) {
+                        currentCaveTopY = std::clamp(MapRenderState::g_caveTopY, -64, 319);
+                        currentCaveScanDepth = caveDepth;
+                    } else {
+                        currentCaveTopY = std::clamp((int)g_playerY + kCaveLayerTopOffset, -64, 319);
+                        currentCaveScanDepth = caveDepth;
+                    }
+
                     while (currentRow <= MAP_DATA_RADIUS && !timeBudgetExceeded) {
                         int dx = currentRow;
                         int arrX = dx + MAP_DATA_RADIUS;
@@ -2113,30 +2204,10 @@ LL_TYPE_INSTANCE_HOOK(
                             int targetZ = currentScanZ + dz;
                             int arrZ    = dz + MAP_DATA_RADIUS;
 
-                            // 确定扫描起点 Y
-                            // 手动 Top Y 模式: 使用 g_caveTopY 作为起点
-                            // Auto 模式: 从每列地表实心方块 (surfY-1) 开始扫描
-                            //   - surfY = getAboveTopSolidBlock 返回值 = 地表上方空气格 Y
-                            //   - surfY-1 = 地表实心方块 Y, 从此处开始 seenAir=false,
-                            //     避免从空气开始导致 seenAir=true 误将地表方块当作洞穴地板返回 (浅洞穴 bug)
-                            //   - cap=8: 限制扫描起点不超过玩家头顶 8 格
-                            int startY;
-                            int scanDepth;
-                            if (MapRenderState::currentDimensionId == 1) {
-                                // [下界地图] 下界无天空, 从天花板下方扫描到地面
-                                // startY = min(120, playerY+40): 确保覆盖玩家上方的方块
-                                // scanDepth = 80: 覆盖下界完整高度范围
-                                startY = std::min(120, (int)g_playerY + 40);
-                                scanDepth = 80;
-                            } else if (!MapRenderState::g_caveTopYAuto) {
-                                // 手动 Top Y: 钳制到有效范围, 防御旧配置残留的 -99 哨兵值导致整图空白
-                                startY = std::clamp(MapRenderState::g_caveTopY, -64, 320);
-                                scanDepth = caveDepth;
-                            } else {
-                                short surfY = SafeGetSurfaceY(region, targetX, targetZ);
-                                startY = std::min((int)surfY - 1, (int)g_playerY + 8);
-                                scanDepth = caveDepth;
-                            }
+                            // 统一 Top Y: 所有列共用 currentCaveTopY，不再逐列调 SafeGetSurfaceY
+                            // (逐列 SafeGetSurfaceY 在部分加载区块返回洞穴天花板Y → 读石头/netherrack → 黑灰/红块)
+                            int startY = currentCaveTopY;
+                            int scanDepth = currentCaveScanDepth;
 
                             std::string blockName;
                             int blockY = 0, depth = 0;
@@ -2144,25 +2215,35 @@ LL_TYPE_INSTANCE_HOOK(
                             if (startY > -64 && ScanColumnCave(region, targetX, targetZ, startY, scanDepth, blockName, blockY, depth)) {
                                 g_mapHeightsBack[arrX][arrZ] = (float)blockY;
 
-                                // 液体方块: 使用饱和颜色, 不应用深度衰减
-                                mce::Color liquidCol = GetCaveLiquidColor(blockName);
-                                if (liquidCol.a > 0.0f) {
-                                    g_mapColorsBack[arrX][arrZ] = liquidCol;
+                                // 深洞: 有空气通道但 64 格内无地板，渲染深灰避免泄露地表色
+                                if (blockName == "__CAVE_DEEPHOLE__") {
+                                    g_mapColorsBack[arrX][arrZ] = mce::Color(0.08f, 0.08f, 0.08f, 1.0f);
                                 } else {
-                                    // 实心方块: 使用洞穴专用颜色表 (含矿石/石头变种/基岩等)
-                                    mce::Color baseColor = GetCaveBlockColor(blockName);
+                                    // 液体方块: 使用饱和颜色, 不应用深度衰减
+                                    mce::Color liquidCol = GetCaveLiquidColor(blockName);
+                                    if (liquidCol.a > 0.0f) {
+                                        g_mapColorsBack[arrX][arrZ] = liquidCol;
+                                    } else {
+                                        // 实心方块: 使用洞穴专用颜色表 (含矿石/石头变种/基岩等)
+                                        mce::Color baseColor = GetCaveBlockColor(blockName);
 
-                                    // 应用深度亮度衰减
-                                    // 注意: 分母必须用 scanDepth (Full=128, Layered=caveDepth),
-                                    // 否则 Full 模式下 depth 超过 caveDepth 后全部钳制到最低亮度 0.375,
-                                    // 深度层次信息完全丢失
-                                    float brightness = ComputeCaveBrightness(depth, scanDepth);
-                                    g_mapColorsBack[arrX][arrZ] = mce::Color(
-                                        baseColor.r * brightness,
-                                        baseColor.g * brightness,
-                                        baseColor.b * brightness,
-                                        1.0f  // 洞穴模式 alpha=1 (完全不透明)
-                                    );
+                                        // 水色叠加: 若地板方块为水体材质，用 BlendWaterOverFloor 叠加水色
+                                        try {
+                                            Block const& floorBlock = region.getBlock(BlockPos(targetX, blockY, targetZ));
+                                            if (IsCaveWaterBlock(floorBlock)) {
+                                                baseColor = BlendWaterOverFloor(baseColor, mce::Color(0.15f, 0.45f, 0.90f, 1.0f));
+                                            }
+                                        } catch (...) {}
+
+                                        // 应用深度亮度衰减
+                                        float brightness = ComputeCaveBrightness(depth, scanDepth);
+                                        g_mapColorsBack[arrX][arrZ] = mce::Color(
+                                            baseColor.r * brightness,
+                                            baseColor.g * brightness,
+                                            baseColor.b * brightness,
+                                            1.0f  // 洞穴模式 alpha=1 (完全不透明)
+                                        );
+                                    }
                                 }
                             } else {
                                 // 列内无方块 = 空气/未探索 = 透明 (显示为黑色背景)
@@ -2348,6 +2429,34 @@ LL_TYPE_INSTANCE_HOOK(
                                             s_globalColorCache[cacheKey] = calculatedColor;
                                             g_mapColorsBack[arrX][arrZ] = calculatedColor;
                                         }
+                                    }
+                                }
+                                // 移植0.3.4水域渲染：水面方块向下穿透水层找海床，海床色+水色叠加
+                                // 原实现直接返回纯水色(waterCol)，无海床底色，深海区呈纯蓝缺乏层次。
+                                // 0.3.4: 检测 topY-1 为水体材质 → 向下64格找首个非穿透方块(海床) →
+                                //        海床原色 + 0.65 alpha 水色叠加，保留海床纹理同时覆盖水色。
+                                if (IsCaveWaterBlock(block)) {
+                                    int seaFloor = (int)topY - 1;
+                                    int surfaceY = seaFloor + 1;
+                                    while (seaFloor > -64 && (surfaceY - seaFloor) < 64) {
+                                        try {
+                                            Block const& seaFloorBlock = region.getBlock(BlockPos(targetX, seaFloor, targetZ));
+                                            if (!IsCavePassableBlock(seaFloorBlock)) break;
+                                        } catch (...) { break; }
+                                        seaFloor--;
+                                    }
+                                    g_mapHeightsBack[arrX][arrZ] = (float)seaFloor;
+                                    try {
+                                        Block const& seaFloorBlock = region.getBlock(BlockPos(targetX, seaFloor, targetZ));
+                                        mce::Color seaFloorColor = getBlockColor(
+                                            seaFloorBlock.getTypeName(),
+                                            s_cachedGrass, s_cachedFoliage, s_cachedWater
+                                        );
+                                        g_mapColorsBack[arrX][arrZ] = BlendWaterOverFloor(seaFloorColor, s_cachedWater);
+                                    } catch (...) {
+                                        g_mapColorsBack[arrX][arrZ] = BlendWaterOverFloor(
+                                            mce::Color(0.08f, 0.08f, 0.08f, 1.0f), s_cachedWater
+                                        );
                                     }
                                 }
                             } else {
