@@ -10,6 +10,8 @@ using json = nlohmann::json;
 namespace WaypointManager {
     std::vector<Waypoint> g_waypoints;
     std::mutex g_wpMutex;
+    Waypoint g_lastDeletedWaypoint;
+    bool g_hasDeletedWaypoint = false;
     
     std::string g_worldId = "";
     int g_currentDim = -999; // 玩家当前所处维度 (0=主世界 1=下界 2=末地)
@@ -131,10 +133,12 @@ namespace WaypointManager {
         bool changed = false;
         {
             std::lock_guard<std::mutex> lock(g_wpMutex);
-            auto it = std::remove_if(g_waypoints.begin(), g_waypoints.end(),
+            auto it = std::find_if(g_waypoints.begin(), g_waypoints.end(),
                 [&](const Waypoint& w) { return w.id == id; });
             if (it != g_waypoints.end()) {
-                g_waypoints.erase(it, g_waypoints.end());
+                g_lastDeletedWaypoint = *it;
+                g_hasDeletedWaypoint = true;
+                g_waypoints.erase(it);
                 changed = true;
             }
         }
@@ -181,5 +185,16 @@ namespace WaypointManager {
             it->enabled = enabled;
         }
         SaveWaypoints();
+    }
+
+    bool RestoreLastDeletedWaypoint() {
+        if (!g_hasDeletedWaypoint) return false;
+        {
+            std::lock_guard<std::mutex> lock(g_wpMutex);
+            g_waypoints.push_back(g_lastDeletedWaypoint);
+            g_hasDeletedWaypoint = false;
+        }
+        SaveWaypoints();
+        return true;
     }
 }

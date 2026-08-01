@@ -22,18 +22,21 @@ struct Waypoint {
 namespace WaypointManager {
     extern std::vector<Waypoint> g_waypoints;
     extern std::mutex g_wpMutex;
+    extern Waypoint g_lastDeletedWaypoint;
+    extern bool g_hasDeletedWaypoint;
 
     void Init();
     void SaveWaypoints();
     void LoadWaypoints();
-    
+
     // 增删查改接口
     void AddWaypoint(const std::string& name, int x, int y, int z, float r, float g, float b, int dimId = -1);
     void RemoveWaypoint(const std::string& id);
     void RemoveWaypoints(const std::set<std::string>& ids);
     void ToggleWaypoint(const std::string& id);
     void UpdateWaypoint(const std::string& id, const std::string& name, int x, int y, int z, float r, float g, float b, bool enabled);
-    
+    bool RestoreLastDeletedWaypoint();
+
     // [新增] 跨界热重载引擎
     void SwitchWorld(const std::string& worldId, int dimensionId);
 }
