@@ -899,16 +899,22 @@ inline bool DetectCaveStart(BlockSource& region, int playerX, int playerY, int p
     short surfaceY = SafeGetSurfaceY(region, playerX, playerZ);
     if (surfaceY <= -64) return false;  // 无效地表
 
-    // [树下防误判] getAboveTopSolidBlock 可能返回树叶 Y, 需跳过树叶等覆盖层找到真实地表
-    // 向下扫描跳过树叶/透明方块/植被/液体, 找到第一个实心方块作为真实地表
+    // [树下防误判] getAboveTopSolidBlock 可能返回树叶/树干 Y, 需跳过树叶/树干等覆盖层找到真实地表
+    // 向下扫描跳过树叶/树干/透明方块/植被/液体, 找到第一个实心方块作为真实地表
+    bool foundRealSurface = false;
     for (int y = (int)surfaceY - 1; y > playerY; y--) {
         std::string name;
         if (!SafeGetBlockName(region, playerX, y, playerZ, name)) continue;
+        // 树干(log/stem)也跳过, 避免大树下方误判为洞穴
+        if (name.find("log") != std::string::npos || name.find("stem") != std::string::npos) continue;
         if (!IsAirLikeName(name) && !IsCaveOverlayBlockName(name) && !IsLiquidBlockName(name)) {
             surfaceY = (short)(y + 1);
+            foundRealSurface = true;
             break;
         }
     }
+    // 如果玩家上方全是树叶/树干/空气(没找到真实地表), 说明在树下而非地下
+    if (!foundRealSurface) return false;
 
     // 玩家头顶有 5+ 格实心方块 → 在洞穴中
     // getAboveTopSolidBlock 返回的是"最高的非空气方块 Y+1"
@@ -924,6 +930,11 @@ inline bool DetectCaveStart(BlockSource& region, int playerX, int playerY, int p
     for (int y = playerY + 2; y <= playerY + 8 && y < 320; y++) {
         std::string name;
         if (SafeGetBlockName(region, playerX, y, playerZ, name)) {
+            // 树干(log/stem)不计入实心方块, 避免树下误判
+            if (name.find("log") != std::string::npos || name.find("stem") != std::string::npos) {
+                solidCount = 0;
+                continue;
+            }
             if (!IsAirLikeName(name) && !IsCaveOverlayBlockName(name) &&
                 !IsLiquidBlockName(name)) {
                 solidCount++;
@@ -1426,7 +1437,9 @@ LL_TYPE_INSTANCE_HOOK(
 
     auto* player = this->getLocalPlayer();
         if (player && this->isWorldActive()) {
-            const Vec3 pos = player->getFeetPos();
+         Vec3 pos;
+         try {
+            pos = player->getFeetPos();
 
             if (g_prevPhysicsPos.x == 0.0f && g_prevPhysicsPos.z == 0.0f) {
                 g_prevPhysicsPos = pos;
@@ -1442,6 +1455,10 @@ LL_TYPE_INSTANCE_HOOK(
             g_playerYaw = player->getRotation().y;
             g_hasPlayer   = true;
             g_localPlayer = player;
+         } catch (...) {
+            // player 指针可能失效(维度切换/区块卸载/退出过程), 跳过本帧
+            return result;
+         }
 
         // ==========================================
         // [地表直达传送·增强版] 三级地表Y识别 + 两阶段探测 + 五道安全防线
