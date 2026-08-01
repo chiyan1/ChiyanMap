@@ -1,5 +1,11 @@
 #pragma once
 #include <windows.h>
+#include <wincodec.h>
+#include <ctime>
+#include <vector>
+#include <filesystem>
+#pragma comment(lib, "windowscodecs.lib")
+#pragma comment(lib, "ole32.lib")
 // 定义这些宏，避免与 LeviLamina 中的重复定义冲突
 #define D3D12_FEATURE_DATA_D3D12_OPTIONS  D3D12_FEATURE_DATA_D3D12_OPTIONS_LEGACY
 #define D3D12_FEATURE_DATA_ARCHITECTURE  D3D12_FEATURE_DATA_ARCHITECTURE_LEGACY
@@ -730,6 +736,102 @@ namespace DX11Hook {
             g_pd3dDevice->CreateSamplerState(&desc, &pLinearSampler);
         }
         g_pd3dDeviceContext->PSSetSamplers(0, 1, &pLinearSampler);
+    }
+
+    // ==========================================
+    // [导出地图PNG] 截取当前屏幕并保存为PNG文件
+    // 使用 GDI 截屏 + WIC 编码PNG, 无需第三方库
+    // ==========================================
+    inline void ExportMapAsPNG() {
+        int width = GetSystemMetrics(SM_CXSCREEN);
+        int height = GetSystemMetrics(SM_CYSCREEN);
+
+        HDC hScreen = GetDC(NULL);
+        HDC hDC = CreateCompatibleDC(hScreen);
+        HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, width, height);
+        HGDIOBJ hOld = SelectObject(hDC, hBitmap);
+        BitBlt(hDC, 0, 0, width, height, hScreen, 0, 0, SRCCOPY);
+
+        BITMAPINFOHEADER bi = {};
+        bi.biSize = sizeof(BITMAPINFOHEADER);
+        bi.biWidth = width;
+        bi.biHeight = -height; // top-down
+        bi.biPlanes = 1;
+        bi.biBitCount = 32;
+        bi.biCompression = BI_RGB;
+
+        std::vector<BYTE> pixels(width * height * 4);
+        GetDIBits(hDC, hBitmap, 0, height, pixels.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+
+        SelectObject(hDC, hOld);
+        DeleteObject(hBitmap);
+        DeleteDC(hDC);
+        ReleaseDC(NULL, hScreen);
+
+        // 生成文件路径: mod数据目录/exports/map_YYYYMMDD_HHMMSS.png
+        auto& self = chiyan_map::ChiyanMap::getInstance().getSelf();
+        auto exportDir = self.getDataDir() / "exports";
+        std::filesystem::create_directories(exportDir);
+
+        time_t now = std::time(nullptr);
+        struct tm tm;
+        localtime_s(&tm, &now);
+        char timeBuf[32];
+        std::strftime(timeBuf, sizeof(timeBuf), "%Y%m%d_%H%M%S", &tm);
+
+        auto filePath = exportDir / (std::string("map_") + timeBuf + ".png");
+        std::wstring wPath = filePath.wstring();
+
+        // WIC 编码 PNG
+        HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) return;
+
+        IWICImagingFactory* pFactory = nullptr;
+        hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                              IID_PPV_ARGS(&pFactory));
+        if (FAILED(hr) || !pFactory) return;
+
+        IWICBitmapEncoder* pEncoder = nullptr;
+        hr = pFactory->CreateEncoder(GUID_ContainerFormatPng, nullptr, &pEncoder);
+        if (FAILED(hr)) { pFactory->Release(); return; }
+
+        IWICStream* pStream = nullptr;
+        hr = pFactory->CreateStream(&pStream);
+        if (FAILED(hr)) { pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pStream->InitializeFromFilename(wPath.c_str(), GENERIC_WRITE);
+        if (FAILED(hr)) { pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pEncoder->Initialize(pStream, WICBitmapEncoderNoCache);
+        if (FAILED(hr)) { pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        IWICBitmapFrameEncode* pFrame = nullptr;
+        IPropertyBag2* pProps = nullptr;
+        hr = pEncoder->CreateNewFrame(&pFrame, &pProps);
+        if (FAILED(hr)) { pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pFrame->Initialize(pProps);
+        if (FAILED(hr)) { pFrame->Release(); pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pFrame->SetSize(width, height);
+        WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
+        hr = pFrame->SetPixelFormat(&format);
+        if (FAILED(hr)) { pFrame->Release(); pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pFrame->WritePixels(height, width * 4, width * height * 4, pixels.data());
+        if (FAILED(hr)) { pFrame->Release(); pStream->Release(); pEncoder->Release(); pFactory->Release(); return; }
+
+        hr = pFrame->Commit();
+        pEncoder->Commit();
+
+        pFrame->Release();
+        pStream->Release();
+        pEncoder->Release();
+        pFactory->Release();
+
+        // 在资源管理器中显示文件
+        std::string explorerCmd = "explorer /select,\"" + filePath.string() + "\"";
+        std::system(explorerCmd.c_str());
     }
 
     // ==========================================
@@ -1803,6 +1905,8 @@ namespace DX11Hook {
             ImGui::OpenPopup("BigMapContextMenu");
         }
 
+        static bool s_openSettingsNext = false;
+
         ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.12f, 0.12f, 0.12f, 0.95f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
         if (ImGui::BeginPopup("BigMapContextMenu")) {
@@ -1858,7 +1962,11 @@ namespace DX11Hook {
                 MapRenderState::triggerAddWaypoint = true;
                 MapRenderState::showWaypointUI = true;
             }
-            
+
+            if (ImGui::Selectable(LanguageManager::GetText("TEMP_WAYPOINT"))) {
+                WaypointManager::AddWaypoint("Temp", bx, by, bz, 1.0f, 0.85f, 0.0f);
+            }
+
             if (ImGui::Selectable(LanguageManager::GetText("TELEPORT_HERE"))) {
                 MapRenderState::tpTargetX = (float)bx + 0.5f;
                 MapRenderState::tpTargetY = -999.0f; // 哨兵: 触发维度感知安全传送管线
@@ -1873,9 +1981,31 @@ namespace DX11Hook {
                 MapRenderState::showWaypointUI = true;
             }
 
+            if (ImGui::Selectable(LanguageManager::GetText("SHARE_LOCATION"))) {
+                if (g_localPlayer) {
+                    char cmd[128];
+                    std::snprintf(cmd, sizeof(cmd), "say [%s] X:%d Y:%d Z:%d",
+                                  g_localPlayer->getName().c_str(), bx, by, bz);
+                    SendServerCommand(*g_localPlayer, cmd);
+                }
+            }
+
+            if (ImGui::Selectable(LanguageManager::GetText("EXPORT_MAP_PNG"))) {
+                ExportMapAsPNG();
+            }
+
+            if (ImGui::Selectable(LanguageManager::GetText("OPEN_SETTINGS"))) {
+                s_openSettingsNext = true;
+            }
+
             ImGui::EndPopup();
         }
         ImGui::PopStyleColor(2);
+
+        if (s_openSettingsNext) {
+            s_openSettingsNext = false;
+            ImGui::OpenPopup("SettingsPopup");
+        }
 
         if (triggerWpMenu) {
             ImGui::OpenPopup("WaypointContextMenu");
