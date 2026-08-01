@@ -1559,11 +1559,34 @@ LL_TYPE_INSTANCE_HOOK(
                     // === 洞穴/下界/末地传送: 在玩家当前Y附近搜索安全落脚点 ===
                     // 不使用地表Y, 而是用 SafeFindSafeSpawnYNearY 在 refY 上下扫描 (范围 tpMinY..tpMaxY)
                     // 避免传送到岩浆/方块内/虚空中
-                    if (teleportMode == 1) {
-                        // [洞穴/下界] 总是先传送到安全高度再往下探测, 不走即时传送
-                        // 下界: Phase 0 Y=128 (基岩顶上), 从 Y=125 往下搜
+                    if (teleportMode == 1 && dimId == 1) {
+                        // [下界传送优化] 优先使用缓存Y直接传送, 无缓存才走Y=128探测
+                        // 下界数据以 isCave=true 保存, 查询时也需 isCave=true
+                        int16_t cachedNetherY = MapCacheManager::GetCachedSurfaceHeight(blockX, blockZ, true);
+                        if (cachedNetherY != MapCacheManager::HEIGHT_UNKNOWN && cachedNetherY > 0 && region && chunkReady) {
+                            // 有缓存Y且区块已加载 → 验证安全性后直接传送
+                            int searchX = blockX, searchZ = blockZ;
+                            short safeY = -32000;
+                            if (FindNearestSafeSpawnNearY(*region, searchX, searchZ, safeY, cachedNetherY, 16, tpMinY, tpMaxY)) {
+                                LogTeleport("tp nether-cached (" + std::to_string(searchX) + "," +
+                                            std::to_string((int)safeY) + "," + std::to_string(searchZ) +
+                                            ") [cachedY=" + std::to_string(cachedNetherY) + "]");
+                                char coordBuf[128];
+                                std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f",
+                                              (float)searchX + 0.5f, (float)safeY, (float)searchZ + 0.5f);
+                                SendServerCommand(*player, coordBuf);
+                                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                            } else {
+                                // 缓存Y附近无安全点 → 走Y=128探测
+                                needProbe = true;
+                            }
+                        } else {
+                            // 无缓存Y或区块未就绪 → 走Y=128探测
+                            needProbe = true;
+                        }
+                    } else if (teleportMode == 1) {
+                        // [洞穴传送] 总是先传送到安全高度再往下探测
                         // 洞穴: Phase 0 Y=320 (地表之上), 从 playerY±48 搜
-                        // 避免部分加载区块导致 SafeFindSafeSpawnYNearY 返回错误Y卡在方块里
                         needProbe = true;
                     } else if (region && chunkReady) {
                         int searchX = blockX, searchZ = blockZ;
@@ -1597,6 +1620,7 @@ LL_TYPE_INSTANCE_HOOK(
                     MapRenderState::probeMinY = tpMinY;
                     MapRenderState::probeMaxY = tpMaxY;
                     MapRenderState::probeRefY = refY;
+                    MapRenderState::probeIsNether = (dimId == 1);
                     MapRenderState::probeOriginalX = g_playerX;
                     MapRenderState::probeOriginalY = g_playerY;
                     MapRenderState::probeOriginalZ = g_playerZ;
@@ -1861,9 +1885,10 @@ LL_TYPE_INSTANCE_HOOK(
             }
 
             if (!probeDone) {
-                // [超时降级] 4 秒（原 2 秒）：回退原位
-                // 4s 仍小于 320→地表 ~6s 坠落时间，/tp 重置坠落距离保证安全
-                if (elapsedMs >= 4000) {
+                // [超时降级] 下界 8 秒 / 其他维度 4 秒：回退原位
+                // 下界区块加载较慢, 延长超时确保找到合适落脚点
+                int timeoutMs = MapRenderState::probeIsNether ? 8000 : 4000;
+                if (elapsedMs >= timeoutMs) {
                     char abortBuf[128];
                     std::snprintf(abortBuf, sizeof(abortBuf), "/tp @s %.2f %.2f %.2f",
                                   MapRenderState::probeOriginalX,
@@ -1874,7 +1899,7 @@ LL_TYPE_INSTANCE_HOOK(
                                 std::to_string((int)MapRenderState::probeOriginalX) + "," +
                                 std::to_string((int)MapRenderState::probeOriginalY) + "," +
                                 std::to_string((int)MapRenderState::probeOriginalZ) +
-                                ") [chunk not ready within 4s]");
+                                ") [chunk not ready within " + std::to_string(timeoutMs / 1000) + "s]");
                     MapRenderState::teleportState.store(
                         (int)MapRenderState::TeleportState::Failed);
                     MapRenderState::teleportStatusMsg.clear();
@@ -2164,6 +2189,17 @@ LL_TYPE_INSTANCE_HOOK(
                 std::memset(g_mapHeightsBack, 0, sizeof(g_mapHeightsBack));
                 ticksSinceScan = 101;  // 强制下帧启动新扫描
             }
+            // [洞穴/地表隔离] 模式切换时立即清空前台缓冲, 防止小地图残留旧模式数据
+            // (不清空会导致洞穴模式下小地图短暂显示地表数据, 或地表模式下显示洞穴数据)
+            {
+                std::lock_guard<std::mutex> lock(g_mapDataMutex);
+                std::memset(g_mapColors, 0, sizeof(g_mapColors));
+                std::memset(g_mapHeights, 0, sizeof(g_mapHeights));
+                g_mapDataUpdated.store(true);
+            }
+            // [GPU纹理清理] 清除旧模式的GPU缓存纹理, 防止全屏大地图残留错误模式数据
+            // (地表纹理和洞穴纹理哈希不同, 但旧纹理会占用显存且可能被错误渲染)
+            MapRenderState::clearGPUCache.store(true);
         }
 
         // [洞穴扫描] 玩家在地下且洞穴模式启用时, 执行洞穴列扫描代替地表扫描

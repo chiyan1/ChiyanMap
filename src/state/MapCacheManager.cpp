@@ -1,11 +1,10 @@
 #include "state/MapCacheManager.h"
 #include "mod/ChiyanMap.h"
-#include "ll/api/coro/SleepAwaiter.h"
-#include "ll/api/coro/CoroTask.h"
-#include "ll/api/thread/ThreadPoolExecutor.h"
 #include <fstream>
 #include <filesystem>
 #include <cstring>
+#include <thread>
+#include <chrono>
 
 namespace MapCacheManager {
     std::unordered_map<uint64_t, RegionData*> g_loadedRegions;
@@ -54,11 +53,11 @@ namespace MapCacheManager {
         }
     }
 
-    ll::coro::CoroTask<> IOWorkerCoro() {
+    void IOWorkerThread() {
         auto lastSaveTime = std::chrono::steady_clock::now();
-        
+
         while (g_running) {
-            co_await ll::coro::SleepAwaiter{std::chrono::milliseconds(20)};
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
             std::vector<uint64_t> toLoad;
             std::string currentDir;
@@ -129,7 +128,7 @@ namespace MapCacheManager {
                 }
             }
         }
-        co_return;
+        g_ioDone.release();
     }
 
     void SwitchWorld(const std::string& worldId, int dimensionId) {
@@ -190,20 +189,57 @@ namespace MapCacheManager {
 
         // 末尾保留分隔符以兼容现有 currentDir + "region_..." 字符串拼接
         g_cacheDir = cacheDir.string() + "/";
+
+        // [预加载] 扫描磁盘上的 region 文件并排队异步加载, 使全屏大地图能立即显示已有数据
+        // 而不是从黑屏开始逐步加载。扫描地表(dim_<n>/)和洞穴(dim_<n>/cave/)两个目录。
+        auto preloadDir = [&](const std::string& subdir, bool isCave) {
+            auto fullDir = cacheDir / subdir;
+            std::error_code ec2;
+            if (!std::filesystem::is_directory(fullDir, ec2)) return;
+            for (auto const& entry : std::filesystem::directory_iterator(fullDir, ec2)) {
+                if (!entry.is_regular_file()) continue;
+                std::string filename = entry.path().filename().string();
+                if (filename.rfind("region_", 0) != 0) continue;
+                // 解析文件名 region_RX_RZ.bin → rx, rz (手动解析避免 sscanf 警告)
+                int rx = 0, rz = 0;
+                if (filename.size() > 8 && filename.compare(0, 7, "region_") == 0) {
+                    size_t pos = 7;
+                    bool negX = false;
+                    if (pos < filename.size() && filename[pos] == '-') { negX = true; pos++; }
+                    while (pos < filename.size() && filename[pos] >= '0' && filename[pos] <= '9') {
+                        rx = rx * 10 + (filename[pos] - '0'); pos++;
+                    }
+                    if (negX) rx = -rx;
+                    if (pos < filename.size() && filename[pos] == '_') {
+                        pos++;
+                        bool negZ = false;
+                        if (pos < filename.size() && filename[pos] == '-') { negZ = true; pos++; }
+                        while (pos < filename.size() && filename[pos] >= '0' && filename[pos] <= '9') {
+                            rz = rz * 10 + (filename[pos] - '0'); pos++;
+                        }
+                        if (negZ) rz = -rz;
+                    } else { continue; }
+                    uint64_t hash = GetRegionHash(rx, rz, isCave);
+                    if (g_loadedRegions.find(hash) == g_loadedRegions.end()) {
+                        g_loadedRegions[hash] = nullptr;
+                        g_loadQueue.push_back(hash);
+                    }
+                }
+            }
+        };
+        preloadDir("", false);       // 地表数据
+        preloadDir("cave", true);   // 洞穴/下界数据
     }
 
     void Init() {
         g_running = true;
-        // 在线程池上启动 IO 协程；协程退出时通过 callback 释放信号量
-        ll::coro::keepThis(IOWorkerCoro).launch(
-            ll::thread::ThreadPoolExecutor::getDefault(),
-            [](auto&&) { g_ioDone.release(); }
-        );
+        // 启动 IO 工作线程; 线程退出时释放信号量
+        std::thread(IOWorkerThread).detach();
     }
 
     void Shutdown() {
         g_running = false;
-        // 等待协程退出（最多 20ms 一次循环 + 一次 IO 处理时间）
+        // 等待 IO 线程退出（最多 20ms 一次循环 + 一次 IO 处理时间）
         g_ioDone.acquire();
 
         // [持久化] 游戏关闭时保存所有脏区域 (含下界/末地), 避免退出时数据丢失
@@ -323,11 +359,11 @@ namespace MapCacheManager {
         if (it != g_loadedRegions.end() && it->second) it->second->textureDirty = true;
     }
 
-    int16_t GetCachedSurfaceHeight(int worldX, int worldZ) {
+    int16_t GetCachedSurfaceHeight(int worldX, int worldZ, bool isCave) {
         std::lock_guard<std::mutex> lock(g_cacheMutex);
         int rx = (worldX < 0 ? (worldX + 1) / REGION_SIZE - 1 : worldX / REGION_SIZE);
         int rz = (worldZ < 0 ? (worldZ + 1) / REGION_SIZE - 1 : worldZ / REGION_SIZE);
-        uint64_t hash = GetRegionHash(rx, rz);
+        uint64_t hash = GetRegionHash(rx, rz, isCave);
 
         auto it = g_loadedRegions.find(hash);
         if (it == g_loadedRegions.end()) {

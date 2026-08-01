@@ -1086,7 +1086,7 @@ namespace DX11Hook {
         if (!isLoadedAndDirty) return;
 
         // 需要建图但本帧建图配额（提升至4以加快大后期渲染）已满，直接返回（保留 Dirty 给下帧）
-        if (!isKnown && texCount >= 4) return;
+        if (!isKnown && texCount >= 8) return;
 
         // 内存对齐以支持极速 64 位空域探测
         alignas(8) static uint8_t tempBuffer[256 * 256 * 4];
@@ -1440,12 +1440,12 @@ namespace DX11Hook {
 
             // [地表模式] 渲染缓存区域纹理 (原有逻辑)
             static int s_vramGcTimer = 0;
-            if (++s_vramGcTimer > 300) {
+            if (++s_vramGcTimer > 600) {
                 s_vramGcTimer = 0;
                 std::vector<uint64_t> keysToErase;
                 for (auto& p : g_regionSRVs) {
                     int rx, rz; MapCacheManager::DecodeRegionHash(p.first, rx, rz);
-                    if (rx < startRx - 5 || rx > endRx + 5 || rz < startRz - 5 || rz > endRz + 5) {
+                    if (rx < startRx - 15 || rx > endRx + 15 || rz < startRz - 15 || rz > endRz + 15) {
                         keysToErase.push_back(p.first);
                     }
                 }

@@ -35,21 +35,24 @@ namespace MapCacheManager {
         std::string name;
     };
 
-    // [洞穴隔离] 用哈希高位(第62位)区分地表/洞穴, 同一区域在两种模式下
+    // [洞穴隔离] 用最高位(bit63)区分地表/洞穴, 同一区域在两种模式下
     // 使用独立的缓存条目与独立磁盘文件(surface/ 与 cave/), 避免相互污染。
+    // rx 被限制为 31 位 (bits 0-30, 符号位=bit30), 支持到 ±2^30 区域坐标,
+    // 远超 Minecraft 最大 ±117000 区域需求, 不会与 bit63 冲突。
     inline uint64_t GetRegionHash(int rx, int rz, bool isCave = false) {
-        uint64_t h = ((uint64_t)(uint32_t)rx << 32) | (uint32_t)rz;
-        if (isCave) h |= 0x4000000000000000ULL;
+        uint64_t h = ((uint64_t)((uint32_t)rx & 0x7FFFFFFFu) << 32) | (uint32_t)rz;
+        if (isCave) h |= 0x8000000000000000ULL;
         return h;
     }
     inline bool IsCaveHash(uint64_t h) {
-        return (h & 0x4000000000000000ULL) != 0;
+        return (h & 0x8000000000000000ULL) != 0;
     }
-    // 从哈希还原 (rx,rz)，并清除洞穴位(保留符号位 bit63)
+    // 从哈希还原 (rx,rz)，并清除洞穴位(bit63)
     inline void DecodeRegionHash(uint64_t h, int& rx, int& rz) {
-        uint64_t c = h & 0xBFFFFFFFFFFFFFFFULL;
-        rx = (int)(int32_t)(c >> 32);
-        rz = (int)(int32_t)(c & 0xFFFFFFFF);
+        uint32_t rx_raw = (uint32_t)((h >> 32) & 0x7FFFFFFFu);
+        if (rx_raw & 0x40000000u) rx_raw |= 0x80000000u; // 符号扩展 31→32 位
+        rx = (int)(int32_t)rx_raw;
+        rz = (int)(int32_t)(uint32_t)(h & 0xFFFFFFFFu);
     }
 
     extern std::unordered_map<uint64_t, RegionData*> g_loadedRegions;
@@ -83,7 +86,8 @@ namespace MapCacheManager {
     void UpdateBiomesFromScan(const std::vector<BiomeEntry>& entries);
 
     // [新增] 地表Y缓存查询 (供传送时使用)
-    int16_t GetCachedSurfaceHeight(int worldX, int worldZ);
+    // isCave=true 时查询洞穴/下界缓存数据 (dim_<n>/cave/)
+    int16_t GetCachedSurfaceHeight(int worldX, int worldZ, bool isCave = false);
 
     // [新增] 生物群系缓存查询 (供大地图悬停显示)
     bool GetCachedBiomeName(int worldX, int worldZ, std::string& outName);
