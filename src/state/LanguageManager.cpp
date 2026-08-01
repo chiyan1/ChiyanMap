@@ -1741,6 +1741,7 @@ namespace LanguageManager {
                 MapRenderState::miniMapScale = j.value("miniMapScale", 1.0f);
                 MapRenderState::miniMapOffsetX = j.value("miniMapOffsetX", 0.0f);
                 MapRenderState::miniMapOffsetY = j.value("miniMapOffsetY", 0.0f);
+                MapRenderState::showWaypointsOnMinimap = j.value("showWaypointsOnMinimap", true);
                 MapRenderState::g_caveModeType = j.value("caveModeType", (int)MapRenderState::CaveModeType::Layered);
                 MapRenderState::g_caveTopYAuto = j.value("caveTopYAuto", true);
                 MapRenderState::g_caveTopY = j.value("caveTopY", 64);
@@ -1765,6 +1766,7 @@ namespace LanguageManager {
         j["miniMapScale"] = MapRenderState::miniMapScale;
         j["miniMapOffsetX"] = MapRenderState::miniMapOffsetX;
         j["miniMapOffsetY"] = MapRenderState::miniMapOffsetY;
+        j["showWaypointsOnMinimap"] = MapRenderState::showWaypointsOnMinimap;
         j["caveModeType"] = MapRenderState::g_caveModeType;
         j["caveTopYAuto"] = MapRenderState::g_caveTopYAuto;
         j["caveTopY"] = MapRenderState::g_caveTopY;
