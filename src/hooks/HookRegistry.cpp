@@ -52,3 +52,9 @@ void unregisterAllHooks() {
     LocalPlayerSetSneakingHook::unhook();
     LocalPlayerIsImmobileHook::unhook();
 }
+
+// 非 inline 包装: ChiyanMap.cpp 无法包含 PlayerHook.h (hook 宏会多重定义),
+// 通过此包装函数桥接调用 inline 的 ShutdownCacheWriteThread()
+void shutdownCacheWriteThread() {
+    ShutdownCacheWriteThread();
+}

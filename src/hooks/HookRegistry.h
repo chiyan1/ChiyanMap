@@ -2,3 +2,4 @@
 
 void registerAllHooks();
 void unregisterAllHooks();
+void shutdownCacheWriteThread();

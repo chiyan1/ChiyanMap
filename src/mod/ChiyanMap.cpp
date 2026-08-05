@@ -98,6 +98,7 @@ bool ChiyanMap::load() {
 bool ChiyanMap::enable()  { return true; }
 
 bool ChiyanMap::disable() {
+    shutdownCacheWriteThread();
     MapCacheManager::Shutdown();
     unregisterAllHooks();
     return true;

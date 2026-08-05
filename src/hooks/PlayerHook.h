@@ -3,6 +3,8 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -74,6 +76,89 @@ extern int g_playerBlockZ;
 
 // 数据并发锁，消灭画面撕裂
 inline std::mutex g_mapDataMutex;
+
+// [性能] 持久化缓存写入线程：原实现每次扫描完成时 std::thread().detach() 创建新线程
+// + new ColorGrid/HeightGrid (5MB 堆分配)。改为持久化 worker + 预分配缓冲 + 条件变量，
+// 消除线程创建开销和 5MB 堆分配/释放开销。
+using ColorGrid = mce::Color[MAP_DATA_SIZE][MAP_DATA_SIZE];
+using HeightGrid = float[MAP_DATA_SIZE][MAP_DATA_SIZE];
+inline std::mutex g_cacheWriteMutex;
+inline std::condition_variable g_cacheWriteCV;
+inline std::atomic<bool> g_cacheWritePending{false};
+inline std::atomic<bool> g_cacheWriteExit{false};
+inline std::thread* g_cacheWriteThread = nullptr;
+// 预分配缓冲 (仅 worker 线程访问，无需加锁)
+inline mce::Color (*g_cacheWriteColors)[MAP_DATA_SIZE] = nullptr;
+inline float (*g_cacheWriteHeights)[MAP_DATA_SIZE] = nullptr;
+// 请求参数 (由扫描线程写入，worker 线程读取，通过 g_cacheWritePending 标志同步)
+inline int g_cacheWriteX = 0;
+inline int g_cacheWriteZ = 0;
+inline int g_cacheWriteDim = 0;
+inline bool g_cacheWriteIsCave = false;
+inline std::vector<MapCacheManager::BiomeEntry> g_cacheWriteBiomes;
+
+inline void CacheWriteWorkerFunc() {
+    while (true) {
+        {
+            std::unique_lock<std::mutex> lock(g_cacheWriteMutex);
+            g_cacheWriteCV.wait(lock, [] { return g_cacheWritePending.load() || g_cacheWriteExit.load(); });
+            if (g_cacheWriteExit.load()) return;
+        }
+
+        if (MapRenderState::g_isShuttingDown.load()) {
+            g_cacheWritePending.store(false);
+            continue;
+        }
+        if (MapRenderState::currentDimensionId != g_cacheWriteDim) {
+            g_cacheWritePending.store(false);
+            continue;
+        }
+
+        MapCacheManager::UpdateFromScan(g_cacheWriteX, g_cacheWriteZ, g_cacheWriteColors, g_cacheWriteHeights, g_cacheWriteIsCave);
+        MapCacheManager::UpdateBiomesFromScan(g_cacheWriteBiomes);
+        g_cacheWriteBiomes.clear();
+        g_cacheWritePending.store(false);
+    }
+}
+
+// 提交缓存写入请求 (非阻塞，若 worker 仍在处理上一次请求则跳过)
+inline void SubmitCacheWrite(int x, int z, int dim, bool isCave, std::vector<MapCacheManager::BiomeEntry>& biomes) {
+    if (g_cacheWritePending.load()) return;  // worker 忙，跳过 (数据已在前台缓冲，下次扫描会再写)
+
+    // 懒启动持久化 worker 线程
+    if (!g_cacheWriteThread) {
+        g_cacheWriteColors = new mce::Color[MAP_DATA_SIZE][MAP_DATA_SIZE];
+        g_cacheWriteHeights = new float[MAP_DATA_SIZE][MAP_DATA_SIZE];
+        g_cacheWriteThread = new std::thread(CacheWriteWorkerFunc);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(g_mapDataMutex);
+        std::memcpy(g_cacheWriteColors, g_mapColorsBack, sizeof(g_mapColorsBack));
+        std::memcpy(g_cacheWriteHeights, g_mapHeightsBack, sizeof(g_mapHeightsBack));
+    }
+    g_cacheWriteX = x;
+    g_cacheWriteZ = z;
+    g_cacheWriteDim = dim;
+    g_cacheWriteIsCave = isCave;
+    g_cacheWriteBiomes.swap(biomes);
+    g_cacheWritePending.store(true);
+    g_cacheWriteCV.notify_one();
+}
+
+inline void ShutdownCacheWriteThread() {
+    if (g_cacheWriteThread) {
+        g_cacheWriteExit.store(true);
+        g_cacheWriteCV.notify_one();
+        if (g_cacheWriteThread->joinable()) g_cacheWriteThread->join();
+        delete g_cacheWriteThread;
+        g_cacheWriteThread = nullptr;
+        g_cacheWriteExit.store(false);
+        g_cacheWritePending.store(false);
+    }
+    if (g_cacheWriteColors) { delete[] g_cacheWriteColors; g_cacheWriteColors = nullptr; }
+    if (g_cacheWriteHeights) { delete[] g_cacheWriteHeights; g_cacheWriteHeights = nullptr; }
+}
 
 // ==========================================
 // 生物群系中文翻译字典引擎
@@ -1934,74 +2019,81 @@ LL_TYPE_INSTANCE_HOOK(
 
         // ==========================================
         // [分层地图系统] 跨维度与跨地下层级监听器
+        // [性能] 原实现每帧调用 getLevelId/getSeed/getDefaultSpawn + 构造 worldId 字符串
+        // (约 8-10 次堆分配) + 每帧 getBiome + biome.mHash->getString (2-3 次堆分配)。
+        // 改为 30 帧 (0.5s) 节流：世界 ID 在游戏中几乎不变，生物群系名也只需半秒级刷新。
         // ==========================================
-        try {
-            int dimId = (int)player->getDimensionId();
-            std::string rawLevelId = "UnknownWorld";
-            std::string seedStr = "0";
-            std::string spawnStr = "0_0";
+        static int s_worldBiomeCheckCounter = 0;
+        if (++s_worldBiomeCheckCounter >= 30) {
+            s_worldBiomeCheckCounter = 0;
+            try {
+                int dimId = (int)player->getDimensionId();
+                std::string rawLevelId = "UnknownWorld";
+                std::string seedStr = "0";
+                std::string spawnStr = "0_0";
 
-            try { 
-                std::string lid = player->getLevel().getLevelId();
-                if (!lid.empty()) rawLevelId = lid;
-            } catch(...) {}
-            
-            try { 
-                unsigned int seed = player->getLevel().getSeed();
-                seedStr = std::to_string(seed);
-            } catch(...) {}
+                try {
+                    std::string lid = player->getLevel().getLevelId();
+                    if (!lid.empty()) rawLevelId = lid;
+                } catch(...) {}
 
-            try { 
-                BlockPos spawn = player->getLevel().getDefaultSpawn();
-                spawnStr = std::to_string(spawn.x) + "_" + std::to_string(spawn.z);
-            } catch(...) {}
+                try {
+                    unsigned int seed = player->getLevel().getSeed();
+                    seedStr = std::to_string(seed);
+                } catch(...) {}
 
-            if (rawLevelId.empty() || rawLevelId == "UnknownWorld") {
-                rawLevelId = "RemoteServer";
-            }
-            
-            std::string finalWorldId = rawLevelId + "_S" + seedStr + "_P" + spawnStr;
+                try {
+                    BlockPos spawn = player->getLevel().getDefaultSpawn();
+                    spawnStr = std::to_string(spawn.x) + "_" + std::to_string(spawn.z);
+                } catch(...) {}
 
-            for (char& c : finalWorldId) {
-                if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|') c = '_';
-            }
-            
-            if (MapRenderState::currentWorldId != finalWorldId || MapRenderState::currentDimensionId != dimId) {
-                MapRenderState::currentWorldId = finalWorldId;
-                MapRenderState::currentDimensionId = dimId;
-                
-                MapCacheManager::SwitchWorld(finalWorldId, dimId);
-                WaypointManager::SwitchWorld(finalWorldId, dimId); 
-                
-                std::memset(g_mapHeights, 0, sizeof(g_mapHeights));
-                std::memset(g_mapColors, 0, sizeof(g_mapColors));
-                std::memset(g_mapHeightsBack, 0, sizeof(g_mapHeightsBack));
-                std::memset(g_mapColorsBack, 0, sizeof(g_mapColorsBack));
-
-                MapRenderState::clearGPUCache.store(true);
-                g_mapDataUpdated.store(true);
-            }
-        } catch(...) {}
-
-        try {
-            BlockSource* regionPtr = this->getRegion();
-            if (regionPtr) {
-                auto const& biome = regionPtr->getBiome(BlockPos(g_playerBlockX, (int)g_playerY, g_playerBlockZ));
-                {
-                    std::string rawName = biome.mHash->getString();
-                    std::string displayRawName = rawName;
-                    
-                    // 剥离命名空间前缀（例如将 minecraft:plains 转为 plains）
-                    size_t colonPos = displayRawName.find(":");
-                    if (colonPos != std::string::npos) {
-                        displayRawName = displayRawName.substr(colonPos + 1);
-                    }
-                    
-                    MapRenderState::rawBiomeName = displayRawName;
-                    MapRenderState::translatedBiomeName = TranslateBiomeName(rawName);
+                if (rawLevelId.empty() || rawLevelId == "UnknownWorld") {
+                    rawLevelId = "RemoteServer";
                 }
-            }
-        } catch (...) {}
+
+                std::string finalWorldId = rawLevelId + "_S" + seedStr + "_P" + spawnStr;
+
+                for (char& c : finalWorldId) {
+                    if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|') c = '_';
+                }
+
+                if (MapRenderState::currentWorldId != finalWorldId || MapRenderState::currentDimensionId != dimId) {
+                    MapRenderState::currentWorldId = finalWorldId;
+                    MapRenderState::currentDimensionId = dimId;
+
+                    MapCacheManager::SwitchWorld(finalWorldId, dimId);
+                    WaypointManager::SwitchWorld(finalWorldId, dimId);
+
+                    std::memset(g_mapHeights, 0, sizeof(g_mapHeights));
+                    std::memset(g_mapColors, 0, sizeof(g_mapColors));
+                    std::memset(g_mapHeightsBack, 0, sizeof(g_mapHeightsBack));
+                    std::memset(g_mapColorsBack, 0, sizeof(g_mapColorsBack));
+
+                    MapRenderState::clearGPUCache.store(true);
+                    g_mapDataUpdated.store(true);
+                }
+            } catch(...) {}
+
+            try {
+                BlockSource* regionPtr = this->getRegion();
+                if (regionPtr) {
+                    auto const& biome = regionPtr->getBiome(BlockPos(g_playerBlockX, (int)g_playerY, g_playerBlockZ));
+                    {
+                        std::string rawName = biome.mHash->getString();
+                        std::string displayRawName = rawName;
+
+                        // 剥离命名空间前缀（例如将 minecraft:plains 转为 plains）
+                        size_t colonPos = displayRawName.find(":");
+                        if (colonPos != std::string::npos) {
+                            displayRawName = displayRawName.substr(colonPos + 1);
+                        }
+
+                        MapRenderState::rawBiomeName = displayRawName;
+                        MapRenderState::translatedBiomeName = TranslateBiomeName(rawName);
+                    }
+                }
+            } catch (...) {}
+        }
 
         static bool lastUIState = false;
         bool currentUIState = MapRenderState::IsUIActive();
@@ -2308,7 +2400,7 @@ LL_TYPE_INSTANCE_HOOK(
 
                             if ((currentCol & 31) == 0) {
                                 auto now = std::chrono::high_resolution_clock::now();
-                                if (std::chrono::duration_cast<std::chrono::microseconds>(now - scanStartTime).count() > 4000) {
+                                if (std::chrono::duration_cast<std::chrono::microseconds>(now - scanStartTime).count() > 500) {
                                     timeBudgetExceeded = true;
                                     break;
                                 }
@@ -2335,35 +2427,8 @@ LL_TYPE_INSTANCE_HOOK(
                         }
 
                         // [持久化] 异步写入缓存 (含下界/洞穴数据)
-                        // 之前缺失此调用, 导致下界扫描数据从未写入缓存, dim_1/ 文件夹始终为空
-                        using ColorGrid = mce::Color[MAP_DATA_SIZE][MAP_DATA_SIZE];
-                        using HeightGrid = float[MAP_DATA_SIZE][MAP_DATA_SIZE];
-                        auto asyncColors = new ColorGrid;
-                        auto asyncHeights = new HeightGrid;
-                        std::memcpy(asyncColors, g_mapColorsBack, sizeof(g_mapColorsBack));
-                        std::memcpy(asyncHeights, g_mapHeightsBack, sizeof(g_mapHeightsBack));
-                        int asyncX = currentScanX;
-                        int asyncZ = currentScanZ;
-                        std::vector<MapCacheManager::BiomeEntry> asyncBiomes;
-                        asyncBiomes.swap(biomeEntries);
-
-                        std::thread([asyncX, asyncZ, asyncColors, asyncHeights, asyncBiomes = std::move(asyncBiomes), asyncDim = MapRenderState::currentDimensionId]() {
-                            if (MapRenderState::g_isShuttingDown.load()) {
-                                delete[] asyncColors;
-                                delete[] asyncHeights;
-                                return;
-                            }
-                            // [防跨维度写入] 若维度已变化, 丢弃过时数据, 避免下界数据写入主世界缓存
-                            if (MapRenderState::currentDimensionId != asyncDim) {
-                                delete[] asyncColors;
-                                delete[] asyncHeights;
-                                return;
-                            }
-                            MapCacheManager::UpdateFromScan(asyncX, asyncZ, asyncColors, asyncHeights, true);
-                            MapCacheManager::UpdateBiomesFromScan(asyncBiomes);
-                            delete[] asyncColors;
-                            delete[] asyncHeights;
-                        }).detach();
+                        // [性能] 使用持久化 worker 线程，避免每次扫描完成时创建线程 + 5MB 堆分配
+                        SubmitCacheWrite(currentScanX, currentScanZ, MapRenderState::currentDimensionId, true, biomeEntries);
                     }
                 }
             } catch (...) {}
@@ -2520,7 +2585,7 @@ LL_TYPE_INSTANCE_HOOK(
 
                             if ((currentCol & 31) == 0) {
                                 auto now = std::chrono::high_resolution_clock::now();
-                                if (std::chrono::duration_cast<std::chrono::microseconds>(now - scanStartTime).count() > 4000) {
+                                if (std::chrono::duration_cast<std::chrono::microseconds>(now - scanStartTime).count() > 500) {
                                     timeBudgetExceeded = true;
                                     break;
                                 }
@@ -2560,38 +2625,8 @@ LL_TYPE_INSTANCE_HOOK(
                                 g_mapDataUpdated.store(true);
                             }
 
-                            using ColorGrid = mce::Color[MAP_DATA_SIZE][MAP_DATA_SIZE];
-                            using HeightGrid = float[MAP_DATA_SIZE][MAP_DATA_SIZE];
-                            auto asyncColors = new ColorGrid;
-                            auto asyncHeights = new HeightGrid;
-                            std::memcpy(asyncColors, g_mapColorsBack, sizeof(g_mapColorsBack));
-                            std::memcpy(asyncHeights, g_mapHeightsBack, sizeof(g_mapHeightsBack));
-                            int asyncX = currentScanX;
-                            int asyncZ = currentScanZ;
-                            // [新增] 将采集的生物群系条目转移到局部变量（O(1) swap），供异步线程写入缓存
-                            std::vector<MapCacheManager::BiomeEntry> asyncBiomes;
-                            asyncBiomes.swap(biomeEntries);
-
-                            std::thread([asyncX, asyncZ, asyncColors, asyncHeights, asyncBiomes = std::move(asyncBiomes), asyncDim = MapRenderState::currentDimensionId]() {
-                                // [关闭期安全] 若 disable() 已开始（缓存 Shutdown 可能已清空 g_loadedRegions，
-                                // 后续 SwitchWorld 析构也会 delete 所有 region），此处继续写入会触达悬空指针。
-                                // 立即释放本线程持有的扫描缓冲，让 MapCacheManager::Shutdown 完成干净退出。
-                                if (MapRenderState::g_isShuttingDown.load()) {
-                                    delete[] asyncColors;
-                                    delete[] asyncHeights;
-                                    return;
-                                }
-                                // [防跨维度写入] 若维度已变化, 丢弃过时数据, 避免数据写入错误维度缓存
-                                if (MapRenderState::currentDimensionId != asyncDim) {
-                                    delete[] asyncColors;
-                                    delete[] asyncHeights;
-                                    return;
-                                }
-                                MapCacheManager::UpdateFromScan(asyncX, asyncZ, asyncColors, asyncHeights);
-                                MapCacheManager::UpdateBiomesFromScan(asyncBiomes);
-                                delete[] asyncColors;
-                                delete[] asyncHeights;
-                            }).detach();
+                            // [性能] 使用持久化 worker 线程，避免每次扫描完成时创建线程 + 5MB 堆分配
+                            SubmitCacheWrite(currentScanX, currentScanZ, MapRenderState::currentDimensionId, false, biomeEntries);
                         }
                         // else: 玩家在地下, 丢弃本次扫描数据, 保留 g_mapColors 和缓存中的纯净地表数据
                     }
