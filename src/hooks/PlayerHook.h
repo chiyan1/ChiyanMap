@@ -114,8 +114,14 @@ inline void CacheWriteWorkerFunc() {
             continue;
         }
 
-        MapCacheManager::UpdateFromScan(g_cacheWriteX, g_cacheWriteZ, g_cacheWriteColors, g_cacheWriteHeights, g_cacheWriteIsCave);
-        MapCacheManager::UpdateBiomesFromScan(g_cacheWriteBiomes);
+        // [修复] 包裹 try-catch 防止 UpdateFromScan/UpdateBiomesFromScan 抛异常
+        // 导致 std::terminate → 0xC0000409 FAST_FAIL_FATAL_APP_EXIT
+        try {
+            MapCacheManager::UpdateFromScan(g_cacheWriteX, g_cacheWriteZ, g_cacheWriteColors, g_cacheWriteHeights, g_cacheWriteIsCave);
+            MapCacheManager::UpdateBiomesFromScan(g_cacheWriteBiomes);
+        } catch (...) {
+            // 异常时仍需复位状态，避免 pending 永远卡住
+        }
         g_cacheWriteBiomes.clear();
         g_cacheWritePending.store(false);
     }
@@ -621,6 +627,10 @@ inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mc
         // [苍白橡树叶] 原版使用固定灰白色调 (不受生物群系着色)，呈现标志性"苍白"外观
         // 匹配实际树叶颜色 RGB(110,115,107)——基于截图采样，原 (0.75,0.75,0.70) 过亮与实际不符
         if (name.find("pale") != std::string::npos) return mce::Color(0.431f, 0.451f, 0.420f, 1.0f);
+        // [白桦树叶] 原版使用固定染色 #80A947 (不受生物群系着色)，呈偏黄暗绿色"枯萎"质感
+        // 匹配实际树叶颜色 RGB(67,87,44)——基于截图采样，最亮树叶主色调（像素数最多）
+        // 原 birch 生物群系 foliage (0.25,0.42,0.20) 过于纯绿偏亮，与实际偏黄暗色不符
+        if (name.find("birch") != std::string::npos) return mce::Color(0.263f, 0.341f, 0.173f, 1.0f);
         return foliageCol;
     }
 
@@ -728,6 +738,9 @@ inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mc
     if (name.find("exposed_copper") != std::string::npos) return mce::Color(0.55f, 0.45f, 0.35f, 1.0f);
     // [铜块] 橙棕色（铜矿石已在 ore 检查中处理）
     if (name.find("copper") != std::string::npos) return mce::Color(0.72f, 0.45f, 0.28f, 1.0f);
+    // [铁栏杆/铁方块] 金属灰色（iron_ore 已在 ore 检查中处理，iron_door/trapdoor 已在 door 检查中处理）
+    // 必须在 stone 通用规则和哈希兜底之前处理，否则 iron_bars 会落入哈希生成伪随机紫色 RGB(143,117,200)
+    if (name.find("iron") != std::string::npos) return mce::Color(0.72f, 0.72f, 0.72f, 1.0f);
     // [粗矿块] 棕色调
     if (name.find("raw_") != std::string::npos) return mce::Color(0.50f, 0.38f, 0.25f, 1.0f);
     // [方解石] 原版为平滑的灰白/米白色方块（紫晶洞外壳），避免落入哈希默认色

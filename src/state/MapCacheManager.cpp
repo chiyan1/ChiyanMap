@@ -59,6 +59,8 @@ namespace MapCacheManager {
         while (g_running) {
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
+            try {
+
             std::vector<uint64_t> toLoad;
             std::string currentDir;
             {
@@ -72,9 +74,11 @@ namespace MapCacheManager {
             }
 
             // 通道 1：极速读取（地表直接存放在 dim_<n>/ 下，洞穴在 cave/ 子目录）
+            // [修复] 使用锁内拷贝的 currentDir 而非无锁读取 g_cacheDir，
+            // 避免 SwitchWorld 并发赋值 g_cacheDir 时的 std::string use-after-free
             for (uint64_t hash : toLoad) {
                 int rx, rz; DecodeRegionHash(hash, rx, rz);
-                std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(hash));
+                std::string dir = currentDir + GetRegionSubdir(IsCaveHash(hash));
                 std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
 
                 RegionData* newRegion = new RegionData();
@@ -92,11 +96,11 @@ namespace MapCacheManager {
                                      (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights)));
                 }
                 newRegion->textureDirty = true;
-                
+
                 {
                     std::lock_guard<std::mutex> lock(g_cacheMutex);
                     if (g_loadedRegions[hash] == nullptr) g_loadedRegions[hash] = newRegion;
-                    else delete newRegion; 
+                    else delete newRegion;
                 }
             }
 
@@ -116,7 +120,7 @@ namespace MapCacheManager {
                 }
                 for (auto& item : regionsToSave) {
                     int rx, rz; DecodeRegionHash(item.first, rx, rz);
-                    std::string dir = g_cacheDir + GetRegionSubdir(IsCaveHash(item.first));
+                    std::string dir = currentDir + GetRegionSubdir(IsCaveHash(item.first));
                     std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
                     std::ofstream out(filePath, std::ios::binary);
                     if (out) {
@@ -126,6 +130,11 @@ namespace MapCacheManager {
                         WriteBiomeSection(out, item.second);
                     }
                 }
+            }
+
+            } catch (...) {
+                // [修复] 捕获所有异常防止 std::terminate → 0xC0000409 FAST_FAIL_FATAL_APP_EXIT
+                // 项目记忆：MapCacheManager.cpp 的 IOWorkerCoro/内存分配 必须包裹 try-catch
             }
         }
         g_ioDone.release();

@@ -1,6 +1,7 @@
 #include "hooks/HookRegistry.h"
 #include "hooks/PlayerHook.h"
 #include "hooks/UIRenderHook.h"
+#include "hooks/DX11Hook.h"
 
 void registerAllHooks() {
     // 只注册原生的游戏逻辑与 UI 钩子
@@ -57,4 +58,10 @@ void unregisterAllHooks() {
 // 通过此包装函数桥接调用 inline 的 ShutdownCacheWriteThread()
 void shutdownCacheWriteThread() {
     ShutdownCacheWriteThread();
+}
+
+// 非 inline 包装: ChiyanMap.cpp 无法包含 DX11Hook.h (会传递包含 PlayerHook.h 导致多重定义),
+// 通过此包装函数桥接调用 inline 的 DX11Hook::shutdown()
+void shutdownDX11Hook() {
+    DX11Hook::shutdown();
 }

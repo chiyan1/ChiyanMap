@@ -98,9 +98,14 @@ bool ChiyanMap::load() {
 bool ChiyanMap::enable()  { return true; }
 
 bool ChiyanMap::disable() {
+    // [修复] 置位关闭标志，使所有钩子入口和后台线程提前返回，
+    // 防止进程退出阶段访问已释放的 D3D/ImGui 资源导致 0xC0000005 退出崩溃
+    MapRenderState::g_isShuttingDown.store(true);
+
     shutdownCacheWriteThread();
     MapCacheManager::Shutdown();
     unregisterAllHooks();
+    shutdownDX11Hook();
     return true;
 }
 
