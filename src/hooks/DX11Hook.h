@@ -3087,50 +3087,39 @@ namespace DX11Hook {
             };
 
             if (g_d3d11On12Device) {
-                // [性能·核心优化] 缓存 IDXGISwapChain3 指针，避免每帧 QueryInterface (约 1-3us)
-                if (!g_cachedSwapChain3) {
-                    pSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&g_cachedSwapChain3);
-                }
-                IDXGISwapChain3* pSwapChain3 = g_cachedSwapChain3;
+                // [全屏切换修复] 回退为每帧即时模式，对齐 0.3.4 不崩溃版本。
+                // 原先跨帧缓存的 D3D11On12 包装资源 + RTV (g_cachedWrappedBuffers) 在全屏/窗口
+                // 切换 (F11) 时交换链状态变化，缓存资源指向失效的 back buffer，复用写越界触发
+                // 游戏栈溢出保护 (0xC0000409 fastfail)。每帧即时 GetBuffer + CreateWrappedResource
+                // + CreateRenderTargetView + Release 虽略有开销，但始终绑定当前有效缓冲。
                 UINT bufferIndex = 0;
-                if (pSwapChain3) {
+                IDXGISwapChain3* pSwapChain3 = nullptr;
+                if (SUCCEEDED(pSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&pSwapChain3))) {
                     bufferIndex = pSwapChain3->GetCurrentBackBufferIndex();
+                    pSwapChain3->Release();
                 }
 
-                // [性能·核心优化] 缓存每个后备缓冲索引的包装资源 + RTV
-                // 原实现每帧 CreateWrappedResource + CreateRenderTargetView (各 0.1-0.5ms)，
-                // 现仅在首次遇到新索引时创建，后续直接复用缓存。双缓冲下每帧节省 ~0.3-1ms。
-                ID3D11Resource* wrappedBackBuffer = nullptr;
-                ID3D11RenderTargetView* rtv = nullptr;
-                if (bufferIndex < 8 && g_cachedWrappedBuffers[bufferIndex]) {
-                    wrappedBackBuffer = g_cachedWrappedBuffers[bufferIndex];
-                    rtv = g_cachedRTVs[bufferIndex];
-                }
+                ID3D12Resource* d3d12BackBuffer = nullptr;
+                if (SUCCEEDED(pSwapChain->GetBuffer(bufferIndex, __uuidof(ID3D12Resource), (void**)&d3d12BackBuffer))) {
+                    ID3D11Resource* wrappedBackBuffer = nullptr;
+                    D3D11_RESOURCE_FLAGS d3d11Flags = {D3D11_BIND_RENDER_TARGET};
 
-                if (!wrappedBackBuffer && bufferIndex < 8) {
-                    ID3D12Resource* d3d12BackBuffer = nullptr;
-                    if (SUCCEEDED(pSwapChain->GetBuffer(bufferIndex, __uuidof(ID3D12Resource), (void**)&d3d12BackBuffer))) {
-                        D3D11_RESOURCE_FLAGS d3d11Flags = {D3D11_BIND_RENDER_TARGET};
-                        if (SUCCEEDED(g_d3d11On12Device->CreateWrappedResource(
-                            d3d12BackBuffer, &d3d11Flags, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_PRESENT, __uuidof(ID3D11Resource), (void**)&wrappedBackBuffer)))
-                        {
-                            g_pd3dDevice->CreateRenderTargetView(wrappedBackBuffer, NULL, &rtv);
-                            g_cachedWrappedBuffers[bufferIndex] = wrappedBackBuffer;
-                            g_cachedRTVs[bufferIndex] = rtv;
-                            if (bufferIndex + 1 > g_cachedBufferCount) g_cachedBufferCount = bufferIndex + 1;
-                        }
-                        d3d12BackBuffer->Release();
+                    if (SUCCEEDED(g_d3d11On12Device->CreateWrappedResource(
+                        d3d12BackBuffer, &d3d11Flags, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_PRESENT, __uuidof(ID3D11Resource), (void**)&wrappedBackBuffer)))
+                    {
+                        ID3D11RenderTargetView* rtv = nullptr;
+                        g_pd3dDevice->CreateRenderTargetView(wrappedBackBuffer, NULL, &rtv);
+                        g_d3d11On12Device->AcquireWrappedResources(&wrappedBackBuffer, 1);
+
+                        if (rtv) renderImGuiFrame(rtv);
+
+                        g_d3d11On12Device->ReleaseWrappedResources(&wrappedBackBuffer, 1);
+                        wrappedBackBuffer->Release();
+                        if (rtv) rtv->Release();
+                        // Flush 确保 D3D11 命令在 D3D12 barrier 之前提交 (D3D11On12 同步要求)。
+                        g_pd3dDeviceContext->Flush();
                     }
-                }
-
-                if (wrappedBackBuffer && rtv) {
-                    g_d3d11On12Device->AcquireWrappedResources(&wrappedBackBuffer, 1);
-                    renderImGuiFrame(rtv);
-                    g_d3d11On12Device->ReleaseWrappedResources(&wrappedBackBuffer, 1);
-                    // [性能] RTV 已在 renderImGuiFrame 中解绑; ImGui DX11 后端自行恢复所有状态。
-                    // ClearState 会重置全部管线状态 (~10-50us), 实测可安全移除。
-                    // Flush 确保 D3D11 命令在 D3D12 barrier 之前提交 (D3D11On12 同步要求)。
-                    g_pd3dDeviceContext->Flush();
+                    d3d12BackBuffer->Release();
                 }
             } else {
                 ID3D11Texture2D* pBackBuffer = nullptr;
