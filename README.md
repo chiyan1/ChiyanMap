@@ -65,7 +65,7 @@ ChiyanMap 是一个以「**让地图信息一目了然**」为目标的客户端
 
 | 项目 | 要求 |
 | --- | --- |
-| 游戏版本 | Minecraft Bedrock Edition（基岩版），与所链接的 LeviLamina / BDS 版本匹配 |
+| 游戏版本 | Minecraft Bedrock Edition（基岩版），与所链接的 LeviLamina 版本匹配 |
 | 加载器 | [LeviLamina](https://github.com/LiteLDev/LeviLamina) |
 | 操作系统 | Windows（依赖 Win32 `d3d11` / `dwmapi` / `winuser`、DirectX 11 运行时） |
 | 渲染后端 | DirectX 11（支持 DXGI 1.2+ / D3D_FEATURE_LEVEL_11_0） |
@@ -100,9 +100,9 @@ xmake
 
 构建产物为 `.dll`（及配套 `manifest.json` / `tooth.json`）。
 
-### 3. 安装到 LeviLamina
+### 3. 安装到 LeviLauncher
 
-将构建产物按 LeviLamina 的 Mod 目录规范放置（通常位于 LeviLamina 的 `mods/<modName>/` 下，包含 `manifest.json`、`ChiyanMap.dll` 以及 `lang/` 资源目录）。具体目录约定以你所使用的 LeviLamina 版本为准。
+将构建产物按 LeviLauncher 的 Mod 目录规范放置（通常位于`levilauncher.exe\versions\1.26.20.04\mods\ChiyanMap` 下，包含 `manifest.json`、`ChiyanMap.dll` 以及 `lang/` 资源目录）；或者用LeviLauncher的导入功能。
 
 启动游戏后，模组会在 `onLoad` 阶段加载语言包与配置，`onEnable` 阶段注册所有 Hook。
 
