@@ -104,7 +104,7 @@ xmake
 
 ### 3. 安装到 LeviLauncher
 
-将构建产物按 LeviLauncher 的 Mod 目录规范放置（通常位于`levilauncher.exe\versions\1.26.20.04\mods\ChiyanMap` 下，包含 `manifest.json`、`ChiyanMap.dll` 以及 `lang/` 资源目录）；或者用LeviLauncher的导入功能。
+将构建产物按 LeviLauncher 的 Mod 目录规范放置（通常位于`levilauncher.exe\versions\1.26.20.04\mods\ChiyanMap` 下，包含 `manifest.json`、`ChiyanMap.dll`）；或者用LeviLauncher的导入功能。
 
 启动游戏后，模组会在 `onLoad` 阶段加载语言包与配置，`onEnable` 阶段注册所有 Hook。
 
