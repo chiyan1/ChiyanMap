@@ -200,7 +200,7 @@ namespace LanguageManager {
         "CAVE_TOP_Y_MANUAL": "手动",
         "CAVE_TOP_Y_MODE": "顶部高度模式",
         "HOTKEY_ACTION": "操作",
-        "HOTKEY_CLEAR": "清除路点",
+        "HOTKEY_CLEAR": "清除快捷键",
         "HOTKEY_DISABLED": "已禁用",
         "HOTKEY_KEY": "按键",
         "HOTKEY_OPEN_BIGMAP": "打开全屏大地图",
@@ -209,7 +209,7 @@ namespace LanguageManager {
         "HOTKEY_RESET_ALL": "重置全部",
         "HOTKEY_SETTINGS": "快捷键",
         "HOTKEY_SETTINGS_TITLE": "快捷键设置",
-        "HOTKEY_STATUS_CLEARED": "已清除路点",
+        "HOTKEY_STATUS_CLEARED": "已清除快捷键",
         "HOTKEY_STATUS_RESET": "视图已重置",
         "HOTKEY_STATUS_UNDONE": "已撤销",
         "HOTKEY_TOGGLE_MINIMAP": "开启/关闭小地图",
@@ -1747,6 +1747,16 @@ namespace LanguageManager {
                 MapRenderState::g_caveTopY = j.value("caveTopY", 64);
                 MapRenderState::g_caveDepth = j.value("caveDepth", 30);
                 MapRenderState::g_legibleCaveMaps = j.value("legibleCaveMaps", false);
+                // 读取快捷键绑定 (持久化保存)
+                if (j.contains("hotkeys") && j["hotkeys"].is_object()) {
+                    auto const& hk = j["hotkeys"];
+                    auto def = MapRenderState::HotkeyBindings::Defaults();
+                    MapRenderState::g_hotkeys.openBigMap      = hk.value("openBigMap", def.openBigMap);
+                    MapRenderState::g_hotkeys.openWaypointMgr = hk.value("openWaypointMgr", def.openWaypointMgr);
+                    MapRenderState::g_hotkeys.toggleMinimap   = hk.value("toggleMinimap", def.toggleMinimap);
+                    MapRenderState::g_hotkeys.toggleMinimapShape = hk.value("toggleMinimapShape", def.toggleMinimapShape);
+                    MapRenderState::g_hotkeys.toggleMinimapRot = hk.value("toggleMinimapRot", def.toggleMinimapRot);
+                }
             } catch (...) {
                 g_currentLanguage = "en";
             }
@@ -1772,6 +1782,13 @@ namespace LanguageManager {
         j["caveTopY"] = MapRenderState::g_caveTopY;
         j["caveDepth"] = MapRenderState::g_caveDepth;
         j["legibleCaveMaps"] = MapRenderState::g_legibleCaveMaps;
+
+        // 保存快捷键绑定 (持久化保存)
+        j["hotkeys"]["openBigMap"] = MapRenderState::g_hotkeys.openBigMap;
+        j["hotkeys"]["openWaypointMgr"] = MapRenderState::g_hotkeys.openWaypointMgr;
+        j["hotkeys"]["toggleMinimap"] = MapRenderState::g_hotkeys.toggleMinimap;
+        j["hotkeys"]["toggleMinimapShape"] = MapRenderState::g_hotkeys.toggleMinimapShape;
+        j["hotkeys"]["toggleMinimapRot"] = MapRenderState::g_hotkeys.toggleMinimapRot;
 
         std::ofstream out(filePath);
         if (out.is_open()) {
