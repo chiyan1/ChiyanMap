@@ -166,6 +166,14 @@ namespace DX11Hook {
     typedef BOOL(WINAPI* PSETCURSORPOS_HOOK)(int, int);
     inline PSETCURSORPOS_HOOK oSetCursorPos = nullptr;
     inline BOOL WINAPI hkSetCursorPos(int X, int Y) {
+        // 【修复大地图鼠标横跳】UI 激活时，游戏底层仍会用 raw input 持续把光标
+        // 锁回屏幕中心 (SetCursorPos 到中心)，这会生成 WM_MOUSEMOVE 使 ImGui 的
+        // io.MousePos 在「用户真实位置」与「屏幕中心」之间反复横跳，表现为鼠标乱晃。
+        // 此时 UI 已吞掉所有鼠标/键盘输入，游戏视角本就不会转动，故直接拦截该调用，
+        // 让 ImGui 只接收用户真实移动，光标不再被强行拉回中心。
+        if (MapRenderState::IsUIActive()) {
+            return TRUE;
+        }
         if (oSetCursorPos) return oSetCursorPos(X, Y);
         return FALSE;
     }
