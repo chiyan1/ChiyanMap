@@ -505,6 +505,14 @@ namespace DX11Hook {
 
             // 热键触发 (打字状态下失效，同时不影响原生聊天栏输入)
             if (!isTyping && uMsg == WM_KEYDOWN) {
+                // 【修复聊天框内误触快捷键】热键仅在「准心游玩画面」生效：当游戏处于聊天栏、
+                // 容器、暂停菜单等原生 UI 时 isInGameInputEnabled() 为 false，此时让按键直接
+                // 穿透给游戏，不再触发打开大地图等热键，避免输入指令时误开地图。
+                // 模组自身 UI 激活时仍允许热键 (如再次按 M 关闭大地图)。
+                bool nativeScreenOpen = g_clientInstance && !g_clientInstance->isInGameInputEnabled();
+                if (nativeScreenOpen && !MapRenderState::IsUIActive()) {
+                    return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+                }
                 if (wParam == MapRenderState::g_hotkeys.openBigMap ||
                     wParam == MapRenderState::g_hotkeys.openWaypointMgr ||
                     wParam == MapRenderState::g_hotkeys.toggleMinimap ||
