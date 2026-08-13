@@ -3051,6 +3051,24 @@ namespace DX11Hook {
             // 原实现每帧无条件执行 ImGui NewFrame/Render + D3D11On12 Acquire/Release/Flush，
             // 即使小地图关闭、大地图未开、无任何面板可见。现改为仅在有 UI 需要渲染时才执行，
             // 无 UI 时仅调用 UpdateSmoothCamera (已改为不依赖 ImGui)，使模组开销趋近于零。
+
+            // 【修复退出 UI 后原生界面光标消失/锁死】全屏大地图等 UI 激活期间，我们拦截了
+            // SetCursorPos 以阻止光标被游戏底层锁回中心 (修横跳)，但这会打断游戏的指针锁定状态机，
+            // 使其 ShowCursor 隐藏计数停留在负值、指针锁定未释放。一旦 Esc 关闭 UI，背包/容器/暂停
+            // 等原生界面本应解锁并显示系统光标，却因状态错乱导致光标被隐藏并锁死在屏幕中心、
+            // 看不见也动不了。故在 UI 由激活转为非激活的下降沿，强制把硬件光标可见计数拉回非负，
+            // 并解除任何残留的光标裁剪，让原生界面恢复正常鼠标操作。
+            {
+                static bool s_wasUIActive = false;
+                bool uiActiveNow = MapRenderState::IsUIActive();
+                if (s_wasUIActive && !uiActiveNow) {
+                    int cur = ShowCursor(TRUE);
+                    while (cur < 0) { cur = ShowCursor(TRUE); }
+                    ClipCursor(NULL);
+                }
+                s_wasUIActive = uiActiveNow;
+            }
+
             UpdateSmoothCamera();
 
             bool needsRender = MapRenderState::showMiniMap || MapRenderState::IsUIActive() ||
