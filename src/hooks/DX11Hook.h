@@ -118,6 +118,10 @@ namespace DX11Hook {
     inline PGETRAWINPUTDATA_HOOK oGetRawInputData = nullptr;
 
     inline UINT WINAPI hkGetRawInputData(HRAWINPUT hRawInput, UINT uiCommand, LPVOID pData, PUINT pcbSize, UINT cbSizeHeader) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oGetRawInputData) return oGetRawInputData(hRawInput, uiCommand, pData, pcbSize, cbSizeHeader);
+            return 0;
+        }
         if (MapRenderState::IsUIActive()) {
             return (UINT)-1;
         }
@@ -131,6 +135,10 @@ namespace DX11Hook {
     typedef UINT(WINAPI* PGETRAWINPUTBUFFER_HOOK)(PRAWINPUT, PUINT, UINT);
     inline PGETRAWINPUTBUFFER_HOOK oGetRawInputBuffer = nullptr;
     inline UINT WINAPI hkGetRawInputBuffer(PRAWINPUT pData, PUINT pcbSize, UINT cbSizeHeader) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oGetRawInputBuffer) return oGetRawInputBuffer(pData, pcbSize, cbSizeHeader);
+            return 0;
+        }
         if (MapRenderState::IsUIActive()) return (UINT)-1;
         if (oGetRawInputBuffer) return oGetRawInputBuffer(pData, pcbSize, cbSizeHeader);
         return 0;
@@ -139,6 +147,10 @@ namespace DX11Hook {
     typedef SHORT(WINAPI* PGETASYNCKEYSTATE_HOOK)(int);
     inline PGETASYNCKEYSTATE_HOOK oGetAsyncKeyState = nullptr;
     inline SHORT WINAPI hkGetAsyncKeyState(int vKey) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oGetAsyncKeyState) return oGetAsyncKeyState(vKey);
+            return 0;
+        }
         if (MapRenderState::IsUIActive() && vKey != VK_F11) {
             return 0;
         }
@@ -149,6 +161,10 @@ namespace DX11Hook {
     typedef SHORT(WINAPI* PGETKEYSTATE_HOOK)(int);
     inline PGETKEYSTATE_HOOK oGetKeyState = nullptr;
     inline SHORT WINAPI hkGetKeyState(int vKey) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oGetKeyState) return oGetKeyState(vKey);
+            return 0;
+        }
         if (MapRenderState::IsUIActive() && vKey != VK_F11) {
             return 0;
         }
@@ -166,6 +182,10 @@ namespace DX11Hook {
     typedef BOOL(WINAPI* PSETCURSORPOS_HOOK)(int, int);
     inline PSETCURSORPOS_HOOK oSetCursorPos = nullptr;
     inline BOOL WINAPI hkSetCursorPos(int X, int Y) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oSetCursorPos) return oSetCursorPos(X, Y);
+            return FALSE;
+        }
         // 【修复大地图鼠标横跳】UI 激活时，游戏底层仍会用 raw input 持续把光标
         // 锁回屏幕中心 (SetCursorPos 到中心)，这会生成 WM_MOUSEMOVE 使 ImGui 的
         // io.MousePos 在「用户真实位置」与「屏幕中心」之间反复横跳，表现为鼠标乱晃。
@@ -230,15 +250,10 @@ namespace DX11Hook {
     // (3) 恢复游戏原始 WndProc；(4) 释放所有 D3D11/D3D12/ImGui 资源。
     // 此前这些资源在游戏退出时从未被显式释放，是 0xC0000005 退出崩溃的根因。
     inline void shutdown() {
-        // g_isShuttingDown 已由 ChiyanMap::disable() 入口处置位；此处仅等待在飞回调退出。
-        // 钩子入口处的 g_isShuttingDown 检查会让新一帧的 Present/Update 直接 return，
-        // 等待 50ms 足以让上一帧的 RenderImGui（约 5-15ms）和后台 baking 线程（约 30-50ms）走完。
-        Sleep(50);
-
-        // 卸载 DX11Hook::init() 直接通过 MinHook 安装的钩子。
-        // unregisterAllHooks() 已卸载 LeviLamina 钩子（LeviLamina 内部也走 MinHook），
-        // 此处 MH_DisableHook(MH_ALL_HOOKS) 仅剩 DX11 钩子需要禁用；重复禁用是 no-op。
-        MH_DisableHook(MH_ALL_HOOKS);
+        // g_isShuttingDown 已由 ChiyanMap::disable() 入口处置位；此处等待在飞回调退出。
+        // 钩子入口处的 g_isShuttingDown 检查会让新一帧的 Present/Update 直接 pass-through，
+        // 等待 30ms 足以让上一帧的 RenderImGui（约 5-15ms）走完。
+        Sleep(30);
 
         // 恢复游戏原始窗口过程，防止窗口销毁期间 WndProcHook 访问已释放的 ImGui 上下文
         if (oWndProc && g_hWnd) {
@@ -246,11 +261,15 @@ namespace DX11Hook {
             oWndProc = nullptr;
         }
 
-        // 释放 D3D11/D3D12/ImGui 资源（包括 g_pGameCommandQueue 的 AddRef 配对 Release）
+        // 释放 D3D11/D3D12/ImGui 资源（包括停止持久化烘焙线程）
         ShutdownImGuiAndBuffers();
     }
 
     inline HRESULT __stdcall hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oResizeBuffers) return oResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+            return S_OK;
+        }
         // [性能] ResizeBuffers 会使所有后备缓冲失效，必须释放缓存的包装资源 + RTV，
         // 否则下一帧 GetBuffer 返回的新资源与缓存的旧包装资源不匹配 → 渲染到已释放的缓冲 → 崩溃。
         InvalidateCachedWrappedResources();
@@ -267,6 +286,10 @@ namespace DX11Hook {
     }
 
     inline void __stdcall hkExecuteCommandLists(ID3D12CommandQueue* pQueue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oExecuteCommandLists) oExecuteCommandLists(pQueue, NumCommandLists, ppCommandLists);
+            return;
+        }
         if (!g_pGameCommandQueue) {
             D3D12_COMMAND_QUEUE_DESC desc = pQueue->GetDesc();
             if (desc.Type == D3D12_COMMAND_LIST_TYPE_DIRECT) {
@@ -274,7 +297,7 @@ namespace DX11Hook {
                 g_pGameCommandQueue->AddRef();
             }
         }
-        oExecuteCommandLists(pQueue, NumCommandLists, ppCommandLists);
+        if (oExecuteCommandLists) oExecuteCommandLists(pQueue, NumCommandLists, ppCommandLists);
     }
 
     // 【原生独立输入系统】悬浮宿主模式，归属于游戏窗口但无跨线程死锁
@@ -3172,11 +3195,19 @@ namespace DX11Hook {
     }
 
     inline HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oPresent) return oPresent(pSwapChain, SyncInterval, Flags);
+            return S_OK;
+        }
         RenderImGui(pSwapChain);
         return oPresent(pSwapChain, SyncInterval, Flags);
     }
 
     inline HRESULT __stdcall hkPresent1(IDXGISwapChain1* pSwapChain, UINT SyncInterval, UINT Flags, const DXGI_PRESENT_PARAMETERS* pParams) {
+        if (MapRenderState::g_isShuttingDown.load()) {
+            if (oPresent1) return oPresent1(pSwapChain, SyncInterval, Flags, pParams);
+            return S_OK;
+        }
         RenderImGui(pSwapChain);
         return oPresent1(pSwapChain, SyncInterval, Flags, pParams);
     }

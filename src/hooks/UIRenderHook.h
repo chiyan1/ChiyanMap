@@ -18,6 +18,10 @@ LL_TYPE_INSTANCE_HOOK(
     float deltaTime,
     std::optional<float> obfuscateSwitchTime
 ) {
+    if (MapRenderState::g_isShuttingDown.load()) {
+        origin(deltaTime, obfuscateSwitchTime);
+        return;
+    }
     origin(deltaTime, obfuscateSwitchTime);
 
     // 等游戏 UI 引擎开始运转后，挂钩 DXGI 底层

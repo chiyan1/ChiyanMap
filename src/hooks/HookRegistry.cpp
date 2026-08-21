@@ -13,7 +13,6 @@ void registerAllHooks() {
     GameModeUseItemHook::hook();
     GameModeAttackHook::hook();
 
-    ActorIsImmobileHook::hook();
     LocalPlayerSwingHook::hook();
     GameModeUseItemOnHook::hook();
     GameModeContinueDestroyBlockHook::hook();
@@ -38,7 +37,6 @@ void unregisterAllHooks() {
     GameModeUseItemHook::unhook();
     GameModeAttackHook::unhook();
 
-    ActorIsImmobileHook::unhook();
     LocalPlayerSwingHook::unhook();
     GameModeUseItemOnHook::unhook();
     GameModeContinueDestroyBlockHook::unhook();

@@ -98,13 +98,16 @@ bool ChiyanMap::load() {
 bool ChiyanMap::enable()  { return true; }
 
 bool ChiyanMap::disable() {
-    // [修复] 置位关闭标志，使所有钩子入口和后台线程提前返回，
-    // 防止进程退出阶段访问已释放的 D3D/ImGui 资源导致 0xC0000005 退出崩溃
+    // [修复] 置位关闭标志并清空全局指针，使所有钩子入口直接 pass-through 放行，
+    // 防止进程退出阶段访问已释放的 D3D/ImGui/Player 资源；
+    // 退出时不主动卸载跳板内存，确保 Minecraft 全局析构函数通过跳板时依然安全执行原函数
     MapRenderState::g_isShuttingDown.store(true);
+    g_hasPlayer = false;
+    g_localPlayer = nullptr;
+    g_clientInstance = nullptr;
 
     shutdownCacheWriteThread();
     MapCacheManager::Shutdown();
-    unregisterAllHooks();
     shutdownDX11Hook();
     return true;
 }
