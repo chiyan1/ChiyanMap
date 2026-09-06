@@ -978,8 +978,6 @@ namespace DX11Hook {
 
         // 运行时夹取为安全区间 [10, 200]，防御配置文件被外部工具篡改为越界值
         float ZOOM_RADIUS = std::clamp(MapRenderState::miniMapZoomRadius, 10.0f, 200.0f);
-        float u = 0.5f + (dx / MAP_DATA_SIZE);
-        float v = 0.5f + (dz / MAP_DATA_SIZE);
         float uvR = ZOOM_RADIUS / MAP_DATA_SIZE;
 
         float drawRadius = IM_MAP_R;
@@ -989,6 +987,27 @@ namespace DX11Hook {
             drawRadius = IM_MAP_R * 1.415f;
             uvDrawR = uvR * 1.415f;
         }
+        // 采样窗口半宽不能超过纹理半径, 否则窗口无法完整落入纹理 [0,1] 区间
+        // (仅影响 方形+旋转+zoom>181 的极端配置, 视野略有缩小以换取采样安全)
+        uvDrawR = std::min(uvDrawR, 0.5f);
+
+        // [防越界条纹] 跑图时小地图出现"东西向移动 → 横条纹、南北向移动 → 竖条纹"的整屏伪影,
+        // 根因是: 玩家跑图时扫描中心 (g_textureCenterX/Z, 上一次完成扫描的中心) 大幅滞后,
+        // 玩家距离纹理中心超过 (MAP_DATA_RADIUS - ZOOM_RADIUS) 后, UV 采样窗口越出纹理 [0,1] 区间,
+        // POINT 采样器的 CLAMP 寻址把纹理边缘"一列/一行"拉伸铺满整个小地图:
+        //   - 东西向移动 → u 越界 → 边缘列 (南北向地形线) 拉伸 → 横条纹;
+        //   - 南北向移动 → v 越界 → 边缘行 (东西向地形线) 拉伸 → 竖条纹。
+        // (扫描侧已通过 ShiftScanGrid 跟随平移根治滞后; 此处钳制为最后防线。)
+        // 修复: 将采样窗口中心钳制在 [uvDrawR, 1-uvDrawR], 保证窗口完整落在纹理内;
+        // 同时推算"视图有效中心" (viewPX/viewPZ, 钳制后窗口中心对应的真实世界坐标),
+        // 供雷达/路径点/玩家标记定位, 保证窗口被钳制时标记仍然地理精确。
+        float maxOff = 0.5f - uvDrawR;
+        float uOff = std::clamp(dx / (float)MAP_DATA_SIZE, -maxOff, maxOff);
+        float vOff = std::clamp(dz / (float)MAP_DATA_SIZE, -maxOff, maxOff);
+        float u = 0.5f + uOff;
+        float v = 0.5f + vOff;
+        float viewPX = g_textureCenterX + uOff * (float)MAP_DATA_SIZE;
+        float viewPZ = g_textureCenterZ + vOff * (float)MAP_DATA_SIZE;
 
         ImVec2 uv0(u - uvDrawR, v - uvDrawR);
         ImVec2 uv1(u + uvDrawR, v + uvDrawR);
@@ -1084,10 +1103,11 @@ namespace DX11Hook {
             g_radarUpdated.store(false);
         }
 
-        float scale = IM_MAP_R / ZOOM_RADIUS; 
+        float scale = IM_MAP_R / ZOOM_RADIUS;
         for (const auto& ent : s_cachedEntities) {
-            float edx = ent.x - pX;
-            float edz = ent.z - pZ;
+            // 以"视图有效中心"为基准定位, 窗口被钳制时实体位置仍地理精确
+            float edx = ent.x - viewPX;
+            float edz = ent.z - viewPZ;
             
             // 应用相对雷达坐标的矩阵旋转
             float rotDx = edx * c_rot - edz * s_rot;
@@ -1121,8 +1141,9 @@ namespace DX11Hook {
                 if (wp.dimId != MapRenderState::currentDimensionId) continue; // 仅显示当前维度路径点
                 if (!wp.enabled) continue;
                 
-                float wDx = wp.x - pX;
-                float wDz = wp.z - pZ;
+                // 以"视图有效中心"为基准定位, 窗口被钳制时路径点位置仍地理精确
+                float wDx = wp.x - viewPX;
+                float wDz = wp.z - viewPZ;
                 float physicalDist = std::sqrt(wDx * wDx + wDz * wDz);
                 if (physicalDist < 0.001f) physicalDist = 0.001f;
 
@@ -1161,10 +1182,25 @@ namespace DX11Hook {
         }
 
         // 绘制玩家朝向指示器。如果地图旋转开启，指示器永远朝上 (角度 0)。
-        float yawRad = MapRenderState::rotateMiniMap ? 0.0f : (playerYaw + 180.0f) * (3.14159265f / 180.0f); 
+        // 位置按玩家真实坐标相对"视图有效中心"换算: 正常情况两者重合 (箭头居中),
+        // 跑图脱离扫描数据范围时 (窗口被钳制), 箭头沿行进方向滑向地图边缘并钉在边内。
+        float yawRad = MapRenderState::rotateMiniMap ? 0.0f : (playerYaw + 180.0f) * (3.14159265f / 180.0f);
         float cosY = std::cos(yawRad);
         float sinY = std::sin(yawRad);
-        auto rotate = [&](float x, float y) -> ImVec2 { return ImVec2(cx + (x * cosY - y * sinY), cy + (x * sinY + y * cosY)); };
+        float pOffX = (pX - viewPX) * scale;
+        float pOffZ = (pZ - viewPZ) * scale;
+        float pRotX = pOffX * c_rot - pOffZ * s_rot;
+        float pRotY = pOffX * s_rot + pOffZ * c_rot;
+        float pDist = std::sqrt(pRotX * pRotX + pRotY * pRotY);
+        float pMaxDist = IM_MAP_R - 14.0f;
+        if (pDist > pMaxDist) {
+            float k = pMaxDist / pDist;
+            pRotX *= k;
+            pRotY *= k;
+        }
+        float ax = cx + pRotX;
+        float ay = cy + pRotY;
+        auto rotate = [&](float x, float y) -> ImVec2 { return ImVec2(ax + (x * cosY - y * sinY), ay + (x * sinY + y * cosY)); };
 
         draw_list->AddTriangleFilled(rotate(0, -10.0f), rotate(-7.0f, 10.0f), rotate(7.0f, 10.0f), IM_COL32(0, 0, 0, 255));
         draw_list->AddTriangleFilled(rotate(0, -8.0f), rotate(-5.0f, 8.0f), rotate(5.0f, 8.0f), IM_COL32(220, 20, 20, 255));

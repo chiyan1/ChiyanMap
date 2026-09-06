@@ -3,7 +3,9 @@ add_rules("mode.debug", "mode.release")
 add_repositories("levimc-repo https://github.com/LiteLDev/xmake-repo.git")
 
 -- 移除 target_type 选项配置，直接强制 LeviLamina 为 client 端
-add_requires("levilamina", {configs = {target_type = "client"}})
+-- 锁定 26.20.7: 代码已适配该版本 (IOWorkerCoro 用 std::thread 替代 CoroTask);
+-- 26.32.0 的 MinecraftCommands.h 在本机 MSVC 14.51 (VS2026) 下编译失败
+add_requires("levilamina 26.20.7", {configs = {target_type = "client"}})
 
 add_requires("levibuildscript")
 add_requires("imgui", {configs = {shared = false, win32 = true, dx11 = true}})

@@ -167,6 +167,49 @@ inline void ShutdownCacheWriteThread() {
 }
 
 // ==========================================
+// [跑图跟随] 扫描窗口平移工具
+// 根因: 513×513 整幅扫描受每 tick 500μs 预算限制, 完整扫完需数十秒,
+//   玩家持续移动时已完成扫描的中心大幅滞后 (跑图时可滞后 150~300 格),
+//   小地图 UV 采样窗口越出纹理边界, POINT+CLAMP 寻址把纹理边缘行/列
+//   拉伸成"东西向移动→横条纹、南北向移动→竖条纹"的整屏伪影。
+// 方案: 扫描进行中玩家偏离扫描中心 ≥16 格时, 将后台缓冲整体平移(保留已扫数据),
+//   仅新暴露的边缘条带置零等待后续扫描, 游标同步换算到新中心坐标系,
+//   扫描无缝衔接, 扫描中心始终贴近玩家。
+//   注: 平移后尾侧暴露条带 (约16格) 位于玩家行进反方向 240+ 格外,
+//   超出小地图任何视野范围 (zoom 上限 200); 且 UpdateFromScan 跳过
+//   alpha=0 列, 不会用缺口覆盖缓存中已有的已访问区域数据。
+// ==========================================
+template <typename T>
+inline void ShiftScanGrid(T (&grid)[MAP_DATA_SIZE][MAP_DATA_SIZE], int shiftX, int shiftZ) noexcept {
+    constexpr int N = MAP_DATA_SIZE;
+    // X 方向: 整行平移 (grid 按 [arrX][arrZ] 排布, arrX 是行索引)
+    // 玩家向东移动 (shiftX>0): 新[arrX'] = 旧[arrX'+shiftX], 西侧数据移出, 东侧条带置零
+    if (shiftX != 0) {
+        if (shiftX > 0) {
+            std::memmove(grid[0], grid[shiftX], (size_t)(N - shiftX) * sizeof(grid[0]));
+            std::memset(grid[N - shiftX], 0, (size_t)shiftX * sizeof(grid[0]));
+        } else {
+            int s = -shiftX;
+            std::memmove(grid[s], grid[0], (size_t)(N - s) * sizeof(grid[0]));
+            std::memset(grid[0], 0, (size_t)s * sizeof(grid[0]));
+        }
+    }
+    // Z 方向: 每行内部平移
+    if (shiftZ != 0) {
+        for (int x = 0; x < N; x++) {
+            if (shiftZ > 0) {
+                std::memmove(grid[x], grid[x] + shiftZ, (size_t)(N - shiftZ) * sizeof(grid[x][0]));
+                std::memset(grid[x] + (N - shiftZ), 0, (size_t)shiftZ * sizeof(grid[x][0]));
+            } else {
+                int s = -shiftZ;
+                std::memmove(grid[x] + s, grid[x], (size_t)(N - s) * sizeof(grid[x][0]));
+                std::memset(grid[x], 0, (size_t)s * sizeof(grid[x][0]));
+            }
+        }
+    }
+}
+
+// ==========================================
 // 生物群系中文翻译字典引擎
 // ==========================================
     // [性能] FNV-1a 64 位字符串哈希，替代 std::hash<string>。扫描路径内每格调用 2 次，
@@ -2182,6 +2225,32 @@ LL_TYPE_INSTANCE_HOOK(
             // [防残留] 清零后台缓冲区, 确保洞穴→地表切换时不残留旧洞穴数据
             std::memset(g_mapColorsBack, 0, sizeof(g_mapColorsBack));
             std::memset(g_mapHeightsBack, 0, sizeof(g_mapHeightsBack));
+        }
+
+        // [跑图跟随] 扫描进行中玩家继续移动时, 平移扫描窗口跟随玩家 (详见 ShiftScanGrid 注释)。
+        // 使扫描中心始终贴近玩家, 避免小地图纹理中心大幅滞后导致 UV 越界采样条纹。
+        if (isScanning && (std::abs(px - currentScanX) >= 16 || std::abs(pz - currentScanZ) >= 16)) {
+            int shiftX = px - currentScanX;
+            int shiftZ = pz - currentScanZ;
+            if (std::abs(shiftX) >= MAP_DATA_SIZE || std::abs(shiftZ) >= MAP_DATA_SIZE) {
+                // 异常跳转 (平移量超过缓冲区): 放弃平移, 整幅重扫
+                currentScanX = px;
+                currentScanZ = pz;
+                currentRow = -MAP_DATA_RADIUS;
+                currentCol = -MAP_DATA_RADIUS;
+                std::memset(g_mapColorsBack, 0, sizeof(g_mapColorsBack));
+                std::memset(g_mapHeightsBack, 0, sizeof(g_mapHeightsBack));
+            } else {
+                // 后台缓冲仅本 tick 线程读写 (缓存写入走独立拷贝 g_cacheWriteColors), 无需加锁
+                ShiftScanGrid(g_mapColorsBack, shiftX, shiftZ);
+                ShiftScanGrid(g_mapHeightsBack, shiftX, shiftZ);
+                currentScanX += shiftX;
+                currentScanZ += shiftZ;
+                // 游标换算到新中心坐标系并夹取到有效范围;
+                // 换算后可能落在少量已扫描列上, 重扫无害 (数据以最新扫描为准)
+                currentRow = std::clamp(currentRow - shiftX, -MAP_DATA_RADIUS, MAP_DATA_RADIUS);
+                currentCol = std::clamp(currentCol - shiftZ, -MAP_DATA_RADIUS, MAP_DATA_RADIUS);
+            }
         }
 
         // ==================== 洞穴地图检测 (Xaero's Cave Map 1:1 复刻) ====================
