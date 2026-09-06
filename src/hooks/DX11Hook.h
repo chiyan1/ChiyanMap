@@ -2620,7 +2620,20 @@ namespace DX11Hook {
                     
                     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4);
                     ImGui::Text("%s", wp.name.c_str());
-                    
+
+                    // [维度标注] 每个路径点显示其所在维度 (主世界/下界/末地), 便于跨维度辨识
+                    {
+                        const char* dimLabel = LanguageManager::GetText(
+                            wp.dimId == 1 ? "WP_TAB_NETHER" :
+                            wp.dimId == 2 ? "WP_TAB_END" : "WP_TAB_OVERWORLD");
+                        ImVec4 dimCol = wp.dimId == 1 ? ImVec4(0.90f, 0.45f, 0.40f, 1.0f) :
+                                        wp.dimId == 2 ? ImVec4(0.70f, 0.55f, 0.90f, 1.0f) :
+                                                        ImVec4(0.45f, 0.80f, 0.45f, 1.0f);
+                        ImGui::SameLine();
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
+                        ImGui::TextColored(dimCol, "[%s]", dimLabel);
+                    }
+
                     float winWidth = ImGui::GetWindowWidth();
                     
                     ImGui::SameLine(winWidth > 750 ? winWidth - 490 : 200);
