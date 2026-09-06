@@ -2412,7 +2412,8 @@ namespace DX11Hook {
             };
 
             auto defaults = MapRenderState::HotkeyBindings::Defaults();
-            renderRow(LanguageManager::GetText("HOTKEY_OPEN_BIGMAP"),     &MapRenderState::g_hotkeys.openBigMap,         defaults.openBigMap);
+            // [防误操作] "打开全屏大地图" (M 键) 不再展示/可改/可清除:
+            // 清除该键会导致玩家无法再打开操作面板入口, 故固定为默认键
             renderRow(LanguageManager::GetText("HOTKEY_OPEN_WPMGR"),      &MapRenderState::g_hotkeys.openWaypointMgr,    defaults.openWaypointMgr);
             renderRow(LanguageManager::GetText("HOTKEY_TOGGLE_MINIMAP"),  &MapRenderState::g_hotkeys.toggleMinimap,      defaults.toggleMinimap);
             renderRow(LanguageManager::GetText("HOTKEY_TOGGLE_SHAPE"),    &MapRenderState::g_hotkeys.toggleMinimapShape, defaults.toggleMinimapShape);
@@ -2438,16 +2439,14 @@ namespace DX11Hook {
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("HOTKEY_STATUS_UNDONE"));
             ImGui::SameLine();
 
-            // 全部重置 (推入批量撤销，支持 Ctrl+Z 恢复)
+            // 全部重置 (推入批量撤销，支持 Ctrl+Z 恢复; M 键固定不可配置, 不参与)
             if (ImGui::Button(LanguageManager::GetText("HOTKEY_RESET_ALL"), ImVec2(halfW, 0))) {
-                bool anyChanged = (MapRenderState::g_hotkeys.openBigMap         != defaults.openBigMap ||
-                                   MapRenderState::g_hotkeys.openWaypointMgr    != defaults.openWaypointMgr ||
+                bool anyChanged = (MapRenderState::g_hotkeys.openWaypointMgr    != defaults.openWaypointMgr ||
                                    MapRenderState::g_hotkeys.toggleMinimap      != defaults.toggleMinimap ||
                                    MapRenderState::g_hotkeys.toggleMinimapShape != defaults.toggleMinimapShape ||
                                    MapRenderState::g_hotkeys.toggleMinimapRot   != defaults.toggleMinimapRot);
                 if (anyChanged) {
                     std::vector<UndoChange> changes = {
-                        {&MapRenderState::g_hotkeys.openBigMap,         MapRenderState::g_hotkeys.openBigMap},
                         {&MapRenderState::g_hotkeys.openWaypointMgr,    MapRenderState::g_hotkeys.openWaypointMgr},
                         {&MapRenderState::g_hotkeys.toggleMinimap,      MapRenderState::g_hotkeys.toggleMinimap},
                         {&MapRenderState::g_hotkeys.toggleMinimapShape, MapRenderState::g_hotkeys.toggleMinimapShape},
@@ -2456,7 +2455,6 @@ namespace DX11Hook {
                     MapRenderState::g_hotkeys = defaults;
                     pushUndo(LanguageManager::GetText("HOTKEY_RESET_ALL"), std::move(changes));
                     // 全部绿色闪烁
-                    addFlash(&MapRenderState::g_hotkeys.openBigMap,         ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
                     addFlash(&MapRenderState::g_hotkeys.openWaypointMgr,    ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
                     addFlash(&MapRenderState::g_hotkeys.toggleMinimap,      ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
                     addFlash(&MapRenderState::g_hotkeys.toggleMinimapShape, ImVec4(0.2f, 0.7f, 0.3f, 1.0f));

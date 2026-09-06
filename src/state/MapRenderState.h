@@ -42,10 +42,12 @@ namespace MapRenderState {
     inline bool showCaveSettings = false; // [洞穴地图] 洞穴设置面板
 
     // [新增] 快捷键绑定结构 (虚拟键码，参考 Win32 VK_*)
-    // 默认值: M=0x4D, U=0x55, N=0x4E, Y=0x59, J=0x4A
+    // 默认值: U=0x55, N=0x4E, Y=0x59, J=0x4A
     // 0 表示已禁用 (清除设置)，不匹配任何 WM_KEYDOWN 的 wParam
+    // [防误操作] openBigMap (M=0x4D) 固定不可配置 (不展示/不可改/不可清除),
+    // 防止玩家误清除后无法打开操作面板; 不参与配置文件读写
     struct HotkeyBindings {
-        int openBigMap        = 0x4D; // M: 切换大地图
+        int openBigMap        = 0x4D; // M: 切换大地图 (固定键, 不可配置)
         int openWaypointMgr   = 0x55; // U: 切换路径点管理器
         int toggleMinimap     = 0x4E; // N: 切换小地图显示
         int toggleMinimapShape= 0x59; // Y: 切换小地图形状

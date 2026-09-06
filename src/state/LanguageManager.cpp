@@ -1748,10 +1748,11 @@ namespace LanguageManager {
                 MapRenderState::g_caveDepth = j.value("caveDepth", 30);
                 MapRenderState::g_legibleCaveMaps = j.value("legibleCaveMaps", false);
                 // 读取快捷键绑定 (持久化保存)
+                // [防误操作] openBigMap (M 键) 固定不可配置, 不从配置读取,
+                // 避免历史配置中误清除的 0 值导致无法打开操作面板
                 if (j.contains("hotkeys") && j["hotkeys"].is_object()) {
                     auto const& hk = j["hotkeys"];
                     auto def = MapRenderState::HotkeyBindings::Defaults();
-                    MapRenderState::g_hotkeys.openBigMap      = hk.value("openBigMap", def.openBigMap);
                     MapRenderState::g_hotkeys.openWaypointMgr = hk.value("openWaypointMgr", def.openWaypointMgr);
                     MapRenderState::g_hotkeys.toggleMinimap   = hk.value("toggleMinimap", def.toggleMinimap);
                     MapRenderState::g_hotkeys.toggleMinimapShape = hk.value("toggleMinimapShape", def.toggleMinimapShape);
@@ -1783,8 +1784,7 @@ namespace LanguageManager {
         j["caveDepth"] = MapRenderState::g_caveDepth;
         j["legibleCaveMaps"] = MapRenderState::g_legibleCaveMaps;
 
-        // 保存快捷键绑定 (持久化保存)
-        j["hotkeys"]["openBigMap"] = MapRenderState::g_hotkeys.openBigMap;
+        // 保存快捷键绑定 (持久化保存; openBigMap 固定为默认 M 键, 不保存)
         j["hotkeys"]["openWaypointMgr"] = MapRenderState::g_hotkeys.openWaypointMgr;
         j["hotkeys"]["toggleMinimap"] = MapRenderState::g_hotkeys.toggleMinimap;
         j["hotkeys"]["toggleMinimapShape"] = MapRenderState::g_hotkeys.toggleMinimapShape;
