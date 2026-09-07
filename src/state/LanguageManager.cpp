@@ -73,10 +73,10 @@ namespace LanguageManager {
         "WP_TAB_END": "The End",
         "LANG_SELECT": "Language",
         "LOG_VERSION_MISMATCH": "[CRITICAL] Game version mismatch! Current client version",
-        "LOG_VERSION_STRICT": "[CRITICAL] ChiyanMap strictly supports version 1.26.20.04 only!",
+        "LOG_VERSION_STRICT": "[CRITICAL] ChiyanMap strictly supports version 1.26.32.02 only!",
         "LOG_VERSION_ABORT": "[CRITICAL] Mod loading aborted to prevent Access Violation crashes.",
         "LOG_VERSION_PASS": "Game client version verification passed",
-        "LOG_VERSION_UNKNOWN": "Unable to identify game executable version, attempting to force load...",
+        "LOG_VERSION_UNKNOWN": "Unable to identify game executable version, loading aborted to prevent crashes.",
         "CAVE_SETTINGS": "Cave Map Settings",
         "CAVE_MODE_OFF": "Off",
         "CAVE_MODE_LAYERED": "On",
@@ -179,7 +179,7 @@ namespace LanguageManager {
         "WP_TAB_END": "\u672b\u5730",
         "LANG_SELECT": "\u8bed\u8a00",
         "LOG_VERSION_MISMATCH": "\u3010\u4e25\u91cd\u8b66\u544a\u3011\u6e38\u620f\u7248\u672c\u4e0d\u9002\u914d\uff01\u5f53\u524d\u5ba2\u6237\u7aef\u7248\u672c\u4e3a",
-        "LOG_VERSION_STRICT": "\u3010\u4e25\u91cd\u8b66\u544a\u3011\u8d64\u7130\u5730\u56fe (ChiyanMap) \u5e95\u5c42\u62e6\u622a\u5668\u5f53\u524d\u4e25\u683c\u9650\u5b9a\u4ec5\u517c\u5bb9 1.26.20.04 \u7248\u672c\uff01",
+        "LOG_VERSION_STRICT": "\u3010\u4e25\u91cd\u8b66\u544a\u3011\u8d64\u7130\u5730\u56fe (ChiyanMap) \u5e95\u5c42\u62e6\u622a\u5668\u5f53\u524d\u4e25\u683c\u9650\u5b9a\u4ec5\u517c\u5bb9 1.26.32.02 \u7248\u672c\uff01",
         "LOG_VERSION_ABORT": "\u3010\u4e25\u91cd\u8b66\u544a\u3011\u4e3a\u9632\u6b62\u52a0\u8f7d\u8fdb\u5165\u4e16\u754c\u65f6\u53d1\u751f Access Violation \u5d29\u6e83\uff0c\u6a21\u7ec4\u5df2\u4e3b\u52a8\u4e2d\u6b62\u52a0\u8f7d\u3002",
         "LOG_VERSION_PASS": "\u6e38\u620f\u5ba2\u6237\u7aef\u7248\u672c\u9a8c\u8bc1\u901a\u8fc7",
         "LOG_VERSION_UNKNOWN": "\u65e0\u6cd5\u8bc6\u522b\u5f53\u524d\u6e38\u620f\u53ef\u6267\u884c\u6587\u4ef6\u7684\u7248\u672c\u4fe1\u606f\uff0c\u6a21\u7ec4\u5c06\u5c1d\u8bd5\u5f3a\u884c\u52a0\u8f7d...",
@@ -285,7 +285,7 @@ namespace LanguageManager {
         "WP_TAB_END": "\u672b\u5730",
         "LANG_SELECT": "\u8a9e\u8a00",
         "LOG_VERSION_MISMATCH": "\u3010\u56b4\u91cd\u8b66\u544a\u3011\u904a\u6232\u7248\u672c\u4e0d\u7b26\u5408\uff01\u7576\u524d\u5ba2\u6236\u7aef\u7248\u672c\u70ba",
-        "LOG_VERSION_STRICT": "\u3010\u56b4\u91cd\u8b66\u544a\u3011\u8d64\u7130\u5730\u5716 (ChiyanMap) \u5e95\u5c64\u62e6\u622a\u5668\u7576\u524d\u56b4\u683c\u9650\u5b9a\u50c5\u76f8\u5bb9 1.26.20.04 \u7248\u672c\uff01",
+        "LOG_VERSION_STRICT": "\u3010\u56b4\u91cd\u8b66\u544a\u3011\u8d64\u7130\u5730\u5716 (ChiyanMap) \u5e95\u5c64\u62e6\u622a\u5668\u7576\u524d\u56b4\u683c\u9650\u5b9a\u50c5\u76f8\u5bb9 1.26.32.02 \u7248\u672c\uff01",
         "LOG_VERSION_ABORT": "\u3010\u56b4\u91cd\u8b66\u544a\u3011\u70ba\u9632\u6b62\u8f09\u5165\u9032\u5165\u4e16\u754c\u6642\u767c\u751f Access Violation \u5d29\u6e83\uff0c\u6a21\u7d44\u5df2\u4e3b\u52d5\u7d42\u6b62\u8f09\u5165\u3002",
         "LOG_VERSION_PASS": "\u904a\u6232\u5ba2\u6236\u7aef\u7248\u672c\u9a57\u8b49\u901a\u904e",
         "LOG_VERSION_UNKNOWN": "\u7121\u6cd5\u8b58\u5225\u7576\u524d\u904a\u6232\u57f7\u884c\u6a94\u7684\u7248\u672c\u8cc7\u8a0a\uff0c\u6a21\u7d44\u5c07\u5617\u8a66\u5f37\u884c\u8f09\u5165...",
@@ -384,7 +384,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Neuer Wegpunkt",
         "LANG_SELECT": "Sprache",
         "LOG_VERSION_MISMATCH": "[KRITISCH] Spielversion stimmt nicht überein! Aktuelle Client-Version",
-        "LOG_VERSION_STRICT": "[KRITISCH] ChiyanMap unterstützt strikt nur die Version 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[KRITISCH] ChiyanMap unterstützt strikt nur die Version 1.26.32.02!",
         "LOG_VERSION_ABORT": "[KRITISCH] Mod-Ladevorgang abgebrochen, um Access Violation-Abstürze zu verhindern.",
         "LOG_VERSION_PASS": "Überprüfung der Spiel-Client-Version bestanden",
         "LOG_VERSION_UNKNOWN": "Die Version der ausführbaren Spieldatei konnte nicht identifiziert werden. Es wird versucht, das Laden zu erzwingen...",
@@ -483,7 +483,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Nouveau rep\u00e8re",
         "LANG_SELECT": "Langue",
         "LOG_VERSION_MISMATCH": "[CRITIQUE] Incompatibilité de la version du jeu ! Version actuelle du client",
-        "LOG_VERSION_STRICT": "[CRITIQUE] ChiyanMap prend strictement en charge uniquement la version 1.26.20.04 !",
+        "LOG_VERSION_STRICT": "[CRITIQUE] ChiyanMap prend strictement en charge uniquement la version 1.26.32.02 !",
         "LOG_VERSION_ABORT": "[CRITIQUE] Chargement du mod annulé pour éviter les plantages (Access Violation).",
         "LOG_VERSION_PASS": "Vérification de la version du client de jeu réussie",
         "LOG_VERSION_UNKNOWN": "Impossible d'identifier la version de l'exécutable du jeu, tentative de chargement forcé...",
@@ -582,7 +582,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Titik Jalan Baru",
         "LANG_SELECT": "Bahasa",
         "LOG_VERSION_MISMATCH": "[KRITIS] Ketidakcocokan versi game! Versi klien saat ini",
-        "LOG_VERSION_STRICT": "[KRITIS] ChiyanMap secara ketat hanya mendukung versi 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[KRITIS] ChiyanMap secara ketat hanya mendukung versi 1.26.32.02!",
         "LOG_VERSION_ABORT": "[KRITIS] Pemuatan mod dibatalkan untuk mencegah crash Access Violation.",
         "LOG_VERSION_PASS": "Verifikasi versi klien game berhasil",
         "LOG_VERSION_UNKNOWN": "Tidak dapat mengidentifikasi versi eksekusi game, mencoba memaksakan pemuatan...",
@@ -681,7 +681,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Nuovo waypoint",
         "LANG_SELECT": "Lingua",
         "LOG_VERSION_MISMATCH": "[CRITICO] Mancata corrispondenza della versione del gioco! Versione attuale del client",
-        "LOG_VERSION_STRICT": "[CRITICO] ChiyanMap supporta rigorosamente solo la versione 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[CRITICO] ChiyanMap supporta rigorosamente solo la versione 1.26.32.02!",
         "LOG_VERSION_ABORT": "[CRITICO] Caricamento della mod interrotto per prevenire crash (Access Violation).",
         "LOG_VERSION_PASS": "Verifica della versione del client di gioco superata",
         "LOG_VERSION_UNKNOWN": "Impossibile identificare la versione dell'eseguibile del gioco, tentativo di caricamento forzato in corso...",
@@ -780,7 +780,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "\u65b0\u898f\u30dd\u30a4\u30f3\u30c8",
         "LANG_SELECT": "\u8a00\u8a9e",
         "LOG_VERSION_MISMATCH": "\u3010\u91cd\u5927\u306a\u30a8\u30e9\u30fc\u3011\u30b2\u30fc\u30e0\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u304c\u4e00\u81f4\u3057\u307e\u305b\u3093\uff01\u73fe\u5728\u306e\u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u30d0\u30fc\u30b8\u30e7\u30f3",
-        "LOG_VERSION_STRICT": "\u3010\u91cd\u5927\u306a\u30a8\u30e9\u30fc\u3011ChiyanMap\u306f\u30d0\u30fc\u30b8\u30e7\u30f3 1.26.20.04 \u306e\u307f\u3092\u53b3\u5bc6\u306b\u30b5\u30dd\u30fc\u30c8\u3057\u3066\u3044\u307e\u3059\uff01",
+        "LOG_VERSION_STRICT": "\u3010\u91cd\u5927\u306a\u30a8\u30e9\u30fc\u3011ChiyanMap\u306f\u30d0\u30fc\u30b8\u30e7\u30f3 1.26.32.02 \u306e\u307f\u3092\u53b3\u5bc6\u306b\u30b5\u30dd\u30fc\u30c8\u3057\u3066\u3044\u307e\u3059\uff01",
         "LOG_VERSION_ABORT": "\u3010\u91cd\u5927\u306a\u30a8\u30e9\u30fc\u3011Access Violation\u306e\u30af\u30e9\u30c3\u30b7\u30e5\u3092\u9632\u3050\u305f\u3081\u3001Mod\u306e\u30ed\u30fc\u30c9\u3092\u4e2d\u6b62\u3057\u307e\u3057\u305f\u3002",
         "LOG_VERSION_PASS": "\u30b2\u30fc\u30e0\u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u306e\u30d0\u30fc\u30b8\u30e7\u30f3\u78ba\u8a8d\u3092\u901a\u904e\u3057\u307e\u3057\u305f",
         "LOG_VERSION_UNKNOWN": "\u30b2\u30fc\u30e0\u306e\u5b9f\u884c\u30d5\u30a1\u30a4\u30eb\u30d0\u30fc\u30b8\u30e7\u30f3\u3092\u8b58\u5225\u3067\u304d\u307e\u305b\u3093\u3002\u5f37\u5236\u30ed\u30fc\u30c9\u3092\u8a66\u307f\u307e\u3059...",
@@ -879,7 +879,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "\uc0c8 \uc704\uce58",
         "LANG_SELECT": "\uc5b8\uc5b4",
         "LOG_VERSION_MISMATCH": "[\uce58\uba85\uc801 \uc624\ub958] \uac8c\uc784 \ubc84\uc804 \ubd88\uc77c\uce58! \ud604\uc7ac \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804",
-        "LOG_VERSION_STRICT": "[\uce58\uba85\uc801 \uc624\ub958] ChiyanMap\uc740 1.26.20.04 \ubc84\uc804\ub9cc \uc5c4\uaca9\ud558\uac8c \uc9c0\uc6d0\ud569\ub2c8\ub2e4!",
+        "LOG_VERSION_STRICT": "[\uce58\uba85\uc801 \uc624\ub958] ChiyanMap\uc740 1.26.32.02 \ubc84\uc804\ub9cc \uc5c4\uaca9\ud558\uac8c \uc9c0\uc6d0\ud569\ub2c8\ub2e4!",
         "LOG_VERSION_ABORT": "[\uce58\uba85\uc801 \uc624\ub958] Access Violation \ucda9\ub3cc\uc744 \ubc29\uc9c0\ud558\uae30 \uc704\ud574 \ubaa8\ub4dc \ub85c\ub4dc\uac00 \uc911\ub2e8\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
         "LOG_VERSION_PASS": "\uac8c\uc784 \ud074\ub77c\uc774\uc5b8\ud2b8 \ubc84\uc804 \uac80\uc99d \ud1b5\uacfc",
         "LOG_VERSION_UNKNOWN": "\uac8c\uc784 \uc2e4\ud589 \ud30c\uc77c \ubc84\uc804\uc744 \uc2dd\ubcc4\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \uac15\uc81c \ub85c\ub4dc\ub97c \uc2dc\ub3c4\ud569\ub2c8\ub2e4...",
@@ -978,7 +978,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Novo Marcador",
         "LANG_SELECT": "Idioma",
         "LOG_VERSION_MISMATCH": "[CRÍTICO] Incompatibilidade da versão do jogo! Versão atual do cliente",
-        "LOG_VERSION_STRICT": "[CRÍTICO] ChiyanMap suporta estritamente apenas a versão 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[CRÍTICO] ChiyanMap suporta estritamente apenas a versão 1.26.32.02!",
         "LOG_VERSION_ABORT": "[CRÍTICO] Carregamento do mod abortado para evitar travamentos de Access Violation.",
         "LOG_VERSION_PASS": "Verificação da versão do cliente do jogo concluída com sucesso",
         "LOG_VERSION_UNKNOWN": "Não foi possível identificar a versão do executável do jogo, tentando forçar o carregamento...",
@@ -1077,7 +1077,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "\u041d\u043e\u0432\u0430\u044f \u0442\u043e\u0447\u043a\u0430",
         "LANG_SELECT": "\u042f\u0437\u044b\u043a",
         "LOG_VERSION_MISMATCH": "[\u041a\u0420\u0418\u0422\u0418\u0427\u0415\u0421\u041a\u0410\u042f \u041e\u0428\u0418\u0411\u041a\u0410] \u041d\u0435\u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435 \u0432\u0435\u0440\u0441\u0438\u0438 \u0438\u0433\u0440\u044b! \u0422\u0435\u043a\u0443\u0449\u0430\u044f \u0432\u0435\u0440\u0441\u0438\u044f \u043a\u043b\u0438\u0435\u043d\u0442\u0430",
-        "LOG_VERSION_STRICT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u0415\u0421\u041a\u0410\u042f \u041e\u0428\u0418\u0411\u041a\u0410] ChiyanMap \u0441\u0442\u0440\u043e\u0433\u043e \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442 \u0442\u043e\u043b\u044c\u043a\u043e \u0432\u0435\u0440\u0441\u0438\u044e 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u0415\u0421\u041a\u0410\u042f \u041e\u0428\u0418\u0411\u041a\u0410] ChiyanMap \u0441\u0442\u0440\u043e\u0433\u043e \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442 \u0442\u043e\u043b\u044c\u043a\u043e \u0432\u0435\u0440\u0441\u0438\u044e 1.26.32.02!",
         "LOG_VERSION_ABORT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u0415\u0421\u041a\u0410\u042f \u041e\u0428\u0418\u0411\u041a\u0410] \u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 \u043c\u043e\u0434\u0430 \u043f\u0440\u0435\u0440\u0432\u0430\u043d\u0430 \u0434\u043b\u044f \u043f\u0440\u0435\u0434\u043e\u0442\u0432\u0440\u0430\u0449\u0435\u043d\u0438\u044f \u0441\u0431\u043e\u0435\u0432 (Access Violation).",
         "LOG_VERSION_PASS": "\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0432\u0435\u0440\u0441\u0438\u0438 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 \u0438\u0433\u0440\u044b \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u0430",
         "LOG_VERSION_UNKNOWN": "\u041d\u0435\u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0438\u0442\u044c \u0432\u0435\u0440\u0441\u0438\u044e \u0438\u0441\u043f\u043e\u043b\u043d\u044f\u0435\u043c\u043e\u0433\u043e \u0444\u0430\u0439\u043b\u0430 \u0438\u0433\u0440\u044b, \u043f\u043e\u043f\u044b\u0442\u043a\u0430 \u043f\u0440\u0438\u043d\u0443\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0439 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438...",
@@ -1176,7 +1176,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "\u0e08\u0e38\u0e14\u0e40\u0e2a\u0e49\u0e19\u0e17\u0e32\u0e07\u0e43\u0e2b\u0e21\u0e48",
         "LANG_SELECT": "\u0e20\u0e32\u0e29\u0e32",
         "LOG_VERSION_MISMATCH": "[\u0e27\u0e34\u0e01\u0e24\u0e15] \u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19\u0e40\u0e01\u0e21\u0e44\u0e21\u0e48\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19! \u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19\u0e44\u0e04\u0e25\u0e40\u0e2d\u0e19\u0e15\u0e4c\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19",
-        "LOG_VERSION_STRICT": "[\u0e27\u0e34\u0e01\u0e24\u0e15] ChiyanMap \u0e23\u0e2d\u0e07\u0e23\u0e31\u0e1a\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19 1.26.20.04 \u0e40\u0e17\u0e48\u0e32\u0e19\u0e31\u0e49\u0e19!",
+        "LOG_VERSION_STRICT": "[\u0e27\u0e34\u0e01\u0e24\u0e15] ChiyanMap \u0e23\u0e2d\u0e07\u0e23\u0e31\u0e1a\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19 1.26.32.02 \u0e40\u0e17\u0e48\u0e32\u0e19\u0e31\u0e49\u0e19!",
         "LOG_VERSION_ABORT": "[\u0e27\u0e34\u0e01\u0e24\u0e15] \u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e42\u0e2b\u0e25\u0e14\u0e21\u0e2d\u0e14\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e01\u0e32\u0e23\u0e41\u0e04\u0e23\u0e0a\u0e41\u0e1a\u0e1a Access Violation",
         "LOG_VERSION_PASS": "\u0e1c\u0e48\u0e32\u0e19\u0e01\u0e32\u0e23\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19\u0e02\u0e2d\u0e07\u0e44\u0e04\u0e25\u0e40\u0e2d\u0e19\u0e15\u0e4c\u0e40\u0e01\u0e21\u0e41\u0e25\u0e49\u0e27",
         "LOG_VERSION_UNKNOWN": "\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e23\u0e30\u0e1a\u0e38\u0e40\u0e27\u0e2d\u0e23\u0e4c\u0e0a\u0e31\u0e19\u0e02\u0e2d\u0e07\u0e44\u0e1f\u0e25\u0e4c\u0e1b\u0e23\u0e30\u0e21\u0e27\u0e25\u0e1c\u0e25\u0e40\u0e01\u0e21\u0e44\u0e14\u0e49 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e1e\u0e22\u0e32\u0e22\u0e32\u0e21\u0e1a\u0e31\u0e07\u0e04\u0e31\u0e1a\u0e42\u0e2b\u0e25\u0e14...",
@@ -1275,7 +1275,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Yeni Isaret",
         "LANG_SELECT": "Dil",
         "LOG_VERSION_MISMATCH": "[KR\u0130T\u0130K] Oyun s\u00fcr\u00fcm\u00fc uyu\u015fmazl\u0131\u011f\u0131! Mevcut istemci s\u00fcr\u00fcm\u00fc",
-        "LOG_VERSION_STRICT": "[KR\u0130T\u0130K] ChiyanMap kesinlikle yaln\u0131zca 1.26.20.04 s\u00fcr\u00fcm\u00fcn\u00fc destekler!",
+        "LOG_VERSION_STRICT": "[KR\u0130T\u0130K] ChiyanMap kesinlikle yaln\u0131zca 1.26.32.02 s\u00fcr\u00fcm\u00fcn\u00fc destekler!",
         "LOG_VERSION_ABORT": "[KR\u0130T\u0130K] Access Violation \u00e7\u00f6kmelerini \u00f6nlemek i\u00e7in mod y\u00fcklemesi iptal edildi.",
         "LOG_VERSION_PASS": "Oyun istemcisi s\u00fcr\u00fcm do\u011frulamas\u0131 ba\u015far\u0131l\u0131",
         "LOG_VERSION_UNKNOWN": "Oyun y\u00fcr\u00fct\u00fclebilir s\u00fcr\u00fcm\u00fc tan\u0131mlanam\u0131yor, zorla y\u00fckleme deneniyor...",
@@ -1374,7 +1374,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "\u041d\u043e\u0432\u0430 \u0442\u043e\u0447\u043a\u0430",
         "LANG_SELECT": "\u041c\u043e\u0432\u0430",
         "LOG_VERSION_MISMATCH": "[\u041a\u0420\u0418\u0422\u0418\u0427\u041d\u0410 \u041f\u041e\u041c\u0418\u041b\u041a\u0410] \u041d\u0435\u0432\u0456\u0434\u043f\u043e\u0432\u0456\u0434\u043d\u0456\u0441\u0442\u044c \u0432\u0435\u0440\u0441\u0456\u0457 \u0433\u0440\u0438! \u041f\u043e\u0442\u043e\u0447\u043d\u0430 \u0432\u0435\u0440\u0441\u0456\u044f \u043a\u043b\u0456\u0454\u043d\u0442\u0430",
-        "LOG_VERSION_STRICT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u041d\u0410 \u041f\u041e\u041c\u0418\u041b\u041a\u0410] ChiyanMap \u0441\u0443\u0432\u043e\u0440\u043e \u043f\u0456\u0434\u0442\u0440\u0438\u043c\u0443\u0454 \u043b\u0438\u0448\u0435 \u0432\u0435\u0440\u0441\u0456\u044e 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u041d\u0410 \u041f\u041e\u041c\u0418\u041b\u041a\u0410] ChiyanMap \u0441\u0443\u0432\u043e\u0440\u043e \u043f\u0456\u0434\u0442\u0440\u0438\u043c\u0443\u0454 \u043b\u0438\u0448\u0435 \u0432\u0435\u0440\u0441\u0456\u044e 1.26.32.02!",
         "LOG_VERSION_ABORT": "[\u041a\u0420\u0418\u0422\u0418\u0427\u041d\u0410 \u041f\u041e\u041c\u0418\u041b\u041a\u0410] \u0417\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u044f \u043c\u043e\u0434\u0443 \u043f\u0435\u0440\u0435\u0440\u0432\u0430\u043d\u043e \u0434\u043b\u044f \u0437\u0430\u043f\u043e\u0431\u0456\u0433\u0430\u043d\u043d\u044f \u0437\u0431\u043e\u044f\u043c (Access Violation).",
         "LOG_VERSION_PASS": "\u041f\u0435\u0440\u0435\u0432\u0456\u0440\u043a\u0443 \u0432\u0435\u0440\u0441\u0456\u0457 \u043a\u043b\u0456\u0454\u043d\u0442\u0430 \u0433\u0440\u0438 \u043f\u0440\u043e\u0439\u0434\u0435\u043d\u043e",
         "LOG_VERSION_UNKNOWN": "\u041d\u0435\u043c\u043e\u0436\u043b\u0438\u0432\u043e \u0432\u0438\u0437\u043d\u0430\u0447\u0438\u0442\u0438 \u0432\u0435\u0440\u0441\u0456\u044e \u0432\u0438\u043a\u043e\u043d\u0443\u0432\u0430\u043d\u043e\u0433\u043e \u0444\u0430\u0439\u043b\u0443 \u0433\u0440\u0438, \u0441\u043f\u0440\u043e\u0431\u0430 \u043f\u0440\u0438\u043c\u0443\u0441\u043e\u0432\u043e\u0433\u043e \u0437\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u044f...",
@@ -1473,7 +1473,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "M\u1ed1c m\u1edbi",
         "LANG_SELECT": "Ng\u00f4n ng\u1eef",
         "LOG_VERSION_MISMATCH": "[NGHI\u00caM TR\u1eccNG] Phi\u00ean b\u1ea3n tr\u00f2 ch\u01a1i kh\u00f4ng kh\u1edbp! Phi\u00ean b\u1ea3n m\u00e1y kh\u00e1ch hi\u1ec7n t\u1ea1i",
-        "LOG_VERSION_STRICT": "[NGHI\u00caM TR\u1eccNG] ChiyanMap ch\u1ec9 h\u1ed7 tr\u1ee3 nghi\u00eam ng\u1eb7t phi\u00ean b\u1ea3n 1.26.20.04!",
+        "LOG_VERSION_STRICT": "[NGHI\u00caM TR\u1eccNG] ChiyanMap ch\u1ec9 h\u1ed7 tr\u1ee3 nghi\u00eam ng\u1eb7t phi\u00ean b\u1ea3n 1.26.32.02!",
         "LOG_VERSION_ABORT": "[NGHI\u00caM TR\u1eccNG] Qu\u00e1 tr\u00ecnh t\u1ea3i mod \u0111\u00e3 b\u1ecb h\u1ee7y \u0111\u1ec3 ng\u0103n s\u1ef1 c\u1ed1 Access Violation.",
         "LOG_VERSION_PASS": "\u0110\u00e3 v\u01b0\u1ee3t qua x\u00e1c minh phi\u00ean b\u1ea3n m\u00e1y kh\u00e1ch tr\u00f2 ch\u01a1i",
         "LOG_VERSION_UNKNOWN": "Kh\u00f4ng th\u1ec3 x\u00e1c \u0111\u1ecbnh phi\u00ean b\u1ea3n t\u1ec7p th\u1ef1c thi c\u1ee7a tr\u00f2 ch\u01a1i, \u0111ang c\u1ed1 g\u1eafng bu\u1ed9c t\u1ea3i...",
@@ -1572,7 +1572,7 @@ namespace LanguageManager {
         "WP_DEFAULT_NAME": "Nuevo waypoint",
         "LANG_SELECT": "Idioma",
         "LOG_VERSION_MISMATCH": "[CRÍTICO] ¡Incompatibilidad de versión del juego! Versión de cliente actual",
-        "LOG_VERSION_STRICT": "[CRÍTICO] ChiyanMap solo admite la versión 1.26.20.04",
+        "LOG_VERSION_STRICT": "[CRÍTICO] ChiyanMap solo admite la versión 1.26.32.02",
         "LOG_VERSION_ABORT": "[CRÍTICO] Carga del mod abortada para evitar fallos de Access Violation.",
         "LOG_VERSION_PASS": "Verificación de la versión del cliente superada",
         "LOG_VERSION_UNKNOWN": "No se pudo identificar la versión del ejecutable, intentando carga forzada...",
@@ -2080,22 +2080,22 @@ namespace LanguageManager {
             return "[CRITICAL] Game version mismatch! Current client version";
         }
         if (key == "LOG_VERSION_STRICT") {
-            if (g_currentLanguage == "zh_CN") return "【严重警告】赤焰地图 (ChiyanMap) 底层拦截器当前严格限定仅兼容 1.26.20.04 版本！";
-            if (g_currentLanguage == "zh_TW") return "【嚴重警告】赤焰地圖 (ChiyanMap) 底層攔截器當前嚴格限定僅相容 1.26.20.04 版本！";
-            if (g_currentLanguage == "de") return "[KRITISCH] ChiyanMap unterstützt streng genommen nur Version 1.26.20.04!";
-            if (g_currentLanguage == "fr") return "[CRITIQUE] ChiyanMap ne prend en charge que la version 1.26.20.04 !";
-            if (g_currentLanguage == "id") return "[KRITIS] ChiyanMap hanya mendukung versi 1.26.20.04!";
-            if (g_currentLanguage == "it") return "[CRITICO] ChiyanMap supporta rigorosamente solo la versione 1.26.20.04!";
-            if (g_currentLanguage == "ja") return "[重大] ChiyanMap は厳密にバージョン 1.26.20.04 のみをサポートしています！";
-            if (g_currentLanguage == "ko") return "[심각] ChiyanMap은 엄격히 버전 1.26.20.04만 지원합니다!";
-            if (g_currentLanguage == "pt_BR") return "[CRÍTICO] O ChiyanMap é compatível estritamente apenas com a versão 1.26.20.04!";
-            if (g_currentLanguage == "ru") return "[КРИТИЧНО] ChiyanMap строго поддерживает только версию 1.26.20.04!";
-            if (g_currentLanguage == "th") return "[วิกฤต] ChiyanMap รองรับเฉพาะเวอร์ชัน 1.26.20.04 เท่านั้น!";
-            if (g_currentLanguage == "tr") return "[KRİTİK] ChiyanMap yalnızca sürüm 1.26.20.04'ü destekler!";
-            if (g_currentLanguage == "uk") return "[КРИТИЧНО] ChiyanMap суворо підтримує лише версію 1.26.20.04!";
-            if (g_currentLanguage == "vi") return "[QUAN TRỌNG] ChiyanMap chỉ hỗ trợ phiên bản 1.26.20.04!";
-            if (g_currentLanguage == "es") return "[CRÍTICO] ¡ChiyanMap solo es compatible estrictamente con la versión 1.26.20.04!";
-            return "[CRITICAL] ChiyanMap strictly supports version 1.26.20.04 only!";
+            if (g_currentLanguage == "zh_CN") return "【严重警告】赤焰地图 (ChiyanMap) 底层拦截器当前严格限定仅兼容 1.26.32.02 版本！";
+            if (g_currentLanguage == "zh_TW") return "【嚴重警告】赤焰地圖 (ChiyanMap) 底層攔截器當前嚴格限定僅相容 1.26.32.02 版本！";
+            if (g_currentLanguage == "de") return "[KRITISCH] ChiyanMap unterstützt streng genommen nur Version 1.26.32.02!";
+            if (g_currentLanguage == "fr") return "[CRITIQUE] ChiyanMap ne prend en charge que la version 1.26.32.02 !";
+            if (g_currentLanguage == "id") return "[KRITIS] ChiyanMap hanya mendukung versi 1.26.32.02!";
+            if (g_currentLanguage == "it") return "[CRITICO] ChiyanMap supporta rigorosamente solo la versione 1.26.32.02!";
+            if (g_currentLanguage == "ja") return "[重大] ChiyanMap は厳密にバージョン 1.26.32.02 のみをサポートしています！";
+            if (g_currentLanguage == "ko") return "[심각] ChiyanMap은 엄격히 버전 1.26.32.02만 지원합니다!";
+            if (g_currentLanguage == "pt_BR") return "[CRÍTICO] O ChiyanMap é compatível estritamente apenas com a versão 1.26.32.02!";
+            if (g_currentLanguage == "ru") return "[КРИТИЧНО] ChiyanMap строго поддерживает только версию 1.26.32.02!";
+            if (g_currentLanguage == "th") return "[วิกฤต] ChiyanMap รองรับเฉพาะเวอร์ชัน 1.26.32.02 เท่านั้น!";
+            if (g_currentLanguage == "tr") return "[KRİTİK] ChiyanMap yalnızca sürüm 1.26.32.02'ü destekler!";
+            if (g_currentLanguage == "uk") return "[КРИТИЧНО] ChiyanMap суворо підтримує лише версію 1.26.32.02!";
+            if (g_currentLanguage == "vi") return "[QUAN TRỌNG] ChiyanMap chỉ hỗ trợ phiên bản 1.26.32.02!";
+            if (g_currentLanguage == "es") return "[CRÍTICO] ¡ChiyanMap solo es compatible estrictamente con la versión 1.26.32.02!";
+            return "[CRITICAL] ChiyanMap strictly supports version 1.26.32.02 only!";
         }
         if (key == "LOG_VERSION_ABORT") {
             if (g_currentLanguage == "zh_CN") return "【严重警告】为防止加载进入世界时发生 Access Violation 崩溃，模组已主动中止加载。";
@@ -2134,8 +2134,8 @@ namespace LanguageManager {
             return "Game client version verification passed";
         }
         if (key == "LOG_VERSION_UNKNOWN") {
-            if (g_currentLanguage == "zh_CN") return "无法识别当前游戏可执行文件的版本信息，模组将尝试强行加载...";
-            if (g_currentLanguage == "zh_TW") return "無法識別當前遊戲執行檔的版本資訊，模組將嘗試強行載入...";
+            if (g_currentLanguage == "zh_CN") return "无法识别当前游戏可执行文件的版本信息，已中止加载以防崩溃！";
+            if (g_currentLanguage == "zh_TW") return "無法識別當前遊戲執行檔的版本資訊，已中止載入以防崩潰！";
             if (g_currentLanguage == "de") return "Spiel-Executable-Version kann nicht identifiziert werden, erzwungenes Laden wird versucht...";
             if (g_currentLanguage == "fr") return "Impossible d'identifier la version de l'exécutable du jeu, tentative de chargement forcé...";
             if (g_currentLanguage == "id") return "Tidak dapat mengidentifikasi versi executable game, mencoba memaksa muat...";
@@ -2149,7 +2149,7 @@ namespace LanguageManager {
             if (g_currentLanguage == "uk") return "Не вдалося визначити версію виконуваного файлу гри, спроба примусового завантаження...";
             if (g_currentLanguage == "vi") return "Không thể xác định phiên bản tệp thực thi game, đang thử tải bắt buộc...";
             if (g_currentLanguage == "es") return "No se pudo identificar la versión del ejecutable del juego, intentando carga forzada...";
-            return "Unable to identify game executable version, attempting to force load...";
+            return "Unable to identify game executable version, loading aborted to prevent crashes.";
         }
 
         auto it = g_translationCache.find(key);

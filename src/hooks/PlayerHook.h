@@ -2814,11 +2814,12 @@ LL_TYPE_INSTANCE_HOOK(
     GameMode,
     &GameMode::$attack,
     bool,
-    Actor& actor
+    Actor& actor,
+    Vec3 const& hitPosition
 ) {
-    if (MapRenderState::g_isShuttingDown.load()) return origin(actor);
+    if (MapRenderState::g_isShuttingDown.load()) return origin(actor, hitPosition);
     if (MapRenderState::IsUIActive()) return false;
-    return origin(actor);
+    return origin(actor, hitPosition);
 }
 
 LL_TYPE_INSTANCE_HOOK(
