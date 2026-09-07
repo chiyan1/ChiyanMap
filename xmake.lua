@@ -1,5 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
+add_repositories("local-repo xmake/repository")
 add_repositories("levimc-repo https://github.com/LiteLDev/xmake-repo.git")
 
 -- 适配 LeviLamina 最新版 (不指定版本即设为最新版，强制 client 端)

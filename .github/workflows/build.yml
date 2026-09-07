@@ -20,12 +20,32 @@ jobs:
         with:
           path: |
             ~/AppData/Local/.xmake
-          key: xmake-${{ hashFiles('xmake.lua') }}
+          key: xmake-v2-${{ hashFiles('xmake.lua', 'xmake/repository/**') }}
           restore-keys: |
-            xmake-
+            xmake-v2-
 
       - name: Update xmake repository
         run: xmake repo -u
+
+      - name: Patch LeviLamina header issue
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "$env:LOCALAPPDATA\.xmake", ".\.xmake" -Recurse -Filter "xmake.lua" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "*packages*l*levilamina*xmake.lua" } | ForEach-Object {
+            $content = Get-Content $_.FullName -Raw
+            if ($content -notmatch "CommandRegistry.h") {
+              $old = 'import("package.tools.xmake").install(package, {"--target_type=client"})'
+              $replacement = @'
+        local cmd_h = "src/mc/server/commands/MinecraftCommands.h"
+        if os.isfile(cmd_h) then
+            io.replace(cmd_h, "class CommandRegistry;", "#include \"mc/server/commands/CommandRegistry.h\"\n#include \"mc/server/commands/CommandOutputSender.h\"\n#include \"mc/server/commands/Command.h\"\n#include \"mc/server/commands/DeferredCommandBase.h\"\nclass CommandRegistry;", {plain = true})
+        end
+        import("package.tools.xmake").install(package, {"--target_type=client"})
+'@
+              $patched = $content.Replace($old, $replacement)
+              Set-Content -Path $_.FullName -Value $patched -Encoding utf8
+              Write-Host "Patched $($_.FullName)"
+            }
+          }
 
       - name: Configure xmake (Client Only)
         # 去除了 --target_type 参数，因为 xmake.lua 已经硬编码为纯客户端模式
