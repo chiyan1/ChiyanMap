@@ -3,8 +3,8 @@ add_rules("mode.debug", "mode.release")
 add_repositories("local-repo xmake/repository")
 add_repositories("levimc-repo https://github.com/LiteLDev/xmake-repo.git")
 
--- 适配 LeviLamina 最新版 (不指定版本即设为最新版，强制 client 端)
-add_requires("levilamina", {configs = {target_type = "client"}})
+-- 适配 LeviLamina 最新版 (不指定版本即设为最新版，强制 client 端，指定从 local-repo 本地仓库加载)
+add_requires("local-repo@levilamina", {alias = "levilamina", configs = {target_type = "client"}})
 
 add_requires("levibuildscript")
 add_requires("imgui", {configs = {shared = false, win32 = true, dx11 = true}})

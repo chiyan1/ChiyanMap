@@ -31,18 +31,40 @@ package("levilamina")
     end)
 
     on_install(function(package)
-        local cmd_h = "src/mc/server/commands/MinecraftCommands.h"
-        if os.isfile(cmd_h) then
-            local content = io.readfile(cmd_h)
+        cprint("${bright green}>>> [local-repo] Starting patched on_install for LeviLamina...")
+        cprint("${bright cyan}>>> Current directory: " .. os.curdir())
+        local files = os.files("**/MinecraftCommands.h")
+        cprint("${bright cyan}>>> Found " .. tostring(#files) .. " MinecraftCommands.h file(s)")
+        for _, file in ipairs(files) do
+            cprint("${bright yellow}>>> Inspecting: " .. file)
+            local content = io.readfile(file)
             if not content:find("CommandRegistry.h", 1, true) then
+                cprint("${bright green}>>> Patching " .. file .. " for missing CommandRegistry header...")
                 io.replace(
-                    cmd_h,
+                    file,
                     "class CommandRegistry;",
                     "#include \"mc/server/commands/CommandRegistry.h\"\n#include \"mc/server/commands/CommandOutputSender.h\"\n#include \"mc/server/commands/Command.h\"\n#include \"mc/server/commands/DeferredCommandBase.h\"\nclass CommandRegistry;",
                     {plain = true}
                 )
+            else
+                cprint("${bright blue}>>> Already contains CommandRegistry.h: " .. file)
             end
         end
+
+        local exec_events = os.files("**/ExecuteCommandEvent.h")
+        for _, file in ipairs(exec_events) do
+            local content = io.readfile(file)
+            if not content:find("CommandRegistry.h", 1, true) then
+                cprint("${bright green}>>> Patching " .. file .. " for CommandRegistry.h...")
+                io.replace(
+                    file,
+                    "#include \"mc/server/commands/MinecraftCommands.h\"",
+                    "#include \"mc/server/commands/CommandRegistry.h\"\n#include \"mc/server/commands/MinecraftCommands.h\"",
+                    {plain = true}
+                )
+            end
+        end
+
         if package:config("target_type") == "server" then
             import("package.tools.xmake").install(package)
         else

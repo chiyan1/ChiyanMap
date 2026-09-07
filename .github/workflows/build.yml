@@ -20,18 +20,29 @@ jobs:
         with:
           path: |
             ~/AppData/Local/.xmake
-          key: xmake-v2-${{ hashFiles('xmake.lua') }}
+          key: xmake-v3-${{ hashFiles('xmake.lua', 'xmake/repository/**') }}
           restore-keys: |
-            xmake-v2-
+            xmake-v3-
 
-      - name: Update xmake repository
-        run: xmake repo -u
+      - name: Register local repository
+        run: |
+          xmake repo -a local-repo xmake/repository
+          xmake repo -u
 
       - name: Configure xmake (Client Only)
-        run: xmake f -a x64 -m release -p windows -y
+        run: xmake f -a x64 -m release -p windows -vD -y
+
+      - name: Dump install logs on failure
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "$env:LOCALAPPDATA\.xmake" -Recurse -Filter "install.txt" -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "================== $($_.FullName) =================="
+            Get-Content -Path $_.FullName
+          }
 
       - name: Build
-        run: xmake
+        run: xmake -vD
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
