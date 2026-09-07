@@ -65,24 +65,19 @@ package("levilamina")
             end
         end
 
-        -- General pass: in all src/mc headers, remove "= default;" on virtual destructors that hold unique_ptr
-        -- to prevent Clang-CL from inline-instantiating destructors that delete incomplete types
-        local mc_headers = os.files("**/src/mc/**.h")
-        if #mc_headers == 0 then
-            mc_headers = os.files("src/mc/**.h")
-        end
-        local patched_count = 0
-        for _, file in ipairs(mc_headers) do
+        local exec_events = os.files("**/ExecuteCommandEvent.h")
+        for _, file in ipairs(exec_events) do
             local content = io.readfile(file)
-            if content:find("unique_ptr", 1, true) and content:find("= default;", 1, true) then
-                local new_content, count = content:gsub("(virtual%s+~[%w_]+%s*%b()[^;=]*)=%s*default%s*;", "%1;")
-                if count > 0 then
-                    io.writefile(file, new_content)
-                    patched_count = patched_count + count
-                end
+            if not content:find("CommandRegistry.h", 1, true) then
+                cprint("${bright green}>>> Patching " .. file .. " for CommandRegistry.h...")
+                io.replace(
+                    file,
+                    "#include \"mc/server/commands/MinecraftCommands.h\"",
+                    "#include \"mc/server/commands/CommandRegistry.h\"\n#include \"mc/server/commands/MinecraftCommands.h\"",
+                    {plain = true}
+                )
             end
         end
-        cprint("${bright green}>>> Patched " .. tostring(patched_count) .. " virtual destructor(s) across mc headers")
 
         if package:config("target_type") == "server" then
             import("package.tools.xmake").install(package)
@@ -90,4 +85,5 @@ package("levilamina")
             import("package.tools.xmake").install(package, {"--target_type=client"})
         end
     end)
+
 
