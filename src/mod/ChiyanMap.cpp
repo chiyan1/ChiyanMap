@@ -62,11 +62,11 @@ bool ChiyanMap::load() {
     }
     
     if (gameVer) {
-        // 手动构造原始版本字符串 (LeviLamina 输出格式如 "1.26.32-2")
-        std::string rawVer = fmt::format("{}.{}.{}-{}", gameVer->major, gameVer->minor, gameVer->patch, gameVer->build.value_or("2"));
+        // 手动构造原始版本字符串 (LeviLamina 输出格式如 "1.26.40-5")
+        std::string rawVer = fmt::format("{}.{}.{}-{}", gameVer->major, gameVer->minor, gameVer->patch, gameVer->build.value_or("5"));
         std::string displayVer = rawVer;
 
-        // 将 1.26.32-2 格式美化为玩家熟悉的 1.26.32.02 用于日志友好输出
+        // 将 1.26.40-5 格式美化为玩家熟悉的 1.26.40.05 用于日志友好输出
         size_t dashPos = displayVer.find('-');
         if (dashPos != std::string::npos) {
             std::string tail = displayVer.substr(dashPos + 1);
@@ -77,8 +77,8 @@ bool ChiyanMap::load() {
             }
         }
 
-        // 严格限定游戏版本为 1.26.32.02，不匹配则不加载
-        if (displayVer != "1.26.32.02" && rawVer != "1.26.32-2") {
+        // 严格限定游戏版本为 1.26.40.05，不匹配则不加载
+        if (displayVer != "1.26.40.05" && rawVer != "1.26.40-5") {
             getSelf().getLogger().error("{}: {}", LanguageManager::GetText("LOG_VERSION_MISMATCH"), displayVer);
             getSelf().getLogger().error("{}", LanguageManager::GetText("LOG_VERSION_STRICT"));
             getSelf().getLogger().error("{}", LanguageManager::GetText("LOG_VERSION_ABORT"));
