@@ -14,20 +14,23 @@ jobs:
 
       - name: Setup xmake
         uses: xmake-io/github-action-setup-xmake@v1
+
+      - name: Setup LLVM (clang-cl toolchain)
+        uses: ZhongRuoyu/setup-llvm@v0
+        with:
+          llvm-version: 23
       
       - name: Cache xmake dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/AppData/Local/.xmake
-          key: xmake-v3-${{ hashFiles('xmake.lua', 'xmake/repository/**') }}
+          key: xmake-v3-${{ hashFiles('xmake.lua') }}
           restore-keys: |
             xmake-v3-
 
-      - name: Register local repository
-        run: |
-          xmake repo -a local-repo xmake/repository
-          xmake repo -u
+      - name: Update xmake repository
+        run: xmake repo -u
 
       - name: Configure xmake (Client Only)
         run: xmake f -a x64 -m release -p windows -vD -y
