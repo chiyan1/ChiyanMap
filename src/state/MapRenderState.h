@@ -69,9 +69,17 @@ namespace MapRenderState {
     inline float miniMapOffsetY = 0.0f; // 小地图 Y 偏移
     inline bool showMiniMapPosSettings = false; // 小地图位置设置面板
 
+    // [传送状态机] 用于 UI 加载提示与异常反馈
+    // Idle: 无传送 / Loading: 等待区块加载 / Validating: 验证地表 / Failed: 异常回退
+    enum class TeleportState : int { Idle = 0, Loading = 1, Validating = 2, Done = 3, Failed = 4 };
+    inline std::atomic<int> teleportState{(int)TeleportState::Idle};
+    inline std::string teleportStatusMsg;     // 给 UI 显示的简短状态文本（如"加载地形中..."）
+    inline std::string teleportFailReason;    // 失败原因（供日志与调试）
+
     // [统一拦截枢纽] 判断是否有任何全屏 UI 处于活动状态
     inline bool IsUIActive() {
-        return showBigMap || showWaypointUI || showMiniMapPosSettings || showHotkeySettings || showCaveSettings;
+        return showBigMap || showWaypointUI || showMiniMapPosSettings || showHotkeySettings || showCaveSettings ||
+               (teleportState.load() != (int)TeleportState::Idle);
     }
 
     // [新增] 跨菜单桥接：大地图右键唤起新建地标的预设坐标
@@ -121,12 +129,6 @@ namespace MapRenderState {
     inline int  probeStableCount = 0;         // 连续一致帧数
     constexpr static int kProbeStableThreshold = 3;  // 需要的连续一致帧数（v2: 2→3）
 
-    // [传送状态机] 用于 UI 加载提示与异常反馈
-    // Idle: 无传送 / Loading: 等待区块加载 / Validating: 验证地表 / Failed: 异常回退
-    enum class TeleportState : int { Idle = 0, Loading = 1, Validating = 2, Done = 3, Failed = 4 };
-    inline std::atomic<int> teleportState{(int)TeleportState::Idle};
-    inline std::string teleportStatusMsg;     // 给 UI 显示的简短状态文本（如"加载地形中..."）
-    inline std::string teleportFailReason;    // 失败原因（供日志与调试）
 
     inline bool showMiniMap = true;  // 是否显示小地图
     inline bool isSquareMap = false; // 是否为方形小地图

@@ -14,6 +14,9 @@ void registerAllHooks() {
     GameModeAttackHook::hook();
 
     LocalPlayerSwingHook::hook();
+    LocalPlayerMissedSwingHook::hook();
+    GameModeInteractHook::hook();
+    GameModeUseItemAsAttackHook::hook();
     GameModeUseItemOnHook::hook();
     GameModeContinueDestroyBlockHook::hook();
 
@@ -38,6 +41,9 @@ void unregisterAllHooks() {
     GameModeAttackHook::unhook();
 
     LocalPlayerSwingHook::unhook();
+    LocalPlayerMissedSwingHook::unhook();
+    GameModeInteractHook::unhook();
+    GameModeUseItemAsAttackHook::unhook();
     GameModeUseItemOnHook::unhook();
     GameModeContinueDestroyBlockHook::unhook();
 

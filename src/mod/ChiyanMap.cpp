@@ -8,11 +8,15 @@
 #include "ll/api/utils/SystemUtils.h"
 #include "ll/api/io/FileUtils.h"
 #include "ll/api/data/Version.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/event/input/MouseInputEvent.h"
 #include <chrono>
 #include <atomic>
 #include <vector>
 #include <string>
 #include <algorithm>
+
+ll::event::ListenerPtr g_mouseListener = nullptr;
 
 float g_playerX       = 0.0f;
 float g_playerY       = 0.0f;
@@ -98,13 +102,27 @@ bool ChiyanMap::load() {
     return true;
 }
 
-bool ChiyanMap::enable()  { return true; }
+bool ChiyanMap::enable() {
+    g_mouseListener = ll::event::EventBus::getInstance().emplaceListener<ll::event::input::MouseInputEvent>(
+        [](ll::event::input::MouseInputEvent& ev) {
+            if (MapRenderState::g_isShuttingDown.load()) return;
+            if (MapRenderState::IsUIActive()) {
+                ev.cancel();
+            }
+        }
+    );
+    return true;
+}
 
 bool ChiyanMap::disable() {
     // [修复] 置位关闭标志并清空全局指针，使所有钩子入口直接 pass-through 放行，
     // 防止进程退出阶段访问已释放的 D3D/ImGui/Player 资源；
     // 退出时不主动卸载跳板内存，确保 Minecraft 全局析构函数通过跳板时依然安全执行原函数
     MapRenderState::g_isShuttingDown.store(true);
+    if (g_mouseListener) {
+        ll::event::EventBus::getInstance().removeListener(g_mouseListener);
+        g_mouseListener = nullptr;
+    }
     g_hasPlayer = false;
     g_localPlayer = nullptr;
     g_clientInstance = nullptr;

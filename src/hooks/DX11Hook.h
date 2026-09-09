@@ -589,9 +589,10 @@ namespace DX11Hook {
                     return 1;
                 }
                 
-                // 【回归本源：修复被我误删的防穿透代码】吞噬多余鼠标信号，完美阻断挥臂
+                // 【回归本源：修复被我误删的防穿透代码】吞噬多余鼠标信号，完美阻断挥臂与音效
                 if (uMsg == WM_INPUT || uMsg == WM_INPUT_DEVICE_CHANGE) return 1;
                 if (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) return 1;
+                if (uMsg >= 0x0240 && uMsg <= 0x0253) return 1; // WM_POINTERFIRST ~ WM_POINTERLAST (WM_POINTERDOWN 等)
 
                 // 吞噬多余键盘按键，防止游戏内人物移动
                 if (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST && wParam != VK_F11) {

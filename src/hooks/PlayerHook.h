@@ -2835,6 +2835,47 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(swingSource);
 }
 
+// 【彻底阻断打空气音效】当模组 UI 激活时，拦截打空/未击中逻辑，消除 AttackNoDamage 音效与发包
+LL_TYPE_INSTANCE_HOOK(
+    LocalPlayerMissedSwingHook,
+    ll::memory::HookPriority::Normal,
+    LocalPlayer,
+    &LocalPlayer::missedSwing,
+    void
+) {
+    if (MapRenderState::g_isShuttingDown.load()) { origin(); return; }
+    if (MapRenderState::IsUIActive()) return;
+    origin();
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    GameModeInteractHook,
+    ll::memory::HookPriority::Normal,
+    GameMode,
+    &GameMode::$interact,
+    bool,
+    Actor& entity,
+    Vec3 const& location
+) {
+    if (MapRenderState::g_isShuttingDown.load()) return origin(entity, location);
+    if (MapRenderState::IsUIActive()) return false;
+    return origin(entity, location);
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    GameModeUseItemAsAttackHook,
+    ll::memory::HookPriority::Normal,
+    GameMode,
+    &GameMode::$useItemAsAttack,
+    bool,
+    ItemStack& item,
+    Vec3 const& aimDirection
+) {
+    if (MapRenderState::g_isShuttingDown.load()) return origin(item, aimDirection);
+    if (MapRenderState::IsUIActive()) return false;
+    return origin(item, aimDirection);
+}
+
 LL_TYPE_INSTANCE_HOOK(
     GameModeUseItemOnHook,
     ll::memory::HookPriority::Normal,
