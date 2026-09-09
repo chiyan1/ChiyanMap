@@ -149,3 +149,14 @@ target("ChiyanMap")
     add_files("src/**.cpp")
     add_includedirs("src")
     -- 完全移除服务端和客户端的 if-else 区分逻辑
+
+    after_build(function (target)
+        local lang_dir = path.join(os.projectdir(), "lang")
+        local dest_dir = path.join(os.projectdir(), "bin", "ChiyanMap")
+        if os.isdir(lang_dir) then
+            os.cp(lang_dir, dest_dir)
+            cprint("${bright green}[ChiyanMap]: ${reset}copied lang files to " .. path.join(dest_dir, "lang"))
+        end
+    end)
+
+
