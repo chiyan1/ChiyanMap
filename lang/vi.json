@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Phím",
     "HOTKEY_OPEN_BIGMAP": "Mở bản đồ lớn",
     "HOTKEY_OPEN_WPMGR": "Mở trình quản lý điểm đường",
-    "HOTKEY_RESET": "Đặt lại chế độ xem",
+    "HOTKEY_RESET": "Đặt lại",
     "HOTKEY_RESET_ALL": "Đặt lại tất cả",
     "HOTKEY_SETTINGS": "Phím tắt",
     "HOTKEY_SETTINGS_TITLE": "Cài đặt phím tắt",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Tất cả",
     "WP_TAB_OVERWORLD": "Thế giới thực",
     "WP_TAB_NETHER": "Địa ngục",
-    "WP_TAB_END": "The End"
+    "WP_TAB_END": "The End",
+    "WAYPOINT": "Điểm mốc"
 }

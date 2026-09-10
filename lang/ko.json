@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "키",
     "HOTKEY_OPEN_BIGMAP": "큰 지도 열기",
     "HOTKEY_OPEN_WPMGR": "위치 점 관리 열기",
-    "HOTKEY_RESET": "보기 초기화",
+    "HOTKEY_RESET": "초기화",
     "HOTKEY_RESET_ALL": "전체 초기화",
     "HOTKEY_SETTINGS": "단축키",
     "HOTKEY_SETTINGS_TITLE": "단축키 설정",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "모두",
     "WP_TAB_OVERWORLD": "오버월드",
     "WP_TAB_NETHER": "네더",
-    "WP_TAB_END": "디 엔드"
+    "WP_TAB_END": "디 엔드",
+    "WAYPOINT": "경유지"
 }

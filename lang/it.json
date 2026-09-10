@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Tasto",
     "HOTKEY_OPEN_BIGMAP": "Apri mappa grande",
     "HOTKEY_OPEN_WPMGR": "Apri gestore waypoint",
-    "HOTKEY_RESET": "Reimposta vista",
+    "HOTKEY_RESET": "Reimposta",
     "HOTKEY_RESET_ALL": "Reimposta tutto",
     "HOTKEY_SETTINGS": "Tasti",
     "HOTKEY_SETTINGS_TITLE": "Impostazioni tasti",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Tutti",
     "WP_TAB_OVERWORLD": "Superficie",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "L'End"
+    "WP_TAB_END": "L'End",
+    "WAYPOINT": "Punto di passaggio"
 }

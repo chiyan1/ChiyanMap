@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Клавіша",
     "HOTKEY_OPEN_BIGMAP": "Відкрити велику карту",
     "HOTKEY_OPEN_WPMGR": "Відкрити менеджер шляхових точок",
-    "HOTKEY_RESET": "Скинути вигляд",
+    "HOTKEY_RESET": "Скинути",
     "HOTKEY_RESET_ALL": "Скинути все",
     "HOTKEY_SETTINGS": "Гарячі клавіші",
     "HOTKEY_SETTINGS_TITLE": "Налаштування гарячих клавіш",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Усі",
     "WP_TAB_OVERWORLD": "Верхній світ",
     "WP_TAB_NETHER": "Нижній світ",
-    "WP_TAB_END": "Край"
+    "WP_TAB_END": "Край",
+    "WAYPOINT": "Маршрутна точка"
 }

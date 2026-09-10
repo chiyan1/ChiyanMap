@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Touche",
     "HOTKEY_OPEN_BIGMAP": "Ouvrir la grande carte",
     "HOTKEY_OPEN_WPMGR": "Ouvrir le gestionnaire de waypoints",
-    "HOTKEY_RESET": "Réinitialiser la vue",
+    "HOTKEY_RESET": "Réinitialiser",
     "HOTKEY_RESET_ALL": "Tout réinitialiser",
     "HOTKEY_SETTINGS": "Raccourcis",
     "HOTKEY_SETTINGS_TITLE": "Paramètres des raccourcis",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Tous",
     "WP_TAB_OVERWORLD": "Surface",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "L'End"
+    "WP_TAB_END": "L'End",
+    "WAYPOINT": "Point de repère"
 }

@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "キー",
     "HOTKEY_OPEN_BIGMAP": "大型マップを開く",
     "HOTKEY_OPEN_WPMGR": "ウェイポイント管理を開く",
-    "HOTKEY_RESET": "表示リセット",
+    "HOTKEY_RESET": "リセット",
     "HOTKEY_RESET_ALL": "すべてリセット",
     "HOTKEY_SETTINGS": "ショートカット",
     "HOTKEY_SETTINGS_TITLE": "ショートカット設定",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "すべて",
     "WP_TAB_OVERWORLD": "オーバーワールド",
     "WP_TAB_NETHER": "ネザー",
-    "WP_TAB_END": "ジ・エンド"
+    "WP_TAB_END": "ジ・エンド",
+    "WAYPOINT": "ウェイポイント"
 }

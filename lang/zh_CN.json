@@ -80,7 +80,7 @@
     "HOTKEY_KEY": "按键",
     "HOTKEY_OPEN_BIGMAP": "打开全屏大地图",
     "HOTKEY_OPEN_WPMGR": "打开路径点管理器",
-    "HOTKEY_RESET": "重置视图",
+    "HOTKEY_RESET": "重置",
     "HOTKEY_RESET_ALL": "重置全部",
     "HOTKEY_SETTINGS": "快捷键",
     "HOTKEY_SETTINGS_TITLE": "快捷键设置",
@@ -93,7 +93,7 @@
     "HOTKEY_UNDO": "撤销",
     "MINIMAP_ZOOM_RADIUS": "缩放半径",
     "RESET": "重置",
-    "SHOW_WAYPOINTS_MINIMAP": "小地图显示路点",
+    "SHOW_WAYPOINTS_MINIMAP": "小地图显示路径点",
     "TELEPORT_FAILED": "传送失败",
     "TELEPORT_FAILED_DISMISS": "知道了",
     "TELEPORT_FAILED_MSG": "传送失败：超时或被服务器拒绝",
@@ -177,5 +177,6 @@
     "DEFAULT_POS": "恢复默认",
     "TOP_LEFT_POS": "移至左上",
     "ROTATE_MINIMAP": "小地图跟随视角旋转",
-    "SETTINGS_TOOLTIP": "打开设置面板"
+    "SETTINGS_TOOLTIP": "打开设置面板",
+    "WAYPOINT": "路径点"
 }

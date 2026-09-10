@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Tecla",
     "HOTKEY_OPEN_BIGMAP": "Abrir mapa grande",
     "HOTKEY_OPEN_WPMGR": "Abrir gerenciador de waypoints",
-    "HOTKEY_RESET": "Redefinir vista",
+    "HOTKEY_RESET": "Redefinir",
     "HOTKEY_RESET_ALL": "Redefinir tudo",
     "HOTKEY_SETTINGS": "Atalhos",
     "HOTKEY_SETTINGS_TITLE": "Configurações de atalhos",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Todos",
     "WP_TAB_OVERWORLD": "Superfície",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "O End"
+    "WP_TAB_END": "O End",
+    "WAYPOINT": "Ponto de Referência"
 }

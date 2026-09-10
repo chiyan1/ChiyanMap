@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "ปุ่ม",
     "HOTKEY_OPEN_BIGMAP": "เปิดแผนที่ใหญ่",
     "HOTKEY_OPEN_WPMGR": "เปิดตัวจัดการเวย์พอยต์",
-    "HOTKEY_RESET": "รีเซ็ตมุมมอง",
+    "HOTKEY_RESET": "รีเซ็ต",
     "HOTKEY_RESET_ALL": "รีเซ็ตทั้งหมด",
     "HOTKEY_SETTINGS": "ปุ่มลัด",
     "HOTKEY_SETTINGS_TITLE": "การตั้งค่าปุ่มลัด",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "ทั้งหมด",
     "WP_TAB_OVERWORLD": "โอเวอร์เวิลด์",
     "WP_TAB_NETHER": "เนเธอร์",
-    "WP_TAB_END": "ดิเอนด์"
+    "WP_TAB_END": "ดิเอนด์",
+    "WAYPOINT": "จุดอ้างอิง"
 }

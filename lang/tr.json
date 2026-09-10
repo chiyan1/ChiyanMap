@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Tuş",
     "HOTKEY_OPEN_BIGMAP": "Büyük haritayı aç",
     "HOTKEY_OPEN_WPMGR": "Yol noktası yöneticisini aç",
-    "HOTKEY_RESET": "Görünümü sıfırla",
+    "HOTKEY_RESET": "Sıfırla",
     "HOTKEY_RESET_ALL": "Tümünü sıfırla",
     "HOTKEY_SETTINGS": "Kısayollar",
     "HOTKEY_SETTINGS_TITLE": "Kısayol ayarları",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Tümü",
     "WP_TAB_OVERWORLD": "Normal Dünya",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "End"
+    "WP_TAB_END": "End",
+    "WAYPOINT": "Yol Noktası"
 }

@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Клавиша",
     "HOTKEY_OPEN_BIGMAP": "Открыть большую карту",
     "HOTKEY_OPEN_WPMGR": "Открыть менеджер точек",
-    "HOTKEY_RESET": "Сбросить вид",
+    "HOTKEY_RESET": "Сброс",
     "HOTKEY_RESET_ALL": "Сбросить всё",
     "HOTKEY_SETTINGS": "Горячие клавиши",
     "HOTKEY_SETTINGS_TITLE": "Настройки горячих клавиш",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Все",
     "WP_TAB_OVERWORLD": "Верхний мир",
     "WP_TAB_NETHER": "Нижний мир",
-    "WP_TAB_END": "Край"
+    "WP_TAB_END": "Край",
+    "WAYPOINT": "Путевая точка"
 }

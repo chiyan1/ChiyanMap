@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Taste",
     "HOTKEY_OPEN_BIGMAP": "Große Karte öffnen",
     "HOTKEY_OPEN_WPMGR": "Wegpunkt-Manager öffnen",
-    "HOTKEY_RESET": "Ansicht zurücksetzen",
+    "HOTKEY_RESET": "Zurücksetzen",
     "HOTKEY_RESET_ALL": "Alles zurücksetzen",
     "HOTKEY_SETTINGS": "Tastenkürzel",
     "HOTKEY_SETTINGS_TITLE": "Tastenkürzel-Einstellungen",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Alle",
     "WP_TAB_OVERWORLD": "Oberwelt",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "Das Ende"
+    "WP_TAB_END": "Das Ende",
+    "WAYPOINT": "Wegpunkt"
 }

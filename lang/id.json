@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Tombol",
     "HOTKEY_OPEN_BIGMAP": "Buka peta besar",
     "HOTKEY_OPEN_WPMGR": "Buka pengelola waypoint",
-    "HOTKEY_RESET": "Atur ulang tampilan",
+    "HOTKEY_RESET": "Atur ulang",
     "HOTKEY_RESET_ALL": "Atur ulang semua",
     "HOTKEY_SETTINGS": "Tombol pintas",
     "HOTKEY_SETTINGS_TITLE": "Pengaturan tombol pintas",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Semua",
     "WP_TAB_OVERWORLD": "Overworld",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "The End"
+    "WP_TAB_END": "The End",
+    "WAYPOINT": "Titik Arah"
 }

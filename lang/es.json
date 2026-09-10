@@ -73,7 +73,7 @@
     "HOTKEY_KEY": "Tecla",
     "HOTKEY_OPEN_BIGMAP": "Abrir mapa grande",
     "HOTKEY_OPEN_WPMGR": "Abrir gestor de waypoints",
-    "HOTKEY_RESET": "Restablecer vista",
+    "HOTKEY_RESET": "Restablecer",
     "HOTKEY_RESET_ALL": "Restablecer todo",
     "HOTKEY_SETTINGS": "Atajos",
     "HOTKEY_SETTINGS_TITLE": "Configuración de atajos",
@@ -177,5 +177,6 @@
     "WP_TAB_ALL": "Todo",
     "WP_TAB_OVERWORLD": "Mundo principal",
     "WP_TAB_NETHER": "Nether",
-    "WP_TAB_END": "El Fin"
+    "WP_TAB_END": "El Fin",
+    "WAYPOINT": "Punto de ruta"
 }

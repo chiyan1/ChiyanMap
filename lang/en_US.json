@@ -80,7 +80,7 @@
     "HOTKEY_KEY": "Key",
     "HOTKEY_OPEN_BIGMAP": "Open big map",
     "HOTKEY_OPEN_WPMGR": "Open waypoint manager",
-    "HOTKEY_RESET": "Reset view",
+    "HOTKEY_RESET": "Reset",
     "HOTKEY_RESET_ALL": "Reset all",
     "HOTKEY_SETTINGS": "Hotkeys",
     "HOTKEY_SETTINGS_TITLE": "Hotkey settings",
@@ -177,5 +177,6 @@
     "DEFAULT_POS": "Restore Default",
     "TOP_LEFT_POS": "Move to Top-Left",
     "ROTATE_MINIMAP": "Rotate Minimap",
-    "SETTINGS_TOOLTIP": "Open Settings"
+    "SETTINGS_TOOLTIP": "Open Settings",
+    "WAYPOINT": "Waypoint"
 }

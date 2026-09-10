@@ -1855,7 +1855,7 @@ namespace DX11Hook {
             float btnSize = ImGui::GetFrameHeight();
             float inputWidth = 45.0f;
             float popupSpacing = ImGui::GetStyle().ItemSpacing.x;
-            float sliderWidth = availWidth - (btnSize * 2.0f) - inputWidth - (popupSpacing * 3.0f);
+            float sliderWidth = availWidth - (btnSize * 3.0f) - inputWidth - (popupSpacing * 4.0f);
             
             bool tScaleChanged = false;
             
@@ -1879,6 +1879,13 @@ namespace DX11Hook {
                 MapRenderState::uiTextScale += 0.1f;
                 tScaleChanged = true;
             }
+
+            ImGui::SameLine();
+            if (ImGui::Button("\u21BA##TextScaleReset", ImVec2(btnSize, btnSize))) {
+                MapRenderState::uiTextScale = 1.0f;
+                tScaleChanged = true;
+            }
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("RESET"));
             
             if (tScaleChanged) {
                 if (MapRenderState::uiTextScale < 0.1f) MapRenderState::uiTextScale = 0.1f;
@@ -2051,13 +2058,14 @@ namespace DX11Hook {
             }
 
             if (found) {
-                // 标题栏: 粉色背景 + 白色 "Waypoint" 文字
-                ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.8f, 0.2f, 0.5f, 1.0f));
+                // 标题栏: 黑色背景 + 白色标题文字
+                ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
                 ImGui::BeginChild("##wp_title", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() + 6), false, ImGuiWindowFlags_NoScrollbar);
-                ImVec2 titleSize = ImGui::CalcTextSize("Waypoint");
+                const char* titleText = LanguageManager::GetText("WAYPOINT");
+                ImVec2 titleSize = ImGui::CalcTextSize(titleText);
                 ImGui::SetCursorPosX((ImGui::GetWindowWidth() - titleSize.x) * 0.5f);
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
-                ImGui::TextColored(ImVec4(1, 1, 1, 1), "Waypoint");
+                ImGui::TextColored(ImVec4(1, 1, 1, 1), "%s", titleText);
                 ImGui::EndChild();
                 ImGui::PopStyleColor();
 
@@ -2069,47 +2077,29 @@ namespace DX11Hook {
                 ImGui::TextDisabled("%s", coordBuf);
                 ImGui::Separator();
 
-                // [E] Edit Waypoint
-                {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 0.85f, 0.3f, 1.0f));
-                    ImGui::TextUnformatted("[E]");
-                    ImGui::PopStyleColor();
-                    ImGui::SameLine();
-                    if (ImGui::Selectable(LanguageManager::GetText("EDIT_WP"))) {
-                        bigMapEditId = selectedWpId;
-                        bigMapTriggerEdit = true;
-                    }
+                // 编辑路径点
+                if (ImGui::Selectable(LanguageManager::GetText("EDIT_WP"))) {
+                    bigMapEditId = selectedWpId;
+                    bigMapTriggerEdit = true;
                 }
 
-                // [XP] Copy Coordinates
-                {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 0.85f, 0.3f, 1.0f));
-                    ImGui::TextUnformatted("[XP]");
-                    ImGui::PopStyleColor();
-                    ImGui::SameLine();
-                    if (ImGui::Selectable(LanguageManager::GetText("COPY_COORDS"))) {
-                        char buf[128]; snprintf(buf, sizeof(buf), "%d %d %d", targetWp.x, targetWp.y, targetWp.z);
-                        ImGui::SetClipboardText(buf);
-                    }
+                // 复制坐标
+                if (ImGui::Selectable(LanguageManager::GetText("COPY_COORDS"))) {
+                    char buf[128]; snprintf(buf, sizeof(buf), "%d %d %d", targetWp.x, targetWp.y, targetWp.z);
+                    ImGui::SetClipboardText(buf);
                 }
 
-                // [T] Teleport to Waypoint
-                {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 0.85f, 0.3f, 1.0f));
-                    ImGui::TextUnformatted("[T]");
-                    ImGui::PopStyleColor();
-                    ImGui::SameLine();
-                    if (ImGui::Selectable(LanguageManager::GetText("TELEPORT_WP"))) {
-                        MapRenderState::tpTargetX = (float)targetWp.x + 0.5f;
-                        MapRenderState::tpTargetY = (float)targetWp.y;
-                        MapRenderState::tpTargetZ = (float)targetWp.z + 0.5f;
-                        MapRenderState::triggerTeleport.store(true);
-                        MapRenderState::showBigMap = false;
-                        ImGui::CloseCurrentPopup();
-                    }
+                // 传送到路径点
+                if (ImGui::Selectable(LanguageManager::GetText("TELEPORT_WP"))) {
+                    MapRenderState::tpTargetX = (float)targetWp.x + 0.5f;
+                    MapRenderState::tpTargetY = (float)targetWp.y;
+                    MapRenderState::tpTargetZ = (float)targetWp.z + 0.5f;
+                    MapRenderState::triggerTeleport.store(true);
+                    MapRenderState::showBigMap = false;
+                    ImGui::CloseCurrentPopup();
                 }
 
-                // Share Waypoint In Chat
+                // 在聊天栏分享
                 if (ImGui::Selectable(LanguageManager::GetText("SHARE_WP"))) {
                     if (g_localPlayer) {
                         char cmd[256];
@@ -2120,7 +2110,7 @@ namespace DX11Hook {
                     }
                 }
 
-                // Restore Waypoint (only shown if there's a deleted waypoint)
+                // 恢复已删除路径点
                 if (WaypointManager::g_hasDeletedWaypoint) {
                     if (ImGui::Selectable(LanguageManager::GetText("RESTORE_WP"))) {
                         WaypointManager::RestoreLastDeletedWaypoint();
@@ -2129,18 +2119,12 @@ namespace DX11Hook {
 
                 ImGui::Separator();
 
-                // [DEL] Confirm Deletion
-                {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 0.85f, 0.3f, 1.0f));
-                    ImGui::TextUnformatted("[DEL]");
-                    ImGui::PopStyleColor();
-                    ImGui::SameLine();
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-                    if (ImGui::Selectable(LanguageManager::GetText("CONFIRM_DELETE"))) {
-                        WaypointManager::RemoveWaypoint(selectedWpId);
-                    }
-                    ImGui::PopStyleColor();
+                // 删除路径点
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+                if (ImGui::Selectable(LanguageManager::GetText("CONFIRM_DELETE"))) {
+                    WaypointManager::RemoveWaypoint(selectedWpId);
                 }
+                ImGui::PopStyleColor();
             } else {
                 ImGui::CloseCurrentPopup();
             }
