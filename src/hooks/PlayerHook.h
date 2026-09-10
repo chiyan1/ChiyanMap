@@ -1034,64 +1034,144 @@ inline bool IsCaveOverlayBlockName(std::string const& name) noexcept {
     return false;
 }
 
-// [洞穴检测] 检测玩家是否在地下洞穴中
-// 对应 Xaero's CaveStartCalculator.getCaving: 检查玩家头顶是否有实心方块遮挡
-// 返回值: true=在洞穴中, caveStartY=洞穴起始Y(地表高度)
-inline bool DetectCaveStart(BlockSource& region, int playerX, int playerY, int playerZ, int& outCaveStartY) noexcept {
-    // 获取地表高度
-    short surfaceY = SafeGetSurfaceY(region, playerX, playerZ);
-    if (surfaceY <= -64) return false;  // 无效地表
+// [辅助] 安全判断指定坐标是否为可穿透/非实心天花板阻挡方块
+inline bool IsPassableCeilingBlock(BlockSource& region, int x, int y, int z) noexcept {
+    std::string name;
+    if (!SafeGetBlockName(region, x, y, z, name)) return true;
+    if (name.empty()) return true;
+    if (IsAirLikeName(name) || IsCaveOverlayBlockName(name) || IsLiquidBlockName(name)) return true;
+    if (name.find("log") != std::string::npos || name.find("stem") != std::string::npos) return true;
+    return false;
+}
 
-    // [树下防误判] getAboveTopSolidBlock 可能返回树叶/树干 Y, 需跳过树叶/树干等覆盖层找到真实地表
-    // 向下扫描跳过树叶/树干/透明方块/植被/液体, 找到第一个实心方块作为真实地表
-    bool foundRealSurface = false;
-    for (int y = (int)surfaceY - 1; y > playerY; y--) {
-        std::string name;
-        if (!SafeGetBlockName(region, playerX, y, playerZ, name)) continue;
-        // 树干(log/stem)也跳过, 避免大树下方误判为洞穴
-        if (name.find("log") != std::string::npos || name.find("stem") != std::string::npos) continue;
-        if (!IsAirLikeName(name) && !IsCaveOverlayBlockName(name) && !IsLiquidBlockName(name)) {
-            surfaceY = (short)(y + 1);
-            foundRealSurface = true;
+// [洞穴检测] 智能检测玩家是否身处真正的地下洞穴中
+// 彻底解决浮空岛、悬崖突出岩壁、空中建筑/桥梁、大树冠、凉亭屋檐下方误判为洞穴的问题
+// 返回值: true=在洞穴中, caveStartY=洞穴起始Y
+inline bool DetectCaveStart(BlockSource& region, int playerX, int playerY, int playerZ, int& outCaveStartY) noexcept {
+    if (playerY <= -64 || playerY >= 315) return false;
+
+    // 1. 获取玩家所在列的最高方块高度
+    short surfaceY = SafeGetSurfaceY(region, playerX, playerZ);
+    if (surfaceY <= -64 || surfaceY == -32000) return false;  // 未加载区块或无效地表
+
+    // 如果玩家自身高度已经等于或超过最高地表高度 (例如站在开阔地表、山顶、高台或悬崖顶)，直接为地表
+    if (surfaceY <= playerY + 2) return false;
+
+    // 2. 向上探测玩家头顶的第一个实心天花板 (非空气、非植被、非树叶/原木、非透明方块)
+    int ceilingY = -1;
+    int maxScanCeilingY = std::min((int)surfaceY, playerY + 40);
+    for (int y = playerY + 2; y <= maxScanCeilingY; y++) {
+        if (!IsPassableCeilingBlock(region, playerX, y, playerZ)) {
+            ceilingY = y;
             break;
         }
     }
-    // 如果玩家上方全是树叶/树干/空气(没找到真实地表), 说明在树下而非地下
-    if (!foundRealSurface) return false;
 
-    // 玩家头顶有 5+ 格实心方块 → 在洞穴中
-    // getAboveTopSolidBlock 返回的是"最高的非空气方块 Y+1"
-    // 如果 surfaceY > playerY + 5，说明玩家在地下
-    if (surfaceY > playerY + 5) {
-        outCaveStartY = (int)surfaceY;
-        return true;
+    // 若头顶 40 格内没有任何实心天花板，说明上方空间开阔，玩家处在露天环境
+    if (ceilingY == -1) return false;
+
+    // 3. 结构厚度与空中悬浮检测 (针对浮空岛、空中桥梁、高空建筑、单层屋顶)
+    // 从 ceilingY 往上检查该天花板实心层，判断上方是否出现空气层
+    int solidThickness = 0;
+    bool airAbove = false;
+    for (int y = ceilingY; y <= (int)surfaceY; y++) {
+        if (IsPassableCeilingBlock(region, playerX, y, playerZ)) {
+            airAbove = true;
+            break;
+        }
+        solidThickness++;
     }
 
-    // 额外检查: 玩家头顶方块是否为实心（防止在屋檐下误判）
-    // 检查玩家头顶 3-8 格是否有连续实心方块
-    int solidCount = 0;
-    for (int y = playerY + 2; y <= playerY + 8 && y < 320; y++) {
-        std::string name;
-        if (SafeGetBlockName(region, playerX, y, playerZ, name)) {
-            // 树干(log/stem)不计入实心方块, 避免树下误判
-            if (name.find("log") != std::string::npos || name.find("stem") != std::string::npos) {
-                solidCount = 0;
-                continue;
-            }
-            if (!IsAirLikeName(name) && !IsCaveOverlayBlockName(name) &&
-                !IsLiquidBlockName(name)) {
-                solidCount++;
-                if (solidCount >= 3) {
-                    outCaveStartY = (int)surfaceY;
-                    return true;
-                }
-            } else {
-                solidCount = 0;
+    // 若天花板上方存在空气层 (如浮空岛、空中桥梁、单层建筑屋顶)，说明是悬浮障碍物而非地下岩层
+    if (airAbove) return false;
+
+    // 若天花板厚度极薄 (<= 2 格实心方块，如遮阳板/木板挑檐/树枝)
+    if (solidThickness <= 2) return false;
+
+    // 4. 头顶净空高度检测 (针对高空浮空岛/高空突出悬崖):
+    int clearance = ceilingY - (playerY + 2);
+    // 在海平面及以上 (playerY >= 62)，若头顶净空超过 12 格:
+    // 自然生成的地下洞穴不可能在海平面以上悬空十几格岩石而下方仍是地表
+    if (playerY >= 62 && clearance > 12) {
+        std::string floorName;
+        if (SafeGetBlockName(region, playerX, playerY - 1, playerZ, floorName)) {
+            if (floorName.find("grass_block") != std::string::npos ||
+                floorName.find("dirt_with_roots") != std::string::npos ||
+                floorName.find("podzol") != std::string::npos ||
+                floorName.find("mycelium") != std::string::npos) {
+                return false;
             }
         }
     }
 
-    return false;
+    // 5. 四周地表采样判决 (地下 vs 露天的核心判据):
+    // 真实地下洞穴处于连续山体/地表之下，四周采样点的地表高度 surfaceY 均远高于玩家；
+    // 而浮空岛、悬崖、树冠、建筑屋顶属于局部遮挡，四周走出遮挡范围后，地表高度必然接近地面。
+    static const struct { int dx, dz; } kSampleOffsets[] = {
+        { -8,   0 }, {  8,   0 }, {  0,  -8 }, {  0,   8 },
+        { -14,  0 }, { 14,   0 }, {  0, -14 }, {  0,  14 },
+        { -10, -10 }, { 10, -10 }, { -10, 10 }, { 10, 10 }
+    };
+
+    int openSurfaceCount = 0;
+    int validSampleCount = 0;
+
+    for (const auto& offset : kSampleOffsets) {
+        short sY = SafeGetSurfaceY(region, playerX + offset.dx, playerZ + offset.dz);
+        if (sY <= -64 || sY == -32000) continue;
+        validSampleCount++;
+
+        // 若采样点地表高度在玩家脚下附近 (sY <= playerY + 5)，说明该方向是露天地表
+        if (sY <= playerY + 5) {
+            openSurfaceCount++;
+        }
+    }
+
+    // 只要有 2 个及以上方向是开阔露天地表，或者有露天采样且净空较大，判定为地表露天
+    if (validSampleCount >= 4 && openSurfaceCount >= 2) {
+        return false;
+    }
+    if (validSampleCount > 0 && openSurfaceCount >= 1 && clearance > 6) {
+        return false;
+    }
+
+    // 6. 若周边有任何露天采样点且脚下为草方块，直接排除洞穴
+    if (openSurfaceCount > 0) {
+        std::string floorName;
+        if (SafeGetBlockName(region, playerX, playerY - 1, playerZ, floorName)) {
+            if (floorName.find("grass_block") != std::string::npos) {
+                return false;
+            }
+        }
+    }
+
+    // 7. 针对特大浮空岛 (半径超过 14 格): 扩展至 24 格进行采样
+    if (clearance > 8 || playerY >= 62) {
+        static const struct { int dx, dz; } kFarOffsets[] = {
+            { -24, 0 }, { 24, 0 }, { 0, -24 }, { 0, 24 },
+            { -18, -18 }, { 18, -18 }, { -18, 18 }, { 18, 18 }
+        };
+        int farOpenCount = 0;
+        int farValidCount = 0;
+        for (const auto& offset : kFarOffsets) {
+            short sY = SafeGetSurfaceY(region, playerX + offset.dx, playerZ + offset.dz);
+            if (sY <= -64 || sY == -32000) continue;
+            farValidCount++;
+            if (sY <= playerY + 6) {
+                farOpenCount++;
+            }
+        }
+        if (farValidCount >= 4 && farOpenCount >= 2) {
+            return false;
+        }
+        if (farValidCount > 0 && farOpenCount >= 1 && clearance > 10) {
+            return false;
+        }
+    }
+
+    // 经各层次严格校验，玩家处于封闭深层岩体包围中，确为地下洞穴
+    outCaveStartY = ceilingY;
+    return true;
 }
 
 // [洞穴亮度计算] 深度衰减亮度公式
