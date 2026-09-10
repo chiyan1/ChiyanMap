@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Restaurer par défaut",
     "TOP_LEFT_POS": "Déplacer en haut à gauche",
     "ROTATE_MINIMAP": "Faire pivoter la minimap",
-    "SETTINGS_TOOLTIP": "Ouvrir les paramètres"
+    "SETTINGS_TOOLTIP": "Ouvrir les paramètres",
+    "EDIT_WP": "Modifier",
+    "EDIT_WP_TITLE": "Modifier le point de repère##Popup",
+    "WP_SHOW_ON_MAP": "Afficher sur la carte",
+    "WP_TAB_ALL": "Tous",
+    "WP_TAB_OVERWORLD": "Surface",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "L'End"
 }

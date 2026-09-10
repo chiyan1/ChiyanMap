@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Відновити типове",
     "TOP_LEFT_POS": "Перемістити ліворуч-вгору",
     "ROTATE_MINIMAP": "Обертати мінікарту",
-    "SETTINGS_TOOLTIP": "Відкрити налаштування"
+    "SETTINGS_TOOLTIP": "Відкрити налаштування",
+    "EDIT_WP": "Редагувати",
+    "EDIT_WP_TITLE": "Редагувати маршрутну точку##Popup",
+    "WP_SHOW_ON_MAP": "Показати на карті",
+    "WP_TAB_ALL": "Усі",
+    "WP_TAB_OVERWORLD": "Верхній світ",
+    "WP_TAB_NETHER": "Нижній світ",
+    "WP_TAB_END": "Край"
 }

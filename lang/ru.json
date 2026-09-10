@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Восстановить по умолчанию",
     "TOP_LEFT_POS": "Переместить вверх-влево",
     "ROTATE_MINIMAP": "Вращать мини-карту",
-    "SETTINGS_TOOLTIP": "Открыть настройки"
+    "SETTINGS_TOOLTIP": "Открыть настройки",
+    "EDIT_WP": "Редактировать",
+    "EDIT_WP_TITLE": "Редактировать путевую точку##Popup",
+    "WP_SHOW_ON_MAP": "Показать на карте",
+    "WP_TAB_ALL": "Все",
+    "WP_TAB_OVERWORLD": "Верхний мир",
+    "WP_TAB_NETHER": "Нижний мир",
+    "WP_TAB_END": "Край"
 }

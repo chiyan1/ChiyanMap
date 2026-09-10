@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Ripristina predefinito",
     "TOP_LEFT_POS": "Sposta in alto a sinistra",
     "ROTATE_MINIMAP": "Ruota la minimappa",
-    "SETTINGS_TOOLTIP": "Apri Impostazioni"
+    "SETTINGS_TOOLTIP": "Apri Impostazioni",
+    "EDIT_WP": "Modifica",
+    "EDIT_WP_TITLE": "Modifica punto di passaggio##Popup",
+    "WP_SHOW_ON_MAP": "Mostra sulla mappa",
+    "WP_TAB_ALL": "Tutti",
+    "WP_TAB_OVERWORLD": "Superficie",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "L'End"
 }

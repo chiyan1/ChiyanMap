@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Kembalikan Bawaan",
     "TOP_LEFT_POS": "Pindah ke Kiri Atas",
     "ROTATE_MINIMAP": "Putar Minimap",
-    "SETTINGS_TOOLTIP": "Buka Pengaturan"
+    "SETTINGS_TOOLTIP": "Buka Pengaturan",
+    "EDIT_WP": "Edit",
+    "EDIT_WP_TITLE": "Edit Titik Arah##Popup",
+    "WP_SHOW_ON_MAP": "Tampilkan di peta",
+    "WP_TAB_ALL": "Semua",
+    "WP_TAB_OVERWORLD": "Overworld",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "The End"
 }

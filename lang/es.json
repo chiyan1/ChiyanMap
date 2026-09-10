@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Restaurar predeterminado",
     "TOP_LEFT_POS": "Mover a la esquina superior izquierda",
     "ROTATE_MINIMAP": "Rotar minimapa",
-    "SETTINGS_TOOLTIP": "Abrir Ajustes"
+    "SETTINGS_TOOLTIP": "Abrir Ajustes",
+    "EDIT_WP": "Editar",
+    "EDIT_WP_TITLE": "Editar punto de ruta##Popup",
+    "WP_SHOW_ON_MAP": "Mostrar en el mapa",
+    "WP_TAB_ALL": "Todo",
+    "WP_TAB_OVERWORLD": "Mundo principal",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "El Fin"
 }

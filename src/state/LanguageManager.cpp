@@ -19,18 +19,40 @@ namespace LanguageManager {
     static std::filesystem::path g_langDir;
 
     static std::filesystem::path GetLanguageDirectory() {
+        // 1. 优先通过模块句柄获取 ChiyanMap.dll 所在的绝对路径下的 lang 目录
+        // 彻底免疫不同启动器/游戏工作路径 (CWD) 差异导致的相对路径失效
+        HMODULE hMod = NULL;
+        if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                               (LPCWSTR)&Init, &hMod)) {
+            wchar_t modPath[MAX_PATH];
+            if (GetModuleFileNameW(hMod, modPath, MAX_PATH)) {
+                std::filesystem::path dllDir = std::filesystem::path(modPath).parent_path();
+                auto langDir = dllDir / "lang";
+                std::error_code ec;
+                if (std::filesystem::exists(langDir, ec) && std::filesystem::is_directory(langDir, ec)) {
+                    return langDir;
+                }
+            }
+        }
+
+        // 2. 尝试 LeviLamina API 获取的 lang 目录
         try {
             auto dir = chiyan_map::ChiyanMap::getInstance().getSelf().getLangDir();
-            if (std::filesystem::exists(dir) && std::filesystem::is_directory(dir)) {
+            std::error_code ec;
+            if (std::filesystem::exists(dir, ec) && std::filesystem::is_directory(dir, ec)) {
                 return dir;
             }
         } catch (...) {}
 
-        // Fallbacks
-        if (std::filesystem::exists("mods/ChiyanMap/lang")) {
+        // 3. 常见 Fallbacks
+        std::error_code ec;
+        if (std::filesystem::exists("mods/ChiyanMap/lang", ec)) {
             return "mods/ChiyanMap/lang";
         }
-        if (std::filesystem::exists("lang")) {
+        if (std::filesystem::exists("plugins/ChiyanMap/lang", ec)) {
+            return "plugins/ChiyanMap/lang";
+        }
+        if (std::filesystem::exists("lang", ec)) {
             return "lang";
         }
         return "mods/ChiyanMap/lang";
@@ -39,13 +61,36 @@ namespace LanguageManager {
     void Init() {
         g_langDir = GetLanguageDirectory();
 
-        // 加载语言包目录至 LeviLamina 官方 I18n 实例
+        // 1. 优先尝试 LeviLamina 官方 I18n 批量加载
         if (auto res = ll::i18n::getInstance().load(g_langDir); !res) {
-            // 尝试备用路径
             if (g_langDir != "lang" && std::filesystem::exists("lang")) {
                 (void)ll::i18n::getInstance().load("lang");
             }
         }
+
+        // 2. 安全逐文件加载并注册至 ll::i18n，防止目录批量加载中某文件解析异常导致后续语言包漏载
+        try {
+            std::error_code ec;
+            if (std::filesystem::exists(g_langDir, ec) && std::filesystem::is_directory(g_langDir, ec)) {
+                for (const auto& entry : std::filesystem::directory_iterator(g_langDir, ec)) {
+                    if (entry.is_regular_file(ec) && entry.path().extension() == ".json") {
+                        std::string stem = entry.path().stem().string();
+                        try {
+                            std::ifstream ifs(entry.path());
+                            if (ifs.is_open()) {
+                                json j;
+                                ifs >> j;
+                                for (auto& [k, v] : j.items()) {
+                                    if (v.is_string()) {
+                                        ll::i18n::getInstance().set(stem, k, v.get<std::string>());
+                                    }
+                                }
+                            }
+                        } catch (...) {}
+                    }
+                }
+            }
+        } catch (...) {}
 
         ScanLanguages();
         LoadConfig();
@@ -54,52 +99,46 @@ namespace LanguageManager {
     void ScanLanguages() {
         g_availableLanguages.clear();
 
-        static const std::unordered_map<std::string, std::string> knownLangs = {
-            {"de", "Deutsch"},
-            {"de_DE", "Deutsch"},
-            {"en", "English"},
+        static const std::vector<std::pair<std::string, std::string>> orderedLangs = {
+            {"zh_CN", "简体中文"},
+            {"zh_TW", "繁體中文"},
             {"en_US", "English"},
+            {"de", "Deutsch"},
             {"es", "Español"},
-            {"es_ES", "Español"},
             {"fr", "Français"},
-            {"fr_FR", "Français"},
             {"id", "Bahasa Indonesia"},
-            {"id_ID", "Bahasa Indonesia"},
             {"it", "Italiano"},
-            {"it_IT", "Italiano"},
             {"ja", "日本語"},
-            {"ja_JP", "日本語"},
             {"ko", "한국어"},
-            {"ko_KR", "한국어"},
             {"pt_BR", "Português (Brasil)"},
             {"ru", "Русский"},
-            {"ru_RU", "Русский"},
             {"th", "ไทย"},
-            {"th_TH", "ไทย"},
             {"tr", "Türkçe"},
-            {"tr_TR", "Türkçe"},
             {"uk", "Українська"},
-            {"uk_UA", "Українська"},
-            {"vi", "Tiếng Việt"},
-            {"vi_VN", "Tiếng Việt"},
-            {"zh_CN", "简体中文"},
-            {"zh_TW", "繁體中文"}
+            {"vi", "Tiếng Việt"}
         };
 
         try {
-            if (std::filesystem::exists(g_langDir) && std::filesystem::is_directory(g_langDir)) {
-                for (const auto& entry : std::filesystem::directory_iterator(g_langDir)) {
-                    if (entry.is_regular_file() && entry.path().extension() == ".json") {
-                        std::string stem = entry.path().stem().string();
-                        auto it = knownLangs.find(stem);
-                        std::string displayName = (it != knownLangs.end()) ? it->second : stem;
+            std::error_code ec;
+            if (std::filesystem::exists(g_langDir, ec) && std::filesystem::is_directory(g_langDir, ec)) {
+                // 先按照推荐顺序添加已知语言
+                for (const auto& item : orderedLangs) {
+                    auto p = g_langDir / (item.first + ".json");
+                    if (std::filesystem::exists(p, ec)) {
+                        g_availableLanguages.push_back(item);
+                    }
+                }
 
+                // 再扫描并补充其余第三方/自制语言包
+                for (const auto& entry : std::filesystem::directory_iterator(g_langDir, ec)) {
+                    if (entry.is_regular_file(ec) && entry.path().extension() == ".json") {
+                        std::string stem = entry.path().stem().string();
                         bool exists = false;
                         for (const auto& p : g_availableLanguages) {
                             if (p.first == stem) { exists = true; break; }
                         }
                         if (!exists) {
-                            g_availableLanguages.push_back({stem, displayName});
+                            g_availableLanguages.push_back({stem, stem});
                         }
                     }
                 }

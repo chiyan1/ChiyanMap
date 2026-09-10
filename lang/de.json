@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Standard wiederherstellen",
     "TOP_LEFT_POS": "Nach oben links verschieben",
     "ROTATE_MINIMAP": "Minimap drehen",
-    "SETTINGS_TOOLTIP": "Einstellungen öffnen"
+    "SETTINGS_TOOLTIP": "Einstellungen öffnen",
+    "EDIT_WP": "Bearbeiten",
+    "EDIT_WP_TITLE": "Wegpunkt bearbeiten##Popup",
+    "WP_SHOW_ON_MAP": "Auf Karte anzeigen",
+    "WP_TAB_ALL": "Alle",
+    "WP_TAB_OVERWORLD": "Oberwelt",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "Das Ende"
 }

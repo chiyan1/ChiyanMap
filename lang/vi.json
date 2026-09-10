@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Khôi phục Mặc định",
     "TOP_LEFT_POS": "Di chuyển đến Trên Trái",
     "ROTATE_MINIMAP": "Xoay bản đồ nhỏ",
-    "SETTINGS_TOOLTIP": "Mở Cài đặt"
+    "SETTINGS_TOOLTIP": "Mở Cài đặt",
+    "EDIT_WP": "Chỉnh sửa",
+    "EDIT_WP_TITLE": "Chỉnh sửa điểm mốc##Popup",
+    "WP_SHOW_ON_MAP": "Hiển thị trên bản đồ",
+    "WP_TAB_ALL": "Tất cả",
+    "WP_TAB_OVERWORLD": "Thế giới thực",
+    "WP_TAB_NETHER": "Địa ngục",
+    "WP_TAB_END": "The End"
 }

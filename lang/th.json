@@ -170,5 +170,12 @@
     "DEFAULT_POS": "คืนค่าเริ่มต้น",
     "TOP_LEFT_POS": "ย้ายไปซ้ายบน",
     "ROTATE_MINIMAP": "หมุนแผนที่ย่อ",
-    "SETTINGS_TOOLTIP": "เปิดการตั้งค่า"
+    "SETTINGS_TOOLTIP": "เปิดการตั้งค่า",
+    "EDIT_WP": "แก้ไข",
+    "EDIT_WP_TITLE": "แก้ไขจุดอ้างอิง##Popup",
+    "WP_SHOW_ON_MAP": "แสดงบนแผนที่",
+    "WP_TAB_ALL": "ทั้งหมด",
+    "WP_TAB_OVERWORLD": "โอเวอร์เวิลด์",
+    "WP_TAB_NETHER": "เนเธอร์",
+    "WP_TAB_END": "ดิเอนด์"
 }

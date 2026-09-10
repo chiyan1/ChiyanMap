@@ -170,5 +170,12 @@
     "DEFAULT_POS": "Varsayılanı Geri Yükle",
     "TOP_LEFT_POS": "Sol Üst Köşeye Taşı",
     "ROTATE_MINIMAP": "Mini Haritayı Döndür",
-    "SETTINGS_TOOLTIP": "Ayarları Aç"
+    "SETTINGS_TOOLTIP": "Ayarları Aç",
+    "EDIT_WP": "Düzenle",
+    "EDIT_WP_TITLE": "Yol Noktasını Düzenle##Popup",
+    "WP_SHOW_ON_MAP": "Haritada göster",
+    "WP_TAB_ALL": "Tümü",
+    "WP_TAB_OVERWORLD": "Normal Dünya",
+    "WP_TAB_NETHER": "Nether",
+    "WP_TAB_END": "End"
 }

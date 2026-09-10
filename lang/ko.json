@@ -170,5 +170,12 @@
     "DEFAULT_POS": "기본값 복원",
     "TOP_LEFT_POS": "왼쪽 위로 이동",
     "ROTATE_MINIMAP": "미니맵 회전",
-    "SETTINGS_TOOLTIP": "설정 열기"
+    "SETTINGS_TOOLTIP": "설정 열기",
+    "EDIT_WP": "편집",
+    "EDIT_WP_TITLE": "경유지 편집##Popup",
+    "WP_SHOW_ON_MAP": "지도에 표시",
+    "WP_TAB_ALL": "모두",
+    "WP_TAB_OVERWORLD": "오버월드",
+    "WP_TAB_NETHER": "네더",
+    "WP_TAB_END": "디 엔드"
 }

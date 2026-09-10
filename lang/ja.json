@@ -170,5 +170,12 @@
     "DEFAULT_POS": "既定値に戻す",
     "TOP_LEFT_POS": "左上に移動",
     "ROTATE_MINIMAP": "ミニマップを回転",
-    "SETTINGS_TOOLTIP": "設定を開く"
+    "SETTINGS_TOOLTIP": "設定を開く",
+    "EDIT_WP": "編集",
+    "EDIT_WP_TITLE": "ウェイポイントの編集##Popup",
+    "WP_SHOW_ON_MAP": "マップに表示",
+    "WP_TAB_ALL": "すべて",
+    "WP_TAB_OVERWORLD": "オーバーワールド",
+    "WP_TAB_NETHER": "ネザー",
+    "WP_TAB_END": "ジ・エンド"
 }
