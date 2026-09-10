@@ -78,8 +78,12 @@ namespace MapRenderState {
 
     // [统一拦截枢纽] 判断是否有任何全屏 UI 处于活动状态
     inline bool IsUIActive() {
+        int tp = teleportState.load();
+        bool isTeleportUIActive = (tp == (int)TeleportState::Loading || 
+                                   tp == (int)TeleportState::Validating || 
+                                   tp == (int)TeleportState::Failed);
         return showBigMap || showWaypointUI || showMiniMapPosSettings || showHotkeySettings || showCaveSettings ||
-               (teleportState.load() != (int)TeleportState::Idle);
+               isTeleportUIActive;
     }
 
     // [新增] 跨菜单桥接：大地图右键唤起新建地标的预设坐标

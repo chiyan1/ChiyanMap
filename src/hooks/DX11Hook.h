@@ -2013,6 +2013,7 @@ namespace DX11Hook {
                 MapRenderState::tpTargetZ = (float)bz + 0.5f;
                 MapRenderState::triggerTeleport.store(true);
                 MapRenderState::showBigMap = false;
+                ImGui::CloseCurrentPopup();
             }
             
             ImGui::Separator();
@@ -2104,6 +2105,7 @@ namespace DX11Hook {
                         MapRenderState::tpTargetZ = (float)targetWp.z + 0.5f;
                         MapRenderState::triggerTeleport.store(true);
                         MapRenderState::showBigMap = false;
+                        ImGui::CloseCurrentPopup();
                     }
                 }
 
@@ -2938,6 +2940,11 @@ namespace DX11Hook {
                 failedShowStart = -1.0;
                 return;
             }
+        } else if (state == (int)MapRenderState::TeleportState::Done) {
+            MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+            MapRenderState::teleportStatusMsg.clear();
+            failedShowStart = -1.0;
+            return;
         } else {
             failedShowStart = -1.0;
         }
@@ -3150,8 +3157,10 @@ namespace DX11Hook {
 
             UpdateSmoothCamera();
 
-            bool needsRender = MapRenderState::showMiniMap || MapRenderState::IsUIActive() ||
-                               MapRenderState::teleportState.load() != (int)MapRenderState::TeleportState::Idle;
+            bool isTeleportUI = (MapRenderState::teleportState.load() == (int)MapRenderState::TeleportState::Loading ||
+                                 MapRenderState::teleportState.load() == (int)MapRenderState::TeleportState::Validating ||
+                                 MapRenderState::teleportState.load() == (int)MapRenderState::TeleportState::Failed);
+            bool needsRender = MapRenderState::showMiniMap || MapRenderState::IsUIActive() || isTeleportUI;
             if (!needsRender) { isRendering = false; return; }
 
             auto renderImGuiFrame = [&](ID3D11RenderTargetView* rtv) {

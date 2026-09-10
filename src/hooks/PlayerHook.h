@@ -1825,7 +1825,8 @@ LL_TYPE_INSTANCE_HOOK(
                             std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f",
                                           (float)blockX + 0.5f, finalY, (float)blockZ + 0.5f);
                             SendServerCommand(*player, coordBuf);
-                            MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                            MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                            MapRenderState::teleportStatusMsg.clear();
                         } else {
                             // [防线⑤] 目标列为岩浆/虚空/不安全 → 螺旋搜索周围安全落脚点 (±16~±32)
                             int searchX = blockX, searchZ = blockZ;
@@ -1840,7 +1841,8 @@ LL_TYPE_INSTANCE_HOOK(
                                 std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f",
                                               (float)searchX + 0.5f, (float)nearbyY, (float)searchZ + 0.5f);
                                 SendServerCommand(*player, coordBuf);
-                                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                MapRenderState::teleportStatusMsg.clear();
                             } else {
                                 // 目标区块已加载且周围全是岩浆/虚空，无安全落脚点 → 驳回传送
                                 LogTeleport("tp REJECT (" + std::to_string(blockX) + "," +
@@ -1868,7 +1870,8 @@ LL_TYPE_INSTANCE_HOOK(
                                 std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f",
                                               (float)blockX + 0.5f, (float)safeY, (float)blockZ + 0.5f);
                                 SendServerCommand(*player, coordBuf);
-                                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                MapRenderState::teleportStatusMsg.clear();
                             } else {
                                 // 目标点为岩浆或不安全 → 搜索周围安全落脚点 (±16~±32)
                                 int searchX = blockX, searchZ = blockZ;
@@ -1882,7 +1885,8 @@ LL_TYPE_INSTANCE_HOOK(
                                     std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f",
                                                   (float)searchX + 0.5f, (float)nearbyY, (float)searchZ + 0.5f);
                                     SendServerCommand(*player, coordBuf);
-                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                    MapRenderState::teleportStatusMsg.clear();
                                 } else {
                                     // 下界区块已加载且周围全是岩浆/实心，无安全落脚点 → 驳回传送
                                     LogTeleport("tp nether REJECT (" + std::to_string(blockX) + "," +
@@ -1942,7 +1946,8 @@ LL_TYPE_INSTANCE_HOOK(
                 char coordBuf[128];
                 std::snprintf(coordBuf, sizeof(coordBuf), "/tp @s %.2f %.2f %.2f", targetX, targetY, targetZ);
                 SendServerCommand(*player, coordBuf);
-                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                MapRenderState::teleportStatusMsg.clear();
             }
 
             MapRenderState::triggerTeleport.store(false);
@@ -1990,7 +1995,8 @@ LL_TYPE_INSTANCE_HOOK(
                                                 std::to_string((int)finalY) + "," + std::to_string(probeZ) +
                                                 ") [mode=" + std::to_string(probeMode) + " refY=" + std::to_string(refY) +
                                                 ", verified safe spawn]");
-                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                    MapRenderState::teleportStatusMsg.clear();
                                     probeDone = true;
                                 } else {
                                     // 目标列为岩浆/不安全 → 搜索周围安全落脚点
@@ -2007,7 +2013,8 @@ LL_TYPE_INSTANCE_HOOK(
                                                     std::to_string((int)finalY) + "," + std::to_string(searchZ) +
                                                     ") [mode=" + std::to_string(probeMode) + " refY=" + std::to_string(refY) +
                                                     ", landed on nearby safe ground]");
-                                        MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                        MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                        MapRenderState::teleportStatusMsg.clear();
                                         probeDone = true;
                                     } else {
                                         // 周围全为岩浆，无安全落脚点 → 驳回传送，回退原位
@@ -2047,7 +2054,8 @@ LL_TYPE_INSTANCE_HOOK(
                                     LogTeleport("probe SUCCESS (" + std::to_string(probeX) + "," +
                                                 std::to_string((int)finalY) + "," + std::to_string(probeZ) +
                                                 ") dim=" + std::to_string(dimId) + " method=stable-safe");
-                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                    MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                    MapRenderState::teleportStatusMsg.clear();
                                     probeDone = true;
                                 } else {
                                     // 目标点为岩浆（主世界）或虚空（末地）或不安全 → 搜索周围安全落脚点
@@ -2068,7 +2076,8 @@ LL_TYPE_INSTANCE_HOOK(
                                                     std::to_string((int)nearbyY) + "," +
                                                     std::to_string(searchZ) +
                                                     ") [original lava/void, landed on safe ground, dim=" + std::to_string(dimId) + "]");
-                                        MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Done);
+                                        MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
+                                        MapRenderState::teleportStatusMsg.clear();
                                         probeDone = true;
                                     } else {
                                         // 周围全为岩浆/虚空，无安全落脚点 → 驳回传送，回退原位
