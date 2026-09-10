@@ -152,10 +152,11 @@ target("ChiyanMap")
 
     after_build(function (target)
         local lang_dir = path.join(os.projectdir(), "lang")
-        local dest_dir = path.join(os.projectdir(), "bin", "ChiyanMap")
+        local dest_lang_dir = path.join(os.projectdir(), "bin", "ChiyanMap", "lang")
         if os.isdir(lang_dir) then
-            os.cp(lang_dir, dest_dir)
-            cprint("${bright green}[ChiyanMap]: ${reset}copied lang files to " .. path.join(dest_dir, "lang"))
+            os.mkdir(dest_lang_dir)
+            os.cp(path.join(lang_dir, "*.json"), dest_lang_dir)
+            cprint("${bright green}[ChiyanMap]: ${reset}copied lang files to " .. dest_lang_dir)
         end
     end)
 
