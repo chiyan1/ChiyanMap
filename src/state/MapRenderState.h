@@ -130,6 +130,8 @@ namespace MapRenderState {
     // 防止部分加载区块返回临时错误 Y（如地下结构）导致地下传送
     // v2: 从 2 帧升级到 3 帧，进一步过滤部分加载区块的"稳定但错误"Y 值
     inline short probeLastY = -32000;         // 上一帧探测到的 Y
+    inline int  probeLastX = 0;               // 上一帧探测到的 X
+    inline int  probeLastZ = 0;               // 上一帧探测到的 Z
     inline int  probeStableCount = 0;         // 连续一致帧数
     constexpr static int kProbeStableThreshold = 3;  // 需要的连续一致帧数（v2: 2→3）
 

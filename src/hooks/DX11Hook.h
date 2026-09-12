@@ -921,7 +921,8 @@ namespace DX11Hook {
                 s_cursorShowingCached = false;
             }
         }
-        if (!MapRenderState::IsUIActive() && s_cursorShowingCached) {
+        bool nativeScreenOpen = s_cursorShowingCached || (g_clientInstance && !g_clientInstance->isInGameInputEnabled());
+        if (!MapRenderState::IsUIActive() && nativeScreenOpen) {
             return;
         }
 
@@ -1975,7 +1976,8 @@ namespace DX11Hook {
             }
             // 实时未命中 → 查询缓存高度图（可识别已扫描但已卸载的区域）
             if (by == 320) {
-                int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(bx, bz);
+                bool isCave = MapRenderState::g_caveModeActive || (MapRenderState::currentDimensionId == 1);
+                int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(bx, bz, isCave);
                 if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -64) {
                     by = (int)cachedY + 1;
                 }
@@ -2061,7 +2063,7 @@ namespace DX11Hook {
                 // 标题栏: 黑色背景 + 白色标题文字
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
                 ImGui::BeginChild("##wp_title", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() + 6), false, ImGuiWindowFlags_NoScrollbar);
-                const char* titleText = LanguageManager::GetText("WAYPOINT");
+                const char* titleText = targetWp.name.empty() ? LanguageManager::GetText("WAYPOINT") : targetWp.name.c_str();
                 ImVec2 titleSize = ImGui::CalcTextSize(titleText);
                 ImGui::SetCursorPosX((ImGui::GetWindowWidth() - titleSize.x) * 0.5f);
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);

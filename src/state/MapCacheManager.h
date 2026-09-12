@@ -7,6 +7,7 @@
 #include <atomic>
 #include <vector>
 #include <semaphore>
+#include <algorithm>
 #include "state/MapRenderState.h"
 #include <mc/deps/core/math/Color.h>
 
@@ -21,11 +22,15 @@ namespace MapCacheManager {
 
     struct RegionData {
         uint8_t colors[REGION_SIZE * REGION_SIZE * 4] = {0};
-        int16_t heights[REGION_SIZE * REGION_SIZE] = {0};       // 地表Y缓存, 供传送时查询
+        int16_t heights[REGION_SIZE * REGION_SIZE];              // 地表Y缓存, 供传送时查询
         std::vector<std::string> biomeTable;                    // 生物群系名称表 (去重)
         uint8_t biomeCells[BIOME_CELLS_PER_REGION * BIOME_CELLS_PER_REGION] = {0}; // 生物群系索引
         bool dirty = false;
         bool textureDirty = true;
+
+        RegionData() {
+            std::fill(std::begin(heights), std::end(heights), HEIGHT_UNKNOWN);
+        }
     };
 
     // [生物群系条目] 扫描时采集, 批量写入缓存

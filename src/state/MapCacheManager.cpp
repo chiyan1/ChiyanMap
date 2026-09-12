@@ -370,22 +370,41 @@ namespace MapCacheManager {
 
     int16_t GetCachedSurfaceHeight(int worldX, int worldZ, bool isCave) {
         std::lock_guard<std::mutex> lock(g_cacheMutex);
+        if (g_cacheDir.empty()) return HEIGHT_UNKNOWN;
         int rx = (worldX < 0 ? (worldX + 1) / REGION_SIZE - 1 : worldX / REGION_SIZE);
         int rz = (worldZ < 0 ? (worldZ + 1) / REGION_SIZE - 1 : worldZ / REGION_SIZE);
         uint64_t hash = GetRegionHash(rx, rz, isCave);
 
         auto it = g_loadedRegions.find(hash);
-        if (it == g_loadedRegions.end()) {
-            // 区域未加载 → 排队异步加载（与 FetchRegionTextureData 一致的行为）
-            g_loadedRegions[hash] = nullptr;
-            g_loadQueue.push_back(hash);
-            return HEIGHT_UNKNOWN;
-        }
-        if (it->second == nullptr) {
-            return HEIGHT_UNKNOWN; // 已排队但尚未加载完成
+        if (it == g_loadedRegions.end() || it->second == nullptr) {
+            // 如果磁盘存在该 region 文件，尝试直接同步加载，确保查询高度时不因异步排队未完成而丢失
+            std::string dir = g_cacheDir + GetRegionSubdir(isCave);
+            std::string filePath = dir + "region_" + std::to_string(rx) + "_" + std::to_string(rz) + ".bin";
+            std::ifstream in(filePath, std::ios::binary | std::ios::ate);
+            if (in) {
+                auto fileSize = in.tellg();
+                in.seekg(0, std::ios::beg);
+                RegionData* newRegion = (it != g_loadedRegions.end() && it->second) ? it->second : new RegionData();
+                in.read((char*)newRegion->colors, sizeof(newRegion->colors));
+                if (fileSize >= (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights))) {
+                    in.read((char*)newRegion->heights, sizeof(newRegion->heights));
+                }
+                ReadBiomeSection(in, *newRegion, fileSize,
+                                 (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights)));
+                newRegion->textureDirty = true;
+                g_loadedRegions[hash] = newRegion;
+                it = g_loadedRegions.find(hash);
+            } else {
+                if (it == g_loadedRegions.end()) {
+                    g_loadedRegions[hash] = nullptr;
+                    g_loadQueue.push_back(hash);
+                }
+                return HEIGHT_UNKNOWN;
+            }
         }
 
         RegionData* region = it->second;
+        if (!region) return HEIGHT_UNKNOWN;
         int localX = worldX - (rx * REGION_SIZE);
         int localZ = worldZ - (rz * REGION_SIZE);
         return region->heights[localZ * REGION_SIZE + localX];
