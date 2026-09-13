@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Радіус масштабу",
     "RESET": "Скинути",
     "SHOW_WAYPOINTS_MINIMAP": "Показувати шляхові точки на міні-карті",
+    "SHOW_RADAR": "Показувати радар на міні-карті",
     "TELEPORT_FAILED": "Телепортація не вдалася",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Телепортація не вдалася: час вичерпано або відхилено сервером",

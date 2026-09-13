@@ -90,6 +90,12 @@ namespace MapCacheManager {
                     // 新格式：colors + heights；旧格式仅 colors（heights 保持 HEIGHT_UNKNOWN）
                     if (fileSize >= (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights))) {
                         in.read((char*)newRegion->heights, sizeof(newRegion->heights));
+                        // 清理旧版本全 0 污染：未探索像素 (a < 10) 强制置为 HEIGHT_UNKNOWN
+                        for (int i = 0; i < REGION_SIZE * REGION_SIZE; ++i) {
+                            if (newRegion->colors[i * 4 + 3] < 10) {
+                                newRegion->heights[i] = HEIGHT_UNKNOWN;
+                            }
+                        }
                     }
                     // [新增] 生物群系段（colors+heights 之后）
                     ReadBiomeSection(in, *newRegion, fileSize,
@@ -299,6 +305,12 @@ namespace MapCacheManager {
                         in.read((char*)newRegion->colors, sizeof(newRegion->colors));
                         if (fileSize >= (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights))) {
                             in.read((char*)newRegion->heights, sizeof(newRegion->heights));
+                            // 清理旧版本全 0 污染：未探索像素 (a < 10) 强制置为 HEIGHT_UNKNOWN
+                            for (int i = 0; i < REGION_SIZE * REGION_SIZE; ++i) {
+                                if (newRegion->colors[i * 4 + 3] < 10) {
+                                    newRegion->heights[i] = HEIGHT_UNKNOWN;
+                                }
+                            }
                         }
                         // [新增] 生物群系段（colors+heights 之后）
                         ReadBiomeSection(in, *newRegion, fileSize,
@@ -344,7 +356,7 @@ namespace MapCacheManager {
         }
     }
 
-    bool FetchRegionTextureData(uint64_t hash, uint8_t* outBuffer) {
+    bool FetchRegionTextureData(uint64_t hash, uint8_t* outBuffer, bool forceCopy) {
         std::lock_guard<std::mutex> lock(g_cacheMutex);
         auto it = g_loadedRegions.find(hash);
         if (it == g_loadedRegions.end()) {
@@ -353,7 +365,7 @@ namespace MapCacheManager {
             return false;
         } else {
             RegionData* region = it->second;
-            if (region && region->textureDirty) {
+            if (region && (forceCopy || region->textureDirty)) {
                 std::memcpy(outBuffer, region->colors, REGION_SIZE * REGION_SIZE * 4);
                 region->textureDirty = false;
                 return true;
@@ -388,6 +400,12 @@ namespace MapCacheManager {
                 in.read((char*)newRegion->colors, sizeof(newRegion->colors));
                 if (fileSize >= (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights))) {
                     in.read((char*)newRegion->heights, sizeof(newRegion->heights));
+                    // 清理旧版本全 0 污染：未探索像素 (a < 10) 强制置为 HEIGHT_UNKNOWN
+                    for (int i = 0; i < REGION_SIZE * REGION_SIZE; ++i) {
+                        if (newRegion->colors[i * 4 + 3] < 10) {
+                            newRegion->heights[i] = HEIGHT_UNKNOWN;
+                        }
+                    }
                 }
                 ReadBiomeSection(in, *newRegion, fileSize,
                                  (std::streamoff)(sizeof(newRegion->colors) + sizeof(newRegion->heights)));
@@ -407,7 +425,20 @@ namespace MapCacheManager {
         if (!region) return HEIGHT_UNKNOWN;
         int localX = worldX - (rx * REGION_SIZE);
         int localZ = worldZ - (rz * REGION_SIZE);
-        return region->heights[localZ * REGION_SIZE + localX];
+        int colorIndex = (localZ * REGION_SIZE + localX) * 4;
+
+        // [严谨有效性检查]
+        // 1. 若该像素未渲染/完全透明 (a < 10)，绝对无有效高度，杜绝未渲染区域误判为有缓存
+        if (region->colors[colorIndex + 3] < 10) {
+            return HEIGHT_UNKNOWN;
+        }
+
+        int16_t h = region->heights[localZ * REGION_SIZE + localX];
+        if (h <= -64 || h >= 320 || h == HEIGHT_UNKNOWN) {
+            return HEIGHT_UNKNOWN;
+        }
+
+        return h;
     }
 
     // ==========================================

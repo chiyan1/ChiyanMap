@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Radius zoom",
     "RESET": "Atur ulang",
     "SHOW_WAYPOINTS_MINIMAP": "Tampilkan waypoint di minimap",
+    "SHOW_RADAR": "Tampilkan radar di minimap",
     "TELEPORT_FAILED": "Teleport gagal",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Teleport gagal: waktu habis atau ditolak oleh server",

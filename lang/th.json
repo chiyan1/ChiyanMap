@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "รัศมีการซูม",
     "RESET": "รีเซ็ต",
     "SHOW_WAYPOINTS_MINIMAP": "แสดงเวย์พอยต์บนแผนที่ย่อ",
+    "SHOW_RADAR": "แสดงเรดาร์บนแผนที่ย่อ",
     "TELEPORT_FAILED": "การเทเลพอร์ตล้มเหลว",
     "TELEPORT_FAILED_DISMISS": "ตกลง",
     "TELEPORT_FAILED_MSG": "การเทเลพอร์ตล้มเหลว: หมดเวลาหรือถูกปฏิเสธโดยเซิร์ฟเวอร์",

@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Rayon de zoom",
     "RESET": "Réinitialiser",
     "SHOW_WAYPOINTS_MINIMAP": "Afficher les waypoints sur la minimap",
+    "SHOW_RADAR": "Afficher le radar sur la minimap",
     "TELEPORT_FAILED": "Échec de la téléportation",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Échec de la téléportation : délai dépassé ou refusé par le serveur",

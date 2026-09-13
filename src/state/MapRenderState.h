@@ -37,6 +37,9 @@ namespace MapRenderState {
     // [新增] 小地图路径点显示开关 (独立于路径点 enabled 属性，控制是否在小地图上绘制)
     inline bool showWaypointsOnMinimap = true;
 
+    // [新增] 小地图雷达显示开关 (控制是否扫描并显示周围生物/实体)
+    inline bool showRadar = true;
+
     // [新增] 快捷键设置面板开启状态
     inline bool showHotkeySettings = false;
     inline bool showCaveSettings = false; // [洞穴地图] 洞穴设置面板
@@ -133,7 +136,7 @@ namespace MapRenderState {
     inline int  probeLastX = 0;               // 上一帧探测到的 X
     inline int  probeLastZ = 0;               // 上一帧探测到的 Z
     inline int  probeStableCount = 0;         // 连续一致帧数
-    constexpr static int kProbeStableThreshold = 3;  // 需要的连续一致帧数（v2: 2→3）
+    constexpr static int kProbeStableThreshold = 8;  // 需要的连续一致帧数（6→8，约133~160ms）
 
 
     inline bool showMiniMap = true;  // 是否显示小地图

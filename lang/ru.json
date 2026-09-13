@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Радиус зума",
     "RESET": "Сброс",
     "SHOW_WAYPOINTS_MINIMAP": "Показывать точки на миникарте",
+    "SHOW_RADAR": "Показывать радар на миникарте",
     "TELEPORT_FAILED": "Ошибка телепортации",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Ошибка телепортации: тайм-аут или отклонено сервером",

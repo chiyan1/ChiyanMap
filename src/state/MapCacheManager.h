@@ -79,7 +79,7 @@ namespace MapCacheManager {
     void Init();
     void Shutdown();
     void UpdateFromScan(int centerX, int centerZ, mce::Color scanColors[MAP_DATA_SIZE][MAP_DATA_SIZE], float scanHeights[MAP_DATA_SIZE][MAP_DATA_SIZE], bool isCave = false);
-    bool FetchRegionTextureData(uint64_t hash, uint8_t* outBuffer);
+    bool FetchRegionTextureData(uint64_t hash, uint8_t* outBuffer, bool forceCopy = false);
 
     // [新增] 当 GPU 繁忙时，退回纹理更新请求
     void MarkTextureDirty(uint64_t hash);

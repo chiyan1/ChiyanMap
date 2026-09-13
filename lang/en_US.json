@@ -94,6 +94,7 @@
     "MINIMAP_ZOOM_RADIUS": "Zoom radius",
     "RESET": "Reset",
     "SHOW_WAYPOINTS_MINIMAP": "Show waypoints on minimap",
+    "SHOW_RADAR": "Show radar on minimap",
     "TELEPORT_FAILED": "Teleport failed",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Teleport failed: timed out or rejected by server",

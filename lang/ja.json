@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "ズーム半径",
     "RESET": "リセット",
     "SHOW_WAYPOINTS_MINIMAP": "ミニマップにウェイポイントを表示",
+    "SHOW_RADAR": "ミニマップにレーダーを表示",
     "TELEPORT_FAILED": "転送失敗",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "転送失敗：タイムアウトまたはサーバーに拒否されました",

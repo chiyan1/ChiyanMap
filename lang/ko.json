@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "확대 반경",
     "RESET": "초기화",
     "SHOW_WAYPOINTS_MINIMAP": "미니맵에 위치 표시",
+    "SHOW_RADAR": "미니맵에 레이더 표시",
     "TELEPORT_FAILED": "전송 실패",
     "TELEPORT_FAILED_DISMISS": "확인",
     "TELEPORT_FAILED_MSG": "전송 실패: 시간 초과 또는 서버 거부",

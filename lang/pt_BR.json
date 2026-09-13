@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Raio de zoom",
     "RESET": "Redefinir",
     "SHOW_WAYPOINTS_MINIMAP": "Mostrar waypoints no minimapa",
+    "SHOW_RADAR": "Mostrar radar no minimapa",
     "TELEPORT_FAILED": "Falha no teleporte",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Falha no teleporte: tempo esgotado ou recusado pelo servidor",

@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Zoomradius",
     "RESET": "Zurücksetzen",
     "SHOW_WAYPOINTS_MINIMAP": "Wegpunkte auf der Minimap anzeigen",
+    "SHOW_RADAR": "Radar auf Minimap anzeigen",
     "TELEPORT_FAILED": "Teleport fehlgeschlagen",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Teleport fehlgeschlagen: Zeitüberschreitung oder vom Server abgelehnt",

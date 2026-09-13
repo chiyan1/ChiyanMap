@@ -1099,40 +1099,44 @@ namespace DX11Hook {
         drawRotatedText(LanguageManager::GetText("COMPASS_E"), textDist, 0.0f);
         drawRotatedText(LanguageManager::GetText("COMPASS_W"), -textDist, 0.0f);
 
-        static std::vector<RadarEntity> s_cachedEntities;
-        if (g_radarUpdated.load()) {
-            s_cachedEntities = g_radarEntities;
-            g_radarUpdated.store(false);
-        }
-
         float scale = IM_MAP_R / ZOOM_RADIUS;
-        for (const auto& ent : s_cachedEntities) {
-            // 以"视图有效中心"为基准定位, 窗口被钳制时实体位置仍地理精确
-            float edx = ent.x - viewPX;
-            float edz = ent.z - viewPZ;
-            
-            // 应用相对雷达坐标的矩阵旋转
-            float rotDx = edx * c_rot - edz * s_rot;
-            float rotDz = edx * s_rot + edz * c_rot;
-            
-            float ex = cx + rotDx * scale;
-            float ez = cy + rotDz * scale;
-            
-            bool inBounds = false;
-            if (MapRenderState::isSquareMap) {
-                inBounds = (std::abs(rotDx * scale) <= IM_MAP_R && std::abs(rotDz * scale) <= IM_MAP_R);
-            } else {
-                float distSq = (ex - cx) * (ex - cx) + (ez - cy) * (ez - cy);
-                inBounds = (distSq <= IM_MAP_R * IM_MAP_R);
+
+        // [小地图雷达] 开启时绘制周围实体
+        if (MapRenderState::showRadar) {
+            static std::vector<RadarEntity> s_cachedEntities;
+            if (g_radarUpdated.load()) {
+                s_cachedEntities = g_radarEntities;
+                g_radarUpdated.store(false);
             }
 
-            if (inBounds) {
-                ImU32 col;
-                if (ent.type == 0) col = IM_COL32(255, 255, 255, 255);
-                else if (ent.type == 1) col = IM_COL32(255, 50, 50, 255);
-                else if (ent.type == 2) col = IM_COL32(50, 255, 50, 255);
-                else col = IM_COL32(255, 255, 50, 255);
-                draw_list->AddRectFilled(ImVec2(ex - 2, ez - 2), ImVec2(ex + 2, ez + 2), col);
+            for (const auto& ent : s_cachedEntities) {
+                // 以"视图有效中心"为基准定位, 窗口被钳制时实体位置仍地理精确
+                float edx = ent.x - viewPX;
+                float edz = ent.z - viewPZ;
+                
+                // 应用相对雷达坐标的矩阵旋转
+                float rotDx = edx * c_rot - edz * s_rot;
+                float rotDz = edx * s_rot + edz * c_rot;
+                
+                float ex = cx + rotDx * scale;
+                float ez = cy + rotDz * scale;
+                
+                bool inBounds = false;
+                if (MapRenderState::isSquareMap) {
+                    inBounds = (std::abs(rotDx * scale) <= IM_MAP_R && std::abs(rotDz * scale) <= IM_MAP_R);
+                } else {
+                    float distSq = (ex - cx) * (ex - cx) + (ez - cy) * (ez - cy);
+                    inBounds = (distSq <= IM_MAP_R * IM_MAP_R);
+                }
+
+                if (inBounds) {
+                    ImU32 col;
+                    if (ent.type == 0) col = IM_COL32(255, 255, 255, 255);
+                    else if (ent.type == 1) col = IM_COL32(255, 50, 50, 255);
+                    else if (ent.type == 2) col = IM_COL32(50, 255, 50, 255);
+                    else col = IM_COL32(255, 255, 50, 255);
+                    draw_list->AddRectFilled(ImVec2(ex - 2, ez - 2), ImVec2(ex + 2, ez + 2), col);
+                }
             }
         }
 
@@ -1214,6 +1218,7 @@ namespace DX11Hook {
         bool isKnown = (g_regionTextures.find(hash) != g_regionTextures.end());
         
         // 1. 【极速状态探测】直接窥探底层 IO 状态，如果缺失直接排队，绝不阻塞主线程，完美修复加载断层
+        bool isLoaded = false;
         bool isLoadedAndDirty = false;
         {
             std::lock_guard<std::mutex> lock(MapCacheManager::g_cacheMutex);
@@ -1221,21 +1226,25 @@ namespace DX11Hook {
             if (it == MapCacheManager::g_loadedRegions.end()) {
                 MapCacheManager::g_loadedRegions[hash] = nullptr;
                 MapCacheManager::g_loadQueue.push_back(hash);
-                return; // 刚排队，直接闪退
+                return; // 刚排队，直接返回
             } else if (it->second != nullptr) {
+                isLoaded = true;
                 isLoadedAndDirty = it->second->textureDirty;
             }
         }
 
-        // 数据没脏就不需要更新
-        if (!isLoadedAndDirty) return;
+        // 正在异步加载中
+        if (!isLoaded) return;
 
-        // 需要建图但本帧建图配额（提升至4以加快大后期渲染）已满，直接返回（保留 Dirty 给下帧）
+        // 如果纹理已在 GPU 中且数据未变，无需更新
+        if (isKnown && !isLoadedAndDirty) return;
+
+        // 需要建图但本帧建图配额（提升至8以加快大地图初次渲染）已满，直接返回（保留给下帧）
         if (!isKnown && texCount >= 8) return;
 
         // 内存对齐以支持极速 64 位空域探测
         alignas(8) static uint8_t tempBuffer[256 * 256 * 4];
-        if (MapCacheManager::FetchRegionTextureData(hash, tempBuffer)) {
+        if (MapCacheManager::FetchRegionTextureData(hash, tempBuffer, !isKnown)) {
             
             // 【DrawCall级优化核心】透明区块免疫技术：如果这片区域完全没探索过（纯透明），彻底免渲染！
             bool isEmpty = true;
@@ -1831,7 +1840,7 @@ namespace DX11Hook {
             ImGui::SetTooltip("%s", LanguageManager::GetText("SETTINGS_TOOLTIP"));
         }
         
-        ImGui::SetNextWindowSize(ImVec2(290, 270));
+        ImGui::SetNextWindowSize(ImVec2(290, 305));
         if (ImGui::BeginPopup("SettingsPopup")) {
             ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), LanguageManager::GetText("SIDEBAR_OPS"));
             ImGui::Separator();
@@ -1847,6 +1856,10 @@ namespace DX11Hook {
             }
             // [Task 2] 小地图路径点显示开关 (独立于单个路径点的 enabled 属性)
             if (ImGui::Checkbox(LanguageManager::GetText("SHOW_WAYPOINTS_MINIMAP"), &MapRenderState::showWaypointsOnMinimap)) {
+                LanguageManager::SaveConfig();
+            }
+            // 小地图雷达显示开关
+            if (ImGui::Checkbox(LanguageManager::GetText("SHOW_RADAR"), &MapRenderState::showRadar)) {
                 LanguageManager::SaveConfig();
             }
             ImGui::Spacing();
@@ -1978,7 +1991,7 @@ namespace DX11Hook {
             if (by == 320) {
                 bool isCave = MapRenderState::g_caveModeActive || (MapRenderState::currentDimensionId == 1);
                 int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(bx, bz, isCave);
-                if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -64) {
+                if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -64 && cachedY < 319) {
                     by = (int)cachedY + 1;
                 }
             }

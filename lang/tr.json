@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Yakınlaştırma yarıçapı",
     "RESET": "Sıfırla",
     "SHOW_WAYPOINTS_MINIMAP": "Mini haritada yol noktalarını göster",
+    "SHOW_RADAR": "Mini haritada radarı göster",
     "TELEPORT_FAILED": "Işınlanma başarısız",
     "TELEPORT_FAILED_DISMISS": "Tamam",
     "TELEPORT_FAILED_MSG": "Işınlanma başarısız: sunucu tarafından zaman aşımı veya reddedildi",

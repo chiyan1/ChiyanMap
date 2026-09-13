@@ -94,6 +94,7 @@
     "MINIMAP_ZOOM_RADIUS": "縮放半徑",
     "RESET": "重置",
     "SHOW_WAYPOINTS_MINIMAP": "小地圖顯示路徑點",
+    "SHOW_RADAR": "小地圖顯示雷達",
     "TELEPORT_FAILED": "傳送失敗",
     "TELEPORT_FAILED_DISMISS": "知道了",
     "TELEPORT_FAILED_MSG": "傳送失敗：逾時或被伺服器拒絕",

@@ -87,6 +87,7 @@
     "MINIMAP_ZOOM_RADIUS": "Bán kính thu phóng",
     "RESET": "Đặt lại",
     "SHOW_WAYPOINTS_MINIMAP": "Hiển thị điểm đường trên bản đồ thu nhỏ",
+    "SHOW_RADAR": "Hiển thị radar trên bản đồ nhỏ",
     "TELEPORT_FAILED": "Dịch chuyển thất bại",
     "TELEPORT_FAILED_DISMISS": "OK",
     "TELEPORT_FAILED_MSG": "Dịch chuyển thất bại: hết thời gian hoặc bị máy chủ từ chối",

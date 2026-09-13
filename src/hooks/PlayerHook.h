@@ -502,13 +502,11 @@ inline void getBiomeTints(std::string const& biomeName, mce::Color& grass, mce::
         grass   = mce::Color(0.337f, 0.455f, 0.329f, 1.0f);
         foliage = mce::Color(0.176f, 0.261f, 0.175f, 1.0f);
     } 
-    else if ((lower.find("extreme_hills") != std::string::npos || lower.find("windswept_hills") != std::string::npos)
-             && lower.find("forest") == std::string::npos
-             && lower.find("gravelly") == std::string::npos
+    // === 风袭丘陵/山地系列（风袭丘陵、风袭森林、风袭沙砾丘陵）：草地匹配实际颜色 RGB(78,102,76)——基于截图采样，标志性偏冷灰绿/鼠尾草橄榄绿 ===
+    else if ((lower.find("extreme_hills") != std::string::npos || lower.find("windswept") != std::string::npos)
              && lower.find("savanna") == std::string::npos) {
-        // 风蚀丘陵：草地/树叶匹配针叶林颜色
-        grass   = mce::Color(0.337f, 0.455f, 0.329f, 1.0f);
-        foliage = mce::Color(0.176f, 0.261f, 0.175f, 1.0f);
+        grass   = mce::Color(0.306f, 0.400f, 0.298f, 1.0f);
+        foliage = mce::Color(0.215f, 0.337f, 0.215f, 1.0f);
     }
     // === 白桦森林与原始桦木森林：草地匹配实际颜色 RGB(83,114,63)——基于截图采样，温润橄榄绿 ===
     else if (lower.find("birch") != std::string::npos) {
@@ -745,7 +743,17 @@ inline mce::Color getBlockColor(std::string const& name, mce::Color grassCol, mc
         if (name.find("dead") != std::string::npos) return mce::Color(0.70f, 0.70f, 0.70f, 1.0f);
         return mce::Color(0.50f, 0.80f, 0.80f, 1.0f);
     }
-    if (name.find("planks") != std::string::npos || name.find("oak") != std::string::npos || name.find("spruce") != std::string::npos || name.find("birch") != std::string::npos || name.find("jungle") != std::string::npos || name.find("acacia") != std::string::npos || name.find("dark_oak") != std::string::npos) return mce::Color(0.65f, 0.45f, 0.25f, 1.0f);
+    // [云杉木/原木] 针叶林村庄屋顶及云杉树干标志性深褐色原木，匹配实际树皮 RGB(54, 38, 19)
+    if (name.find("spruce") != std::string::npos) {
+        if (name.find("stripped") != std::string::npos) {
+            return mce::Color(0.45f, 0.34f, 0.20f, 1.0f); // 去皮云杉木
+        }
+        if (name.find("log") != std::string::npos || name.find("wood") != std::string::npos) {
+            return mce::Color(0.212f, 0.149f, 0.075f, 1.0f); // 云杉原木/云杉木
+        }
+        return mce::Color(0.45f, 0.33f, 0.19f, 1.0f); // 云杉木板/楼梯/台阶等
+    }
+    if (name.find("planks") != std::string::npos || name.find("oak") != std::string::npos || name.find("birch") != std::string::npos || name.find("jungle") != std::string::npos || name.find("acacia") != std::string::npos || name.find("dark_oak") != std::string::npos) return mce::Color(0.65f, 0.45f, 0.25f, 1.0f);
     if (name.find("wood") != std::string::npos || name.find("log") != std::string::npos || name.find("stem") != std::string::npos || name.find("stairs") != std::string::npos || name.find("slab") != std::string::npos || name.find("fence") != std::string::npos || name.find("door") != std::string::npos || name.find("trapdoor") != std::string::npos || name.find("sign") != std::string::npos || name.find("chest") != std::string::npos) return mce::Color(0.55f, 0.40f, 0.20f, 1.0f);
     // [基岩] 极深灰色
     if (name.find("bedrock") != std::string::npos) return mce::Color(0.18f, 0.18f, 0.18f, 1.0f);
@@ -1381,12 +1389,10 @@ inline mce::Color GetCaveBlockColor(std::string const& name) noexcept {
 // ==========================================
 
 // [防线①] 区块就绪检查：通过 hasChunksAt 验证目标区块已完全加载
-// 防止部分加载区块返回临时错误 Y（地下结构等）
+// ignoreClientChunk = true: 忽略客户端空区块占位，仅当真实数据存在时返回 true
 inline bool IsChunkReady(BlockSource& region, int x, int y, int z) noexcept {
     try {
-        // hasChunksAt(pos, r, ignoreClientChunk): 检查 pos 周围半径 r 内的区块是否已加载
-        // r=0 仅检查目标区块本身；false 表示不忽略客户端区块（更严格）
-        return region.hasChunksAt(BlockPos(x, y, z), 0, false);
+        return region.hasChunksAt(BlockPos(x, y, z), 0, true);
     } catch (...) {
         return false;
     }
@@ -1501,6 +1507,37 @@ inline bool HasAdjacentHazard(BlockSource& region, int x, int y, int z, int radi
         return false;
     } catch (...) {
         return true;
+    }
+}
+
+// [地表露天验证] 验证目标落脚点之上无实心岩石/深板岩/地底天花板阻挡
+// 杜绝两阶段探测传送到地下洞穴天花板下方或未加载完整的下层岩石中窒息
+inline bool HasOpenSkyAbove(BlockSource& region, int x, short standY, int z, int dimId = 0) noexcept {
+    if (dimId == 1) return true; // 下界为封闭洞穴结构，不适用露天检查
+    try {
+        // 主世界全量向上巡检至建筑高度上限 319；末地巡检至 256
+        short scanLimit = (dimId == 2) ? 256 : 319;
+        for (short y = standY + 2; y <= scanLimit; ++y) {
+            std::string name;
+            if (!SafeGetBlockName(region, x, y, z, name)) {
+                // 上方有 subchunk 尚未加载到达客户端 (AV/空指针) → 视为未就绪
+                return false;
+            }
+            if (name.empty()) return false;
+            if (IsAirLikeName(name)) continue;
+            // 允许树木枝叶、树冠、雪层、藤蔓等自然地表覆盖物
+            if (name.find("leaf") != std::string::npos || name.find("leaves") != std::string::npos) continue;
+            if (name.find("wood") != std::string::npos || name.find("log") != std::string::npos) continue;
+            if (name.find("vine") != std::string::npos || name.find("lichen") != std::string::npos) continue;
+            if (name.find("snow") != std::string::npos && name.find("snow_block") == std::string::npos) continue;
+            if (IsBreathableSpaceName(name, dimId)) continue;
+
+            // 遇到任何其他非透气实体方块（岩石/深板岩/泥土/矿石/砂岩等天花板）→ 绝对不是露天！
+            return false;
+        }
+        return true;
+    } catch (...) {
+        return false;
     }
 }
 
@@ -1771,9 +1808,25 @@ inline short SafeFindSafeSpawnY(BlockSource& region, int x, int z, int dimId = 0
         // 从最高空 (319) 向下扫描真实地表
         int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(x, z);
 
+        // [主世界底部基岩与地表就绪校验] 主世界 Y=-64 必须为 bedrock 且 SafeGetSurfaceY 就绪
+        if (dimId == 0) {
+            std::string bottomBlock;
+            if (!SafeGetBlockName(region, x, -64, z, bottomBlock) || bottomBlock.find("bedrock") == std::string::npos) {
+                return -32000;
+            }
+            short surfY = SafeGetSurfaceY(region, x, z);
+            if (surfY <= -64 || surfY >= 320 || surfY == -32000) {
+                return -32000;
+            }
+        }
+
         for (short y = 319; y >= -60; --y) {
             std::string blockName;
-            if (!SafeGetBlockName(region, x, y, z, blockName) || blockName.empty()) continue;
+            if (!SafeGetBlockName(region, x, y, z, blockName)) {
+                // 上层 subchunk 尚未加载到达 (AV/异常) → 严禁当作空气继续向下扫描，直接返回 -32000 等待！
+                return -32000;
+            }
+            if (blockName.empty()) return -32000;
 
             // 跳过空气，寻找从天空向下的第一个实体支撑方块 (y 为支撑方块，y+1 为脚部)
             if (IsAirLikeName(blockName)) {
@@ -1785,11 +1838,24 @@ inline short SafeFindSafeSpawnY(BlockSource& region, int x, int z, int dimId = 0
                 short standY = y + 1;
                 if (standY > 318) return -32000;
 
-                std::string feetName, headName;
+                // 与引擎最高实体高度 SafeGetSurfaceY 校验，落差不可超过 8 格 (杜绝洞穴地面)
+                if (dimId == 0) {
+                    short surfY = SafeGetSurfaceY(region, x, z);
+                    if (surfY <= -64 || surfY >= 320 || surfY == -32000 || standY < surfY - 8) {
+                        return -32000;
+                    }
+                }
+
+                std::string feetName, headName, aboveHeadName;
                 if (!SafeGetBlockName(region, x, standY, z, feetName) || feetName.empty()) return -32000;
                 if (!SafeGetBlockName(region, x, standY + 1, z, headName) || headName.empty()) return -32000;
+                if (!SafeGetBlockName(region, x, standY + 2, z, aboveHeadName) || aboveHeadName.empty()) return -32000;
 
-                if (IsBreathableSpaceName(feetName, dimId) && IsBreathableSpaceName(headName, dimId)) {
+                // 保证脚部、头部及头部上方至少 3 格垂直通畅
+                if (IsBreathableSpaceName(feetName, dimId) && 
+                    IsBreathableSpaceName(headName, dimId) && 
+                    IsBreathableSpaceName(aboveHeadName, dimId)) {
+                    
                     // 如果存在有效历史缓存且当前扫描高度比缓存地表低 15 格以上，
                     // 说明上层 subchunk 尚未加载到达，返回 -32000 继续等待，防止提前掉入未加载的地底石头！
                     if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -60) {
@@ -1797,6 +1863,12 @@ inline short SafeFindSafeSpawnY(BlockSource& region, int x, int z, int dimId = 0
                             return -32000;
                         }
                     }
+
+                    // [露天与无实心天花板阻挡校验]
+                    if (!HasOpenSkyAbove(region, x, standY, z, dimId)) {
+                        return -32000;
+                    }
+
                     return standY;
                 }
             } else {
@@ -1989,7 +2061,7 @@ LL_TYPE_INSTANCE_HOOK(
 
                     // [优先级1] 缓存高度图：可识别已扫描但已卸载的区域
                     int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(blockX, blockZ);
-                    if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY >= -64) {
+                    if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -64 && cachedY < 319) {
                         surfaceY = cachedY;
                         detectMethod = "cache";
                     }
@@ -1997,13 +2069,13 @@ LL_TYPE_INSTANCE_HOOK(
                     // [优先级2] 实时 BlockSource：仅对已加载区块有效
                     if (surfaceY == MapCacheManager::HEIGHT_UNKNOWN && region && chunkReady) {
                         short liveY = SafeGetSurfaceY(*region, blockX, blockZ);
-                        if (liveY >= -64 && liveY < 319) {
+                        if (liveY > -64 && liveY < 319) {
                             surfaceY = liveY;
                             detectMethod = "live";
                         }
                     }
 
-                    if (surfaceY != MapCacheManager::HEIGHT_UNKNOWN && surfaceY >= -64) {
+                    if (surfaceY != MapCacheManager::HEIGHT_UNKNOWN && surfaceY > -64 && surfaceY < 319) {
                         if (region && chunkReady) {
                             // [防线②③] 命中缓存/实时且区块就绪 → 用 SafeFindSafeSpawnY 验证落脚点
                             short safeY = SafeFindSafeSpawnY(*region, blockX, blockZ, dimId);
@@ -2216,15 +2288,33 @@ LL_TYPE_INSTANCE_HOOK(
             auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - MapRenderState::probeStartTime).count();
 
-            // [防线①] Phase 0 tp 后 500ms 宽限期
-            if (elapsedMs >= 500) {
+            // [防线①] Phase 0 tp 后 1000ms 宽限期，留出远端区块建立连接与初始包下发时间
+            if (elapsedMs >= 1000) {
                 BlockSource* region = this->getRegion();
                 if (region) {
                     int probeMode = MapRenderState::probeMode;
                     int dimId = MapRenderState::currentDimensionId;
                     int checkY = (probeMode == 1) ? ((dimId == 1 && MapRenderState::probeRefY >= 120) ? 64 : MapRenderState::probeRefY) : 64;
                     if (IsChunkReady(*region, probeX, checkY, probeZ)) {
-                        if (dimId == 1) {
+                        // [主世界基础数据就绪检查] 确认基岩层与地表就绪，杜绝在空指针/未下发区块上误判
+                        bool baseDataReady = true;
+                        if (dimId == 0) {
+                            std::string testBedrock;
+                            if (!SafeGetBlockName(*region, probeX, -64, probeZ, testBedrock) || testBedrock.find("bedrock") == std::string::npos) {
+                                baseDataReady = false;
+                            }
+                            if (probeMode == 0) {
+                                // 地表传送模式：引擎最高地表高度必须就绪且有效
+                                short testSurfY = SafeGetSurfaceY(*region, probeX, probeZ);
+                                if (testSurfY <= -64 || testSurfY >= 320 || testSurfY == -32000) {
+                                    baseDataReady = false;
+                                }
+                            }
+                        }
+                        if (!baseDataReady) {
+                            MapRenderState::probeStableCount = 0;
+                            MapRenderState::probeLastY = -32000;
+                        } else if (dimId == 1) {
                             // ==========================================
                             // [下界·Phase 1] 确认下界区块方块数据加载到达客户端后，寻找最佳开阔安全落脚点
                             // ==========================================
@@ -2356,13 +2446,6 @@ LL_TYPE_INSTANCE_HOOK(
                         } else {
                             // [主世界地表 / 末地·Phase 1] 稳定性检查：直接通过自顶向下的 SafeFindSafeSpawnY 获取 Y
                             short liveY = SafeFindSafeSpawnY(*region, probeX, probeZ, dimId);
-                            if (liveY <= -64 || liveY == -32000) {
-                                // 目标列未找到安全落脚点：检查区块地表是否已加载（如岩浆池或特殊表面）
-                                short surfY = SafeGetSurfaceY(*region, probeX, probeZ);
-                                if (surfY > -64 && surfY < 319) {
-                                    liveY = surfY;
-                                }
-                            }
 
                             if (liveY > -64 && liveY < 319) {
                                 if (liveY == MapRenderState::probeLastY) {
@@ -2379,8 +2462,10 @@ LL_TYPE_INSTANCE_HOOK(
                             if (MapRenderState::probeStableCount >= MapRenderState::kProbeStableThreshold) {
                                 MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Validating);
 
-                                if (liveY > -64 && liveY < 319 && IsTeleportSpotSafe(*region, probeX, liveY, probeZ, dimId)) {
-                                    // 目标点本身为安全地表/空岛 → 直接传送
+                                if (liveY > -64 && liveY < 319 && 
+                                    IsTeleportSpotSafe(*region, probeX, liveY, probeZ, dimId) &&
+                                    HasOpenSkyAbove(*region, probeX, liveY, probeZ, dimId)) {
+                                    // 目标点本身为安全地表/空岛且完全露天无石顶阻挡 → 直接传送
                                     float finalY = (float)liveY;
                                     char coordBuf[128];
                                     std::snprintf(coordBuf, sizeof(coordBuf),
@@ -2397,8 +2482,9 @@ LL_TYPE_INSTANCE_HOOK(
                                     int searchX = probeX, searchZ = probeZ;
                                     short nearbyY = -32000;
                                     if (FindNearestSafeSpawn(*region, searchX, searchZ, nearbyY, 16, dimId) &&
-                                        IsTeleportSpotSafe(*region, searchX, nearbyY, searchZ, dimId)) {
-                                        // 周围找到安全陆地/空岛 → 传送到安全落脚点
+                                        IsTeleportSpotSafe(*region, searchX, nearbyY, searchZ, dimId) &&
+                                        HasOpenSkyAbove(*region, searchX, nearbyY, searchZ, dimId)) {
+                                        // 周围找到安全陆地/空岛且露天 → 传送到安全落脚点
                                         char coordBuf[128];
                                         std::snprintf(coordBuf, sizeof(coordBuf),
                                                       "/tp @s %.2f %.2f %.2f",
@@ -2414,8 +2500,8 @@ LL_TYPE_INSTANCE_HOOK(
                                         MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Idle);
                                         MapRenderState::teleportStatusMsg.clear();
                                         probeDone = true;
-                                    } else {
-                                        // 周围全为岩浆/虚空，无安全落脚点 → 驳回传送，回退原位
+                                    } else if (elapsedMs >= 4000) {
+                                        // 超过 4 秒仍无任何安全露天落脚点 → 驳回传送，安全回退原位
                                         char abortBuf[128];
                                         std::snprintf(abortBuf, sizeof(abortBuf),
                                                       "/tp @s %.2f %.2f %.2f",
@@ -2424,7 +2510,7 @@ LL_TYPE_INSTANCE_HOOK(
                                                       MapRenderState::probeOriginalZ);
                                         SendServerCommand(*player, abortBuf);
                                         LogTeleport("probe REJECT (" + std::to_string(probeX) + "," +
-                                                    std::to_string(probeZ) + ") [target and surroundings are lava/void, reject] → original, dim=" + std::to_string(dimId));
+                                                    std::to_string(probeZ) + ") [target and surroundings unsafe/unready, reject] → original, dim=" + std::to_string(dimId));
                                         MapRenderState::teleportState.store((int)MapRenderState::TeleportState::Failed);
                                         MapRenderState::teleportStatusMsg.clear();
                                         MapRenderState::teleportFailReason = LanguageManager::GetText("TELEPORT_FAILED_MSG");
@@ -2776,7 +2862,6 @@ LL_TYPE_INSTANCE_HOOK(
 
             // 注意：不要清空前台缓冲 g_mapColors！
             // 保留当前前台地图画面直至新模式完整扫描完成后由 memcpy 原子替换，彻底杜绝切换瞬间的黑屏/黑块！
-            MapRenderState::clearGPUCache.store(true);
         }
 
         // [洞穴扫描] 玩家在地下且洞穴模式启用时, 执行洞穴列扫描代替地表扫描
@@ -3114,29 +3199,34 @@ LL_TYPE_INSTANCE_HOOK(
         static int entityDelay = 0;
         if (++entityDelay >= 60) {
             entityDelay = 0;
-            std::vector<RadarEntity> tempEntities;
-            auto& level = player->getLevel();
-            const auto& entities = level.getRuntimeActorList();
-            
-            for (auto* actor : entities) {
-                if (!actor || actor == player) continue;
-                if (!actor->isAlive()) continue;
-
-                const Vec3& ePos = actor->getPosition();
-                float dx = ePos.x - pos.x;
-                float dz = ePos.z - pos.z;
-
-                if (dx * dx + dz * dz > MAP_DATA_RADIUS * MAP_DATA_RADIUS) continue;
-
-                int type = 2; 
-                if (actor->isPlayer()) type = 0;
-                else if (actor->hasCategory(ActorCategory::Item)) type = 3;
-                else if (actor->hasCategory(ActorCategory::Monster)) type = 1;
+            if (MapRenderState::showRadar) {
+                std::vector<RadarEntity> tempEntities;
+                auto& level = player->getLevel();
+                const auto& entities = level.getRuntimeActorList();
                 
-                tempEntities.push_back({ePos.x, ePos.y, ePos.z, type});
+                for (auto* actor : entities) {
+                    if (!actor || actor == player) continue;
+                    if (!actor->isAlive()) continue;
+
+                    const Vec3& ePos = actor->getPosition();
+                    float dx = ePos.x - pos.x;
+                    float dz = ePos.z - pos.z;
+
+                    if (dx * dx + dz * dz > MAP_DATA_RADIUS * MAP_DATA_RADIUS) continue;
+
+                    int type = 2; 
+                    if (actor->isPlayer()) type = 0;
+                    else if (actor->hasCategory(ActorCategory::Item)) type = 3;
+                    else if (actor->hasCategory(ActorCategory::Monster)) type = 1;
+                    
+                    tempEntities.push_back({ePos.x, ePos.y, ePos.z, type});
+                }
+                g_radarEntities = tempEntities;
+                g_radarUpdated.store(true);
+            } else if (!g_radarEntities.empty()) {
+                g_radarEntities.clear();
+                g_radarUpdated.store(true);
             }
-            g_radarEntities = tempEntities;
-            g_radarUpdated.store(true);
         }
 
     } else {
