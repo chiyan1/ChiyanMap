@@ -434,6 +434,42 @@ namespace MapCacheManager {
         }
 
         int16_t h = region->heights[localZ * REGION_SIZE + localX];
+
+        // [水域检测与水面高度校正]
+        // 若当前像素为地表水体（海洋/河流/沼泽或水色像素）：
+        // 在老存档或旧缓存中，水域可能错误记录了海床高度 (h < 63)。
+        // 主世界地表水域标准海平面水面高度为 63 (脚部位于水面上方)，因此当检测到水域且 h < 63 时，自动校正返回水面高度 63。
+        if (!isCave) {
+            uint8_t r = region->colors[colorIndex + 0];
+            uint8_t g = region->colors[colorIndex + 1];
+            uint8_t b = region->colors[colorIndex + 2];
+            bool isWater = false;
+
+            int cellX = localX / BIOME_CELL_SIZE;
+            int cellZ = localZ / BIOME_CELL_SIZE;
+            int biomeCellIdx = cellZ * BIOME_CELLS_PER_REGION + cellX;
+            if (biomeCellIdx >= 0 && biomeCellIdx < (int)sizeof(region->biomeCells)) {
+                uint8_t bidx = region->biomeCells[biomeCellIdx];
+                if (bidx < region->biomeTable.size()) {
+                    std::string const& bname = region->biomeTable[bidx];
+                    if (bname.find("ocean") != std::string::npos ||
+                        bname.find("river") != std::string::npos ||
+                        bname.find("swamp") != std::string::npos) {
+                        isWater = true;
+                    }
+                }
+            }
+            if (!isWater && b > r + 20 && b > g && b >= 90) {
+                isWater = true;
+            }
+
+            if (isWater) {
+                if (h <= -64 || h == HEIGHT_UNKNOWN || h < 63) {
+                    return 63;
+                }
+            }
+        }
+
         if (h <= -64 || h >= 320 || h == HEIGHT_UNKNOWN) {
             return HEIGHT_UNKNOWN;
         }
@@ -510,5 +546,51 @@ namespace MapCacheManager {
         if (idx == BIOME_INDEX_UNKNOWN || idx >= region->biomeTable.size()) return false;
         outName = region->biomeTable[idx];
         return !outName.empty();
+    }
+
+    // ==========================================
+    // [缓存水域检测] 判断某世界坐标是否为地表水体
+    // ==========================================
+    bool IsCachedWater(int worldX, int worldZ, bool isCave) {
+        if (isCave) return false;
+        std::lock_guard<std::mutex> lock(g_cacheMutex);
+        if (g_cacheDir.empty()) return false;
+        int rx = (worldX < 0 ? (worldX + 1) / REGION_SIZE - 1 : worldX / REGION_SIZE);
+        int rz = (worldZ < 0 ? (worldZ + 1) / REGION_SIZE - 1 : worldZ / REGION_SIZE);
+        uint64_t hash = GetRegionHash(rx, rz, isCave);
+
+        auto it = g_loadedRegions.find(hash);
+        if (it == g_loadedRegions.end() || it->second == nullptr) {
+            return false;
+        }
+
+        RegionData* region = it->second;
+        int localX = worldX - (rx * REGION_SIZE);
+        int localZ = worldZ - (rz * REGION_SIZE);
+        int colorIndex = (localZ * REGION_SIZE + localX) * 4;
+        if (region->colors[colorIndex + 3] < 10) return false;
+
+        uint8_t r = region->colors[colorIndex + 0];
+        uint8_t g = region->colors[colorIndex + 1];
+        uint8_t b = region->colors[colorIndex + 2];
+
+        int cellX = localX / BIOME_CELL_SIZE;
+        int cellZ = localZ / BIOME_CELL_SIZE;
+        int biomeCellIdx = cellZ * BIOME_CELLS_PER_REGION + cellX;
+        if (biomeCellIdx >= 0 && biomeCellIdx < (int)sizeof(region->biomeCells)) {
+            uint8_t bidx = region->biomeCells[biomeCellIdx];
+            if (bidx < region->biomeTable.size()) {
+                std::string const& bname = region->biomeTable[bidx];
+                if (bname.find("ocean") != std::string::npos ||
+                    bname.find("river") != std::string::npos ||
+                    bname.find("swamp") != std::string::npos) {
+                    return true;
+                }
+            }
+        }
+        if (b > r + 20 && b > g && b >= 90) {
+            return true;
+        }
+        return false;
     }
 }

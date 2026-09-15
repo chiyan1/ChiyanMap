@@ -94,6 +94,9 @@ namespace MapCacheManager {
     // isCave=true 时查询洞穴/下界缓存数据 (dim_<n>/cave/)
     int16_t GetCachedSurfaceHeight(int worldX, int worldZ, bool isCave = false);
 
+    // [新增] 缓存水域检测 (供传送/标点判定水面使用)
+    bool IsCachedWater(int worldX, int worldZ, bool isCave = false);
+
     // [新增] 生物群系缓存查询 (供大地图悬停显示)
     bool GetCachedBiomeName(int worldX, int worldZ, std::string& outName);
 }

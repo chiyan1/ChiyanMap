@@ -509,9 +509,13 @@ namespace DX11Hook {
                     // F11 (全屏切换) 透传，不作为可绑定按键
                     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
                 } else {
-                    *MapRenderState::g_listeningHotkey = (int)wParam;
+                    if (MapRenderState::g_listeningHotkey == &MapRenderState::g_hotkeys.openBigMap && (int)wParam == 0) {
+                        // 严禁将 openBigMap 置为 0
+                    } else {
+                        *MapRenderState::g_listeningHotkey = (int)wParam;
+                        LanguageManager::SaveConfig();
+                    }
                     MapRenderState::g_listeningHotkey = nullptr;
-                    LanguageManager::SaveConfig();
                 }
                 return 1;
             }
@@ -1437,6 +1441,8 @@ namespace DX11Hook {
             static float col[3]     = {1.0f, 1.0f, 1.0f};
             static int  rgb[3]      = {255, 255, 255};
             static bool showOnMap   = true;
+            static bool isPinned    = false;
+            static char folderBuf[128] = "";
             static bool initialized = false;
 
             Waypoint targetWp;
@@ -1459,6 +1465,8 @@ namespace DX11Hook {
                     rgb[1] = (int)(col[1] * 255.0f);
                     rgb[2] = (int)(col[2] * 255.0f);
                     showOnMap = targetWp.enabled;
+                    isPinned = targetWp.pinned;
+                    snprintf(folderBuf, sizeof(folderBuf), "%s", targetWp.folder.c_str());
                     initialized = true;
                 }
 
@@ -1487,11 +1495,45 @@ namespace DX11Hook {
                     col[1] = (float)rgb[1] / 255.0f;
                     col[2] = (float)rgb[2] / 255.0f;
                 }
+
+                // 文件夹输入与选择
+                ImGui::PushItemWidth(180);
+                ImGui::InputText("##EditWPFolder", folderBuf, sizeof(folderBuf));
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                if (ImGui::Button("\xe2\x9c\x8e##EditFolderIME")) {
+                    NativeIME::Open(folderBuf, sizeof(folderBuf), LanguageManager::GetText("WP_FOLDER"));
+                }
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("NATIVE_IME_TOOLTIP"));
+                ImGui::SameLine();
+                ImGui::Text("%s", LanguageManager::GetText("WP_FOLDER"));
+
+                auto existingFolders = WaypointManager::GetFolders();
+                if (!existingFolders.empty()) {
+                    std::string fPreview = folderBuf[0] ? folderBuf : LanguageManager::GetText("WP_FOLDER_NONE");
+                    ImGui::PushItemWidth(180);
+                    if (ImGui::BeginCombo("##EditWPFolderCombo", fPreview.c_str())) {
+                        if (ImGui::Selectable(LanguageManager::GetText("WP_FOLDER_NONE"), folderBuf[0] == '\0')) {
+                            folderBuf[0] = '\0';
+                        }
+                        for (const auto& ef : existingFolders) {
+                            bool isSel = (ef == folderBuf);
+                            if (ImGui::Selectable(ef.c_str(), isSel)) {
+                                snprintf(folderBuf, sizeof(folderBuf), "%s", ef.c_str());
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                    ImGui::PopItemWidth();
+                }
+
                 ImGui::Checkbox(LanguageManager::GetText("WP_SHOW_ON_MAP"), &showOnMap);
+                ImGui::SameLine(180);
+                ImGui::Checkbox(LanguageManager::GetText("WP_PIN"), &isPinned);
 
                 ImGui::Spacing();
                 if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
-                    WaypointManager::UpdateWaypoint(wpId, nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], showOnMap);
+                    WaypointManager::UpdateWaypoint(wpId, nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], showOnMap, isPinned, folderBuf);
                     ImGui::CloseCurrentPopup();
                     initialized = false;
                     NativeIME::Close();
@@ -1983,7 +2025,7 @@ namespace DX11Hook {
                 if (region) {
                     short topY = SafeGetSurfaceY(*region, bx, bz);
                     if (topY > -64 && topY < 319) {
-                        by = (int)topY + 1; // 地形已加载 → 立刻抓取地表最高点
+                        by = (int)topY; // topY 已经是地表站立高度 (水面空气格/方块上方格)
                     }
                 }
             }
@@ -1992,8 +2034,12 @@ namespace DX11Hook {
                 bool isCave = MapRenderState::g_caveModeActive || (MapRenderState::currentDimensionId == 1);
                 int16_t cachedY = MapCacheManager::GetCachedSurfaceHeight(bx, bz, isCave);
                 if (cachedY != MapCacheManager::HEIGHT_UNKNOWN && cachedY > -64 && cachedY < 319) {
-                    by = (int)cachedY + 1;
+                    by = (int)cachedY;
                 }
+            }
+            // 水域安全强化：主世界水体在未加载或历史旧缓存时，确保高度为水面高度 (>=63)
+            if (MapRenderState::currentDimensionId == 0 && MapCacheManager::IsCachedWater(bx, bz, MapRenderState::g_caveModeActive)) {
+                if (by < 63) by = 63;
             }
 
             ImVec2 titleSize = ImGui::CalcTextSize(LanguageManager::GetText("CONTEXT_TITLE"));
@@ -2033,6 +2079,7 @@ namespace DX11Hook {
                 MapRenderState::tpTargetX = (float)bx + 0.5f;
                 MapRenderState::tpTargetY = -999.0f; // 哨兵: 触发维度感知安全传送管线
                 MapRenderState::tpTargetZ = (float)bz + 0.5f;
+                MapRenderState::tpTargetDim = MapRenderState::currentDimensionId;
                 MapRenderState::triggerTeleport.store(true);
                 MapRenderState::showBigMap = false;
                 ImGui::CloseCurrentPopup();
@@ -2109,6 +2156,7 @@ namespace DX11Hook {
                     MapRenderState::tpTargetX = (float)targetWp.x + 0.5f;
                     MapRenderState::tpTargetY = (float)targetWp.y;
                     MapRenderState::tpTargetZ = (float)targetWp.z + 0.5f;
+                    MapRenderState::tpTargetDim = targetWp.dimId;
                     MapRenderState::triggerTeleport.store(true);
                     MapRenderState::showBigMap = false;
                     ImGui::CloseCurrentPopup();
@@ -2280,6 +2328,9 @@ namespace DX11Hook {
                 if (!s_undo.valid) return;
                 for (auto& c : s_undo.changes) {
                     if (c.target) {
+                        if (c.target == &MapRenderState::g_hotkeys.openBigMap && c.prevValue == 0) {
+                            c.prevValue = MapRenderState::HotkeyBindings::Defaults().openBigMap;
+                        }
                         *c.target = c.prevValue;
                         addFlash(c.target, ImVec4(0.2f, 0.4f, 0.8f, 1.0f)); // 蓝色闪烁
                     }
@@ -2314,7 +2365,7 @@ namespace DX11Hook {
 
             // 单行渲染：操作名 | 按键按钮(监听/禁用/闪烁态) | 重置按钮 | 清除按钮
             // [ImGui ID 修复] 用 bindPtr 作为唯一 ID 前缀，避免 5 行同标签按钮 (重置/清除/已禁用) 产生 ID 冲突
-            auto renderRow = [&](const char* actionName, int* bindPtr, int defaultVk) {
+            auto renderRow = [&](const char* actionName, int* bindPtr, int defaultVk, bool allowClear = true) {
                 ImGui::PushID(bindPtr);
                 ImGui::Text("%s", actionName);
                 ImGui::NextColumn();
@@ -2393,11 +2444,12 @@ namespace DX11Hook {
                 // --- 清除列 (设置为空=禁用该快捷键) ---
                 {
                     bool isCleared = (*bindPtr == 0);
-                    if (isCleared) ImGui::BeginDisabled();
+                    bool cantClear = !allowClear;
+                    if (isCleared || cantClear) ImGui::BeginDisabled();
                     // [ID 修复] ##Clear 后缀 + PushID 双重保障
                     std::string clearBtnId = std::string(LanguageManager::GetText("HOTKEY_CLEAR")) + "##Clear";
                     if (ImGui::Button(clearBtnId.c_str(), ImVec2(-1, 0))) {
-                        if (*bindPtr != 0) {
+                        if (*bindPtr != 0 && allowClear) {
                             pushUndo(LanguageManager::GetText("HOTKEY_STATUS_CLEARED"), { {bindPtr, *bindPtr} });
                             *bindPtr = 0;
                             addFlash(bindPtr, ImVec4(0.8f, 0.2f, 0.2f, 1.0f)); // 红色闪烁
@@ -2406,16 +2458,23 @@ namespace DX11Hook {
                             LanguageManager::SaveConfig();
                         }
                     }
-                    if (isCleared) ImGui::EndDisabled();
-                    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("HOTKEY_STATUS_CLEARED"));
+                    if (isCleared || cantClear) ImGui::EndDisabled();
+                    if (cantClear) {
+                        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+                            ImGui::SetTooltip("%s", LanguageManager::GetText("HOTKEY_CANNOT_CLEAR"));
+                        }
+                    } else {
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::SetTooltip("%s", LanguageManager::GetText("HOTKEY_STATUS_CLEARED"));
+                        }
+                    }
                 }
                 ImGui::NextColumn();
                 ImGui::PopID();
             };
 
             auto defaults = MapRenderState::HotkeyBindings::Defaults();
-            // [防误操作] "打开全屏大地图" (M 键) 不再展示/可改/可清除:
-            // 清除该键会导致玩家无法再打开操作面板入口, 故固定为默认键
+            renderRow(LanguageManager::GetText("HOTKEY_OPEN_BIGMAP"),     &MapRenderState::g_hotkeys.openBigMap,        defaults.openBigMap, false);
             renderRow(LanguageManager::GetText("HOTKEY_OPEN_WPMGR"),      &MapRenderState::g_hotkeys.openWaypointMgr,    defaults.openWaypointMgr);
             renderRow(LanguageManager::GetText("HOTKEY_TOGGLE_MINIMAP"),  &MapRenderState::g_hotkeys.toggleMinimap,      defaults.toggleMinimap);
             renderRow(LanguageManager::GetText("HOTKEY_TOGGLE_SHAPE"),    &MapRenderState::g_hotkeys.toggleMinimapShape, defaults.toggleMinimapShape);
@@ -2441,26 +2500,29 @@ namespace DX11Hook {
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("HOTKEY_STATUS_UNDONE"));
             ImGui::SameLine();
 
-            // 全部重置 (推入批量撤销，支持 Ctrl+Z 恢复; M 键固定不可配置, 不参与)
+            // 全部重置 (推入批量撤销，支持 Ctrl+Z 恢复; 包含 openBigMap)
             if (ImGui::Button(LanguageManager::GetText("HOTKEY_RESET_ALL"), ImVec2(halfW, 0))) {
-                bool anyChanged = (MapRenderState::g_hotkeys.openWaypointMgr    != defaults.openWaypointMgr ||
-                                   MapRenderState::g_hotkeys.toggleMinimap      != defaults.toggleMinimap ||
-                                   MapRenderState::g_hotkeys.toggleMinimapShape != defaults.toggleMinimapShape ||
-                                   MapRenderState::g_hotkeys.toggleMinimapRot   != defaults.toggleMinimapRot);
+                bool anyChanged = (MapRenderState::g_hotkeys.openBigMap        != defaults.openBigMap ||
+                                   MapRenderState::g_hotkeys.openWaypointMgr   != defaults.openWaypointMgr ||
+                                   MapRenderState::g_hotkeys.toggleMinimap     != defaults.toggleMinimap ||
+                                   MapRenderState::g_hotkeys.toggleMinimapShape!= defaults.toggleMinimapShape ||
+                                   MapRenderState::g_hotkeys.toggleMinimapRot  != defaults.toggleMinimapRot);
                 if (anyChanged) {
                     std::vector<UndoChange> changes = {
-                        {&MapRenderState::g_hotkeys.openWaypointMgr,    MapRenderState::g_hotkeys.openWaypointMgr},
-                        {&MapRenderState::g_hotkeys.toggleMinimap,      MapRenderState::g_hotkeys.toggleMinimap},
-                        {&MapRenderState::g_hotkeys.toggleMinimapShape, MapRenderState::g_hotkeys.toggleMinimapShape},
-                        {&MapRenderState::g_hotkeys.toggleMinimapRot,   MapRenderState::g_hotkeys.toggleMinimapRot}
+                        {&MapRenderState::g_hotkeys.openBigMap,        MapRenderState::g_hotkeys.openBigMap},
+                        {&MapRenderState::g_hotkeys.openWaypointMgr,   MapRenderState::g_hotkeys.openWaypointMgr},
+                        {&MapRenderState::g_hotkeys.toggleMinimap,     MapRenderState::g_hotkeys.toggleMinimap},
+                        {&MapRenderState::g_hotkeys.toggleMinimapShape,MapRenderState::g_hotkeys.toggleMinimapShape},
+                        {&MapRenderState::g_hotkeys.toggleMinimapRot,  MapRenderState::g_hotkeys.toggleMinimapRot}
                     };
                     MapRenderState::g_hotkeys = defaults;
                     pushUndo(LanguageManager::GetText("HOTKEY_RESET_ALL"), std::move(changes));
                     // 全部绿色闪烁
-                    addFlash(&MapRenderState::g_hotkeys.openWaypointMgr,    ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-                    addFlash(&MapRenderState::g_hotkeys.toggleMinimap,      ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-                    addFlash(&MapRenderState::g_hotkeys.toggleMinimapShape, ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
-                    addFlash(&MapRenderState::g_hotkeys.toggleMinimapRot,   ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
+                    addFlash(&MapRenderState::g_hotkeys.openBigMap,        ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
+                    addFlash(&MapRenderState::g_hotkeys.openWaypointMgr,   ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
+                    addFlash(&MapRenderState::g_hotkeys.toggleMinimap,     ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
+                    addFlash(&MapRenderState::g_hotkeys.toggleMinimapShape,ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
+                    addFlash(&MapRenderState::g_hotkeys.toggleMinimapRot,  ImVec4(0.2f, 0.7f, 0.3f, 1.0f));
                     setStatus(LanguageManager::GetText("HOTKEY_STATUS_RESET"), ImVec4(0.4f, 0.9f, 0.5f, 1.0f));
                 }
                 MapRenderState::g_listeningHotkey = nullptr;
@@ -2480,11 +2542,11 @@ namespace DX11Hook {
     }
 
     // ==========================================
-    // 路径点 ImGui 管理控制台 (添加搜索、重命名与传送)
+    // 路径点 ImGui 管理控制台 (添加搜索、排序、置顶、文件夹、手动排序、重命名与传送)
     // ==========================================
     inline void RenderImGuiWaypointUI() {
-        ImGui::SetNextWindowSize(ImVec2(750, 480), ImGuiCond_FirstUseEver); 
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2 - 375, ImGui::GetIO().DisplaySize.y / 2 - 240), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(840, 520), ImGuiCond_FirstUseEver); 
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2 - 420, ImGui::GetIO().DisplaySize.y / 2 - 260), ImGuiCond_FirstUseEver);
         
         // 记录管理器面板当前帧的开启状态
         bool lastShowWPUI = MapRenderState::showWaypointUI;
@@ -2493,11 +2555,15 @@ namespace DX11Hook {
         if (ImGui::Begin(LanguageManager::GetText("WP_MANAGER_TITLE"), &MapRenderState::showWaypointUI, winFlags)) {
             
             static bool showAddPopup = false;
+            static bool showNewFolderPopup = false;
+            static bool showRenameFolderPopup = false;
+            static bool showDeleteFolderPopup = false;
             // 记录新建窗口当前帧的开启状态
             bool lastShowAddPopup = showAddPopup;
             static char searchBuf[256] = "";
             static int wpTab = -1; // 维度标签: -1=全部, 0=主世界, 1=下界, 2=末地
             
+            // 顶栏第一排：搜索栏与新建按钮
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x - 190);
             ImGui::InputTextWithHint("##WPSearch", LanguageManager::GetText("SEARCH_HINT"), searchBuf, sizeof(searchBuf));
             ImGui::PopItemWidth();
@@ -2513,7 +2579,8 @@ namespace DX11Hook {
                 NativeIME::Close();
                 showAddPopup = true;
             }
-            // [新增] 维度标签筛选：全部 / 主世界 / 下界 / 末地
+
+            // 顶栏第二排：维度标签筛选与排序选择
             {
                 if (!lastShowWPUI) wpTab = MapRenderState::currentDimensionId; // 打开管理器时默认选中当前维度
                 const char* tabLabels[4] = {
@@ -2529,7 +2596,94 @@ namespace DX11Hook {
                     ImGui::PushStyleColor(ImGuiCol_Button, active ? ImVec4(0.25f, 0.55f, 0.9f, 1.0f) : ImVec4(0.25f, 0.32f, 0.38f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.45f, 0.52f, 1.0f));
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.28f, 0.34f, 1.0f));
-                    if (ImGui::Button(tabLabels[i], ImVec2(150, 0))) wpTab = tabValues[i];
+                    if (ImGui::Button(tabLabels[i], ImVec2(105, 0))) wpTab = tabValues[i];
+                    ImGui::PopStyleColor(3);
+                }
+
+                // 排序下拉选框 (包含 7 种模式：时间最近/最远、名称升降序、距离升降序、手动排序)
+                ImGui::SameLine();
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
+                ImGui::Text("%s:", LanguageManager::GetText("WP_SORT"));
+                ImGui::SameLine();
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 3);
+                const char* sortLabels[7] = {
+                    LanguageManager::GetText("WP_SORT_TIME_DESC"),
+                    LanguageManager::GetText("WP_SORT_TIME_ASC"),
+                    LanguageManager::GetText("WP_SORT_NAME_ASC"),
+                    LanguageManager::GetText("WP_SORT_NAME_DESC"),
+                    LanguageManager::GetText("WP_SORT_DIST_ASC"),
+                    LanguageManager::GetText("WP_SORT_DIST_DESC"),
+                    LanguageManager::GetText("WP_SORT_MANUAL")
+                };
+                int curSort = MapRenderState::waypointSortMode;
+                if (curSort < 0 || curSort >= 7) curSort = 0;
+                ImGui::SetNextItemWidth(140);
+                if (ImGui::BeginCombo("##WPSortCombo", sortLabels[curSort])) {
+                    for (int s = 0; s < 7; ++s) {
+                        bool isSel = (curSort == s);
+                        if (ImGui::Selectable(sortLabels[s], isSel)) {
+                            MapRenderState::waypointSortMode = s;
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+
+            // 顶栏第三排：文件夹筛选栏与管理按钮
+            {
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
+                ImGui::Text("%s:", LanguageManager::GetText("WP_FOLDER"));
+                ImGui::SameLine();
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 3);
+
+                std::string currentFolderLabel = LanguageManager::GetText("WP_FOLDER_ALL");
+                if (MapRenderState::waypointFolderFilter == "__ROOT__") currentFolderLabel = LanguageManager::GetText("WP_FOLDER_NONE");
+                else if (!MapRenderState::waypointFolderFilter.empty()) currentFolderLabel = MapRenderState::waypointFolderFilter;
+
+                ImGui::SetNextItemWidth(160);
+                if (ImGui::BeginCombo("##WPFolderCombo", currentFolderLabel.c_str())) {
+                    if (ImGui::Selectable(LanguageManager::GetText("WP_FOLDER_ALL"), MapRenderState::waypointFolderFilter.empty())) {
+                        MapRenderState::waypointFolderFilter = "";
+                    }
+                    if (ImGui::Selectable(LanguageManager::GetText("WP_FOLDER_NONE"), MapRenderState::waypointFolderFilter == "__ROOT__")) {
+                        MapRenderState::waypointFolderFilter = "__ROOT__";
+                    }
+                    for (const auto& f : WaypointManager::GetFolders()) {
+                        bool isSel = (MapRenderState::waypointFolderFilter == f);
+                        if (ImGui::Selectable(f.c_str(), isSel)) {
+                            MapRenderState::waypointFolderFilter = f;
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.28f, 0.48f, 0.35f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.38f, 0.58f, 0.45f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.22f, 0.40f, 0.28f, 1.0f));
+                if (ImGui::Button(LanguageManager::GetText("WP_FOLDER_NEW"), ImVec2(80, 0))) {
+                    showNewFolderPopup = true;
+                }
+                ImGui::PopStyleColor(3);
+
+                // 若当前选中了具体文件夹，支持重命名与删除该文件夹
+                if (!MapRenderState::waypointFolderFilter.empty() && MapRenderState::waypointFolderFilter != "__ROOT__") {
+                    ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.35f, 0.42f, 0.52f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.45f, 0.52f, 0.62f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.28f, 0.35f, 0.45f, 1.0f));
+                    if (ImGui::Button(LanguageManager::GetText("WP_FOLDER_RENAME"))) {
+                        showRenameFolderPopup = true;
+                    }
+                    ImGui::PopStyleColor(3);
+
+                    ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.65f, 0.25f, 0.25f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.75f, 0.35f, 0.35f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.55f, 0.18f, 0.18f, 1.0f));
+                    if (ImGui::Button(LanguageManager::GetText("WP_FOLDER_DELETE"))) {
+                        showDeleteFolderPopup = true;
+                    }
                     ImGui::PopStyleColor(3);
                 }
             }
@@ -2538,7 +2692,12 @@ namespace DX11Hook {
 
             ImGui::BeginChild("WPList", ImVec2(0, 0), true);
             std::string toDelete = "";
-            bool toggled = false;
+            std::string toTogglePin = "";
+            std::string toToggleEnabled = "";
+            std::string toSwapId1 = "";
+            std::string toSwapId2 = "";
+            std::string toMoveSrc = "";
+            std::string toMoveTgt = "";
             bool triggerTp = false;
 
             static std::string uiEditId = "";
@@ -2551,20 +2710,79 @@ namespace DX11Hook {
             std::string query = searchBuf;
             for (char& c : query) { if (c >= 'A' && c <= 'Z') c += 32; }
 
-            // [新增] 多选工具栏
+            // 筛选并提取要展示的路径点
+            std::vector<Waypoint> displayList;
+            {
+                std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
+                for (const auto& wp : WaypointManager::g_waypoints) {
+                    if (wpTab != -1 && wp.dimId != wpTab) continue; // 维度标签筛选
+                    if (!MapRenderState::waypointFolderFilter.empty()) {
+                        if (MapRenderState::waypointFolderFilter == "__ROOT__") {
+                            if (!wp.folder.empty()) continue; // 仅未分类
+                        } else {
+                            if (wp.folder != MapRenderState::waypointFolderFilter) continue; // 仅指定文件夹
+                        }
+                    }
+                    if (!query.empty()) {
+                        std::string lowerName = wp.name;
+                        for (char& c : lowerName) { if (c >= 'A' && c <= 'Z') c += 32; }
+                        if (lowerName.find(query) == std::string::npos) continue;
+                    }
+                    displayList.push_back(wp);
+                }
+            }
+
+            // 排序计算：置顶绝对优先于所有其他规则
+            std::sort(displayList.begin(), displayList.end(), [&](const Waypoint& a, const Waypoint& b) {
+                if (a.pinned != b.pinned) return a.pinned > b.pinned; // 置顶项优先排前
+                switch (MapRenderState::waypointSortMode) {
+                    case 0: { // Time Desc: 时间 (最近)
+                        uint64_t ca = a.createdAt ? a.createdAt : (uint64_t)a.order;
+                        uint64_t cb = b.createdAt ? b.createdAt : (uint64_t)b.order;
+                        if (ca != cb) return ca > cb;
+                        return a.order < b.order;
+                    }
+                    case 1: { // Time Asc: 时间 (最远)
+                        uint64_t ca = a.createdAt ? a.createdAt : (uint64_t)a.order;
+                        uint64_t cb = b.createdAt ? b.createdAt : (uint64_t)b.order;
+                        if (ca != cb) return ca < cb;
+                        return a.order > b.order;
+                    }
+                    case 2: { // Name Asc: 名称 (A-Z)
+                        std::string sa = a.name, sb = b.name;
+                        for (char& c : sa) { if (c >= 'A' && c <= 'Z') c += 32; }
+                        for (char& c : sb) { if (c >= 'A' && c <= 'Z') c += 32; }
+                        return sa < sb;
+                    }
+                    case 3: { // Name Desc: 名称 (Z-A)
+                        std::string sa = a.name, sb = b.name;
+                        for (char& c : sa) { if (c >= 'A' && c <= 'Z') c += 32; }
+                        for (char& c : sb) { if (c >= 'A' && c <= 'Z') c += 32; }
+                        return sa > sb;
+                    }
+                    case 4:   // Dist Asc: 距离 (最近)
+                    case 5: { // Dist Desc: 距离 (最远)
+                        bool aSame = (a.dimId == MapRenderState::currentDimensionId);
+                        bool bSame = (b.dimId == MapRenderState::currentDimensionId);
+                        if (aSame != bSame) return aSame > bSame;
+                        double da = (double)(a.x - g_playerBlockX) * (a.x - g_playerBlockX) + (double)(a.z - g_playerBlockZ) * (a.z - g_playerBlockZ);
+                        double db = (double)(b.x - g_playerBlockX) * (b.x - g_playerBlockX) + (double)(b.z - g_playerBlockZ) * (b.z - g_playerBlockZ);
+                        return (MapRenderState::waypointSortMode == 4) ? (da < db) : (da > db);
+                    }
+                    case 6: // Manual: 手动排序
+                        return a.order < b.order;
+                    default:
+                        return a.createdAt > b.createdAt;
+                }
+            });
+
+            // 多选工具栏
             {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.32f, 0.38f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.45f, 0.52f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.28f, 0.34f, 1.0f));
                 if (ImGui::Button(LanguageManager::GetText("WP_SELECT_ALL"), ImVec2(90, 0))) {
-                    std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
-                    for (const auto& wp : WaypointManager::g_waypoints) {
-                        if (wpTab != -1 && wp.dimId != wpTab) continue; // 维度标签筛选
-                        if (!query.empty()) {
-                            std::string lowerName = wp.name;
-                            for (char& c : lowerName) { if (c >= 'A' && c <= 'Z') c += 32; }
-                            if (lowerName.find(query) == std::string::npos) continue;
-                        }
+                    for (const auto& wp : displayList) {
                         selectedIds.insert(wp.id);
                     }
                 }
@@ -2594,99 +2812,174 @@ namespace DX11Hook {
             }
             ImGui::Separator();
 
-            {
-                std::lock_guard<std::mutex> lock(WaypointManager::g_wpMutex);
-                for (auto& wp : WaypointManager::g_waypoints) {
-                    
-                    if (wpTab != -1 && wp.dimId != wpTab) continue; // 维度标签筛选
-                    if (!query.empty()) {
-                        std::string lowerName = wp.name;
-                        for (char& c : lowerName) { if (c >= 'A' && c <= 'Z') c += 32; }
-                        if (lowerName.find(query) == std::string::npos) {
-                            continue; 
+            // 渲染排序后的路径点列表
+            for (size_t idx = 0; idx < displayList.size(); ++idx) {
+                const auto& wp = displayList[idx];
+                ImGui::PushID(wp.id.c_str());
+
+                // 多选复选框
+                bool isSelected = selectedIds.count(wp.id) > 0;
+                if (ImGui::Checkbox("##msel", &isSelected)) {
+                    if (isSelected) selectedIds.insert(wp.id);
+                    else selectedIds.erase(wp.id);
+                }
+                ImGui::SameLine();
+
+                // 上移/下移手动排序按钮 (▲ / ▼)
+                {
+                    bool canUp = (idx > 0 && displayList[idx - 1].pinned == wp.pinned);
+                    if (!canUp) ImGui::BeginDisabled();
+                    if (ImGui::Button("\xe2\x96\xb2##Up", ImVec2(20, 24))) { // ▲ U+25B2
+                        toSwapId1 = wp.id;
+                        toSwapId2 = displayList[idx - 1].id;
+                        MapRenderState::waypointSortMode = 6; // 自动切入手动排序模式
+                    }
+                    if (!canUp) ImGui::EndDisabled();
+                    else if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("WP_MOVE_UP"));
+                    ImGui::SameLine();
+
+                    bool canDown = (idx + 1 < displayList.size() && displayList[idx + 1].pinned == wp.pinned);
+                    if (!canDown) ImGui::BeginDisabled();
+                    if (ImGui::Button("\xe2\x96\xbc##Down", ImVec2(20, 24))) { // ▼ U+25BC
+                        toSwapId1 = wp.id;
+                        toSwapId2 = displayList[idx + 1].id;
+                        MapRenderState::waypointSortMode = 6; // 自动切入手动排序模式
+                    }
+                    if (!canDown) ImGui::EndDisabled();
+                    else if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("WP_MOVE_DOWN"));
+                    ImGui::SameLine();
+                }
+
+                // 置顶切换按钮 (★ / ☆)
+                if (wp.pinned) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.85f, 0.65f, 0.15f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.95f, 0.75f, 0.25f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.75f, 0.55f, 0.10f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                    if (ImGui::Button("\xe2\x98\x85##Pin", ImVec2(24, 24))) { // ★ U+2605
+                        toTogglePin = wp.id;
+                    }
+                    ImGui::PopStyleColor(4);
+                    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("WP_UNPIN"));
+                } else {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.24f, 0.28f, 0.32f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.34f, 0.38f, 0.42f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.18f, 0.22f, 0.26f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+                    if (ImGui::Button("\xe2\x98\x86##Pin", ImVec2(24, 24))) { // ☆ U+2606
+                        toTogglePin = wp.id;
+                    }
+                    ImGui::PopStyleColor(4);
+                    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("WP_PIN"));
+                }
+                ImGui::SameLine();
+
+                // 颜色预览块 (支持拖拽放置目标与拖拽源)
+                ImGui::ColorButton("##color", ImVec4(wp.r, wp.g, wp.b, 1.0f), ImGuiColorEditFlags_NoTooltip, ImVec2(24, 24));
+                
+                // 拖拽重排交互 (Drag & Drop)
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    ImGui::SetDragDropPayload("WP_DND_ROW", wp.id.c_str(), wp.id.size() + 1);
+                    ImGui::Text("%s: %s", LanguageManager::GetText("WP_SORT_MANUAL"), wp.name.c_str());
+                    ImGui::EndDragDropSource();
+                }
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("WP_DND_ROW")) {
+                        const char* srcId = (const char*)payload->Data;
+                        if (srcId && wp.id != srcId) {
+                            toMoveSrc = srcId;
+                            toMoveTgt = wp.id;
+                            MapRenderState::waypointSortMode = 6; // 自动切入手动排序模式
                         }
                     }
-
-                    ImGui::PushID(wp.id.c_str());
-
-                    // [新增] 多选复选框
-                    bool isSelected = selectedIds.count(wp.id) > 0;
-                    if (ImGui::Checkbox("##msel", &isSelected)) {
-                        if (isSelected) selectedIds.insert(wp.id);
-                        else selectedIds.erase(wp.id);
-                    }
-                    ImGui::SameLine();
-
-                    ImGui::ColorButton("##color", ImVec4(wp.r, wp.g, wp.b, 1.0f), ImGuiColorEditFlags_NoTooltip, ImVec2(24, 24));
-                    ImGui::SameLine();
-                    
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4);
-                    ImGui::Text("%s", wp.name.c_str());
-
-                    // [维度标注] 每个路径点显示其所在维度 (主世界/下界/末地), 便于跨维度辨识
-                    {
-                        const char* dimLabel = LanguageManager::GetText(
-                            wp.dimId == 1 ? "WP_TAB_NETHER" :
-                            wp.dimId == 2 ? "WP_TAB_END" : "WP_TAB_OVERWORLD");
-                        ImVec4 dimCol = wp.dimId == 1 ? ImVec4(0.90f, 0.45f, 0.40f, 1.0f) :
-                                        wp.dimId == 2 ? ImVec4(0.70f, 0.55f, 0.90f, 1.0f) :
-                                                        ImVec4(0.45f, 0.80f, 0.45f, 1.0f);
-                        ImGui::SameLine();
-                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
-                        ImGui::TextColored(dimCol, "[%s]", dimLabel);
-                    }
-
-                    float winWidth = ImGui::GetWindowWidth();
-                    
-                    ImGui::SameLine(winWidth > 750 ? winWidth - 490 : 200);
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 4);
-                    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "X: %d  Y: %d  Z: %d", wp.x, wp.y, wp.z);
-                    
-                    ImGui::SameLine(winWidth - 270);
-                    bool enabled = wp.enabled;
-                    if (ImGui::Checkbox(LanguageManager::GetText("WP_LIST_SHOW"), &enabled)) {
-                        wp.enabled = enabled;
-                        toggled = true;
-                    }
-                    
-                    ImGui::SameLine(winWidth - 195);
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.6f, 0.2f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.7f, 0.3f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.5f, 0.1f, 1.0f));
-                    if (ImGui::Button(LanguageManager::GetText("EDIT_WP"), ImVec2(55, 0))) {
-                        uiEditId = wp.id;
-                        uiTriggerEdit = true;
-                    }
-                    ImGui::PopStyleColor(3);
-
-                    ImGui::SameLine(winWidth - 135);
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.8f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.7f, 0.9f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.5f, 0.7f, 1.0f));
-                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_TELEPORT"), ImVec2(45, 0))) {
-                        MapRenderState::tpTargetX = (float)wp.x + 0.5f;
-                        MapRenderState::tpTargetY = (float)wp.y; 
-                        MapRenderState::tpTargetZ = (float)wp.z + 0.5f;
-                        MapRenderState::triggerTeleport.store(true);
-                        triggerTp = true;
-                    }
-                    ImGui::PopStyleColor(3);
-
-                    ImGui::SameLine(winWidth - 75);
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
-                    if (ImGui::Button(LanguageManager::GetText("WP_LIST_DELETE"), ImVec2(45, 0))) {
-                        toDelete = wp.id;
-                    }
-                    ImGui::PopStyleColor(3);
-                    
-                    ImGui::PopID();
-                    ImGui::Separator();
+                    ImGui::EndDragDropTarget();
                 }
-            } 
+                ImGui::SameLine();
+                
+                // 名称展示（置顶项目带醒目微金色高亮）
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4);
+                if (wp.pinned) {
+                    ImGui::TextColored(ImVec4(1.0f, 0.88f, 0.35f, 1.0f), "%s", wp.name.c_str());
+                } else {
+                    ImGui::Text("%s", wp.name.c_str());
+                }
 
-            // [新增] 批量删除优先处理；单个删除时清理对应的选中项
+                // 文件夹归属徽章（在全文件夹视图或未分类视图时明确标注归属）
+                if (!wp.folder.empty() && MapRenderState::waypointFolderFilter.empty()) {
+                    ImGui::SameLine();
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
+                    ImGui::TextColored(ImVec4(0.35f, 0.75f, 1.0f, 1.0f), "[%s]", wp.folder.c_str());
+                }
+
+                // 维度标注：显示主世界 / 下界 / 末地
+                {
+                    const char* dimLabel = LanguageManager::GetText(
+                        wp.dimId == 1 ? "WP_TAB_NETHER" :
+                        wp.dimId == 2 ? "WP_TAB_END" : "WP_TAB_OVERWORLD");
+                    ImVec4 dimCol = wp.dimId == 1 ? ImVec4(0.90f, 0.45f, 0.40f, 1.0f) :
+                                    wp.dimId == 2 ? ImVec4(0.70f, 0.55f, 0.90f, 1.0f) :
+                                                    ImVec4(0.45f, 0.80f, 0.45f, 1.0f);
+                    ImGui::SameLine();
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
+                    ImGui::TextColored(dimCol, "[%s]", dimLabel);
+                }
+
+                float winWidth = ImGui::GetWindowWidth();
+                
+                // 坐标与距离展示
+                ImGui::SameLine(winWidth > 820 ? winWidth - 520 : 250);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 4);
+                if (wp.dimId == MapRenderState::currentDimensionId) {
+                    double dDist = std::sqrt((double)(wp.x - g_playerBlockX) * (wp.x - g_playerBlockX) + (double)(wp.z - g_playerBlockZ) * (wp.z - g_playerBlockZ));
+                    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "X:%d Y:%d Z:%d (%.0fm)", wp.x, wp.y, wp.z, dDist);
+                } else {
+                    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "X:%d Y:%d Z:%d", wp.x, wp.y, wp.z);
+                }
+                
+                ImGui::SameLine(winWidth - 270);
+                bool enabled = wp.enabled;
+                if (ImGui::Checkbox(LanguageManager::GetText("WP_LIST_SHOW"), &enabled)) {
+                    toToggleEnabled = wp.id;
+                }
+                
+                ImGui::SameLine(winWidth - 195);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.6f, 0.2f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.7f, 0.3f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.5f, 0.1f, 1.0f));
+                if (ImGui::Button(LanguageManager::GetText("EDIT_WP"), ImVec2(55, 0))) {
+                    uiEditId = wp.id;
+                    uiTriggerEdit = true;
+                }
+                ImGui::PopStyleColor(3);
+
+                ImGui::SameLine(winWidth - 135);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.8f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.7f, 0.9f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.5f, 0.7f, 1.0f));
+                if (ImGui::Button(LanguageManager::GetText("WP_LIST_TELEPORT"), ImVec2(45, 0))) {
+                    MapRenderState::tpTargetX = (float)wp.x + 0.5f;
+                    MapRenderState::tpTargetY = (float)wp.y; 
+                    MapRenderState::tpTargetZ = (float)wp.z + 0.5f;
+                    MapRenderState::tpTargetDim = wp.dimId;
+                    MapRenderState::triggerTeleport.store(true);
+                    triggerTp = true;
+                }
+                ImGui::PopStyleColor(3);
+
+                ImGui::SameLine(winWidth - 75);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+                if (ImGui::Button(LanguageManager::GetText("WP_LIST_DELETE"), ImVec2(45, 0))) {
+                    toDelete = wp.id;
+                }
+                ImGui::PopStyleColor(3);
+                
+                ImGui::PopID();
+                ImGui::Separator();
+            }
+
+            // 交互处理：批量删除、单个删除、置顶切换、显示状态切换、手动排序交换与拖拽
             if (bulkDeleteTriggered && !selectedIds.empty()) {
                 WaypointManager::RemoveWaypoints(selectedIds);
                 selectedIds.clear();
@@ -2694,8 +2987,19 @@ namespace DX11Hook {
                 WaypointManager::RemoveWaypoint(toDelete);
                 selectedIds.erase(toDelete);  // 清理已删除路径点的选中状态
                 WaypointManager::SaveWaypoints();
-            } else if (toggled) {
+            }
+            if (!toTogglePin.empty()) {
+                WaypointManager::ToggleWaypointPin(toTogglePin);
+            }
+            if (!toToggleEnabled.empty()) {
+                WaypointManager::ToggleWaypoint(toToggleEnabled);
                 WaypointManager::SaveWaypoints();
+            }
+            if (!toSwapId1.empty() && !toSwapId2.empty()) {
+                WaypointManager::SwapWaypointOrder(toSwapId1, toSwapId2);
+            }
+            if (!toMoveSrc.empty() && !toMoveTgt.empty()) {
+                WaypointManager::MoveWaypointToIndex(toMoveSrc, toMoveTgt);
             }
             
             if (triggerTp) {
@@ -2708,6 +3012,95 @@ namespace DX11Hook {
             // 调用 UI 列表专属重命名弹窗模块
             RenderEditModal((std::string(LanguageManager::GetText("EDIT_WP_TITLE")) + "##ModalUIEdit").c_str(), uiEditId, uiTriggerEdit);
 
+            // 新建文件夹弹窗
+            if (showNewFolderPopup) ImGui::OpenPopup(LanguageManager::GetText("WP_FOLDER_NEW"));
+            if (ImGui::BeginPopupModal(LanguageManager::GetText("WP_FOLDER_NEW"), &showNewFolderPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
+                static char fNameBuf[128] = "";
+                if (ImGui::IsWindowAppearing()) { fNameBuf[0] = '\0'; }
+                ImGui::Text("%s:", LanguageManager::GetText("WP_FOLDER_NAME"));
+                ImGui::PushItemWidth(180);
+                ImGui::InputText("##NewFolderName", fNameBuf, sizeof(fNameBuf));
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                if (ImGui::Button("\xe2\x9c\x8e##NewFolderIME")) {
+                    NativeIME::Open(fNameBuf, sizeof(fNameBuf), LanguageManager::GetText("WP_FOLDER_NAME"));
+                }
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("NATIVE_IME_TOOLTIP"));
+                ImGui::Spacing();
+                if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(100, 0))) {
+                    if (fNameBuf[0] != '\0') {
+                        WaypointManager::AddFolder(fNameBuf);
+                        MapRenderState::waypointFolderFilter = fNameBuf;
+                    }
+                    showNewFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                    NativeIME::Close();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(LanguageManager::GetText("WP_CANCEL"), ImVec2(100, 0))) {
+                    showNewFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                    NativeIME::Close();
+                }
+                ImGui::EndPopup();
+            }
+
+            // 重命名文件夹弹窗
+            if (showRenameFolderPopup) ImGui::OpenPopup(LanguageManager::GetText("WP_FOLDER_RENAME"));
+            if (ImGui::BeginPopupModal(LanguageManager::GetText("WP_FOLDER_RENAME"), &showRenameFolderPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
+                static char rNameBuf[128] = "";
+                if (ImGui::IsWindowAppearing()) {
+                    snprintf(rNameBuf, sizeof(rNameBuf), "%s", MapRenderState::waypointFolderFilter.c_str());
+                }
+                ImGui::Text("%s:", LanguageManager::GetText("WP_FOLDER_NAME"));
+                ImGui::PushItemWidth(180);
+                ImGui::InputText("##RenameFolderName", rNameBuf, sizeof(rNameBuf));
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                if (ImGui::Button("\xe2\x9c\x8e##RenameFolderIME")) {
+                    NativeIME::Open(rNameBuf, sizeof(rNameBuf), LanguageManager::GetText("WP_FOLDER_NAME"));
+                }
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("NATIVE_IME_TOOLTIP"));
+                ImGui::Spacing();
+                if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(100, 0))) {
+                    if (rNameBuf[0] != '\0' && MapRenderState::waypointFolderFilter != rNameBuf) {
+                        WaypointManager::RenameFolder(MapRenderState::waypointFolderFilter, rNameBuf);
+                        MapRenderState::waypointFolderFilter = rNameBuf;
+                    }
+                    showRenameFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                    NativeIME::Close();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(LanguageManager::GetText("WP_CANCEL"), ImVec2(100, 0))) {
+                    showRenameFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                    NativeIME::Close();
+                }
+                ImGui::EndPopup();
+            }
+
+            // 删除文件夹弹窗
+            if (showDeleteFolderPopup) ImGui::OpenPopup(LanguageManager::GetText("WP_FOLDER_DELETE"));
+            if (ImGui::BeginPopupModal(LanguageManager::GetText("WP_FOLDER_DELETE"), &showDeleteFolderPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
+                char warnMsg[256];
+                snprintf(warnMsg, sizeof(warnMsg), LanguageManager::GetText("WP_FOLDER_CONFIRM_DELETE"), MapRenderState::waypointFolderFilter.c_str());
+                ImGui::TextWrapped("%s", warnMsg);
+                ImGui::Spacing();
+                if (ImGui::Button(LanguageManager::GetText("CONFIRM_DELETE"), ImVec2(120, 0))) {
+                    WaypointManager::DeleteFolder(MapRenderState::waypointFolderFilter);
+                    MapRenderState::waypointFolderFilter = "";
+                    showDeleteFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(LanguageManager::GetText("WP_CANCEL"), ImVec2(120, 0))) {
+                    showDeleteFolderPopup = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
             if (MapRenderState::triggerAddWaypoint) {
                 showAddPopup = true;
                 MapRenderState::triggerAddWaypoint = false;
@@ -2715,14 +3108,23 @@ namespace DX11Hook {
 
             if (showAddPopup) ImGui::OpenPopup(LanguageManager::GetText("NEW_WP_TITLE"));
             
+            // 新建路径点弹窗（支持置顶与归属文件夹选择）
             if (ImGui::BeginPopupModal(LanguageManager::GetText("NEW_WP_TITLE"), &showAddPopup, ImGuiWindowFlags_AlwaysAutoResize)) {
                 static char nameBuf[256] = "";
+                static char folderBuf[128] = "";
                 static int pos[3] = {0, 0, 0};
                 static float col[3] = {1.0f, 0.3f, 0.3f};
                 static int  rgb[3] = {255, 76, 76};
+                static bool isPinned = false;
                 
                 if (ImGui::IsWindowAppearing()) {
                     nameBuf[0] = '\0'; 
+                    isPinned = false;
+                    if (!MapRenderState::waypointFolderFilter.empty() && MapRenderState::waypointFolderFilter != "__ROOT__") {
+                        snprintf(folderBuf, sizeof(folderBuf), "%s", MapRenderState::waypointFolderFilter.c_str());
+                    } else {
+                        folderBuf[0] = '\0';
+                    }
                     pos[0] = (MapRenderState::addWaypointX != -999999) ? MapRenderState::addWaypointX : g_playerBlockX;
                     pos[1] = (MapRenderState::addWaypointY != -999999) ? MapRenderState::addWaypointY : (int)std::floor(g_playerY);
                     pos[2] = (MapRenderState::addWaypointZ != -999999) ? MapRenderState::addWaypointZ : g_playerBlockZ;
@@ -2761,10 +3163,43 @@ namespace DX11Hook {
                     col[1] = (float)rgb[1] / 255.0f;
                     col[2] = (float)rgb[2] / 255.0f;
                 }
+
+                // 文件夹输入与已有文件夹快捷选择
+                ImGui::PushItemWidth(180);
+                ImGui::InputText("##NewWPFolder", folderBuf, sizeof(folderBuf));
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                if (ImGui::Button("\xe2\x9c\x8e##NewWPFolderIME")) {
+                    NativeIME::Open(folderBuf, sizeof(folderBuf), LanguageManager::GetText("WP_FOLDER"));
+                }
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", LanguageManager::GetText("NATIVE_IME_TOOLTIP"));
+                ImGui::SameLine();
+                ImGui::Text("%s", LanguageManager::GetText("WP_FOLDER"));
+
+                auto existingFolders = WaypointManager::GetFolders();
+                if (!existingFolders.empty()) {
+                    std::string fPreview = folderBuf[0] ? folderBuf : LanguageManager::GetText("WP_FOLDER_NONE");
+                    ImGui::PushItemWidth(180);
+                    if (ImGui::BeginCombo("##NewWPFolderCombo", fPreview.c_str())) {
+                        if (ImGui::Selectable(LanguageManager::GetText("WP_FOLDER_NONE"), folderBuf[0] == '\0')) {
+                            folderBuf[0] = '\0';
+                        }
+                        for (const auto& ef : existingFolders) {
+                            bool isSel = (ef == folderBuf);
+                            if (ImGui::Selectable(ef.c_str(), isSel)) {
+                                snprintf(folderBuf, sizeof(folderBuf), "%s", ef.c_str());
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                    ImGui::PopItemWidth();
+                }
+
+                ImGui::Checkbox(LanguageManager::GetText("WP_PIN"), &isPinned);
                 
                 ImGui::Spacing();
                 if (ImGui::Button(LanguageManager::GetText("WP_SAVE"), ImVec2(120, 0))) {
-                    WaypointManager::AddWaypoint(nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], wpTab);
+                    WaypointManager::AddWaypoint(nameBuf, pos[0], pos[1], pos[2], col[0], col[1], col[2], wpTab, isPinned, folderBuf);
                     showAddPopup = false;
                     ImGui::CloseCurrentPopup();
                     NativeIME::Close();

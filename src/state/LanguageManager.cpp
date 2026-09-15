@@ -18,6 +18,28 @@ namespace LanguageManager {
     static std::mutex g_cacheMutex;
     static std::filesystem::path g_langDir;
 
+    // 内置多语言字典兜底 (覆盖 16 种语言，彻底杜绝界面出现未翻译 raw key)
+    static const std::unordered_map<std::string, std::unordered_map<std::string, std::string>> g_builtinTranslations = {
+        {"HOTKEY_CANNOT_CLEAR", {
+            {"zh_CN", "该快捷键不可清除"},
+            {"zh_TW", "該快捷鍵不可清除"},
+            {"en_US", "This hotkey cannot be cleared"},
+            {"de",    "Dieses Tastenkürzel kann nicht gelöscht werden"},
+            {"es",    "Este atajo no se puede borrar"},
+            {"fr",    "Ce raccourci ne peut pas être effacé"},
+            {"id",    "Tombol pintas ini tidak dapat dihapus"},
+            {"it",    "Questa scorciatoia non può essere cancellata"},
+            {"ja",    "このショートカットキーは消去できません"},
+            {"ko",    "이 단축키는 지ул 수 없습니다"},
+            {"pt_BR", "Este atalho não pode ser limpo"},
+            {"ru",    "Эту горячую клавишу нельзя очистить"},
+            {"th",    "ไม่สามารถลบปุ่มลัดนี้ได้"},
+            {"tr",    "Bu kısayol tuşu temizlenemez"},
+            {"uk",    "Цю гарячу клавішу не можна очистити"},
+            {"vi",    "Không thể xóa phím tắt này"}
+        }}
+    };
+
     static std::filesystem::path GetLanguageDirectory() {
         // 1. 优先通过模块句柄获取 ChiyanMap.dll 所在的绝对路径下的 lang 目录
         // 彻底免疫不同启动器/游戏工作路径 (CWD) 差异导致的相对路径失效
@@ -91,6 +113,13 @@ namespace LanguageManager {
                 }
             }
         } catch (...) {}
+
+        // 3. 注册内置多语言词条至 ll::i18n (提供强保底)
+        for (const auto& [k, transMap] : g_builtinTranslations) {
+            for (const auto& [lang, text] : transMap) {
+                ll::i18n::getInstance().set(lang, k, text);
+            }
+        }
 
         ScanLanguages();
         LoadConfig();
@@ -213,13 +242,16 @@ namespace LanguageManager {
                 MapRenderState::g_caveDepth = j.value("caveDepth", 30);
                 MapRenderState::g_legibleCaveMaps = j.value("legibleCaveMaps", false);
                 // 读取快捷键绑定 (持久化保存)
-                // [防误操作] openBigMap (M 键) 固定不可配置, 不从配置读取,
-                // 避免历史配置中误清除的 0 值导致无法打开操作面板
+                // openBigMap 支持自定义按键，但不可为 0；若配置中为 0 则自动保底为默认 M 键 (0x4D)
                 if (j.contains("hotkeys") && j["hotkeys"].is_object()) {
                     auto const& hk = j["hotkeys"];
                     auto def = MapRenderState::HotkeyBindings::Defaults();
-                    MapRenderState::g_hotkeys.openWaypointMgr = hk.value("openWaypointMgr", def.openWaypointMgr);
-                    MapRenderState::g_hotkeys.toggleMinimap   = hk.value("toggleMinimap", def.toggleMinimap);
+                    MapRenderState::g_hotkeys.openBigMap       = hk.value("openBigMap", def.openBigMap);
+                    if (MapRenderState::g_hotkeys.openBigMap == 0) {
+                        MapRenderState::g_hotkeys.openBigMap = def.openBigMap;
+                    }
+                    MapRenderState::g_hotkeys.openWaypointMgr   = hk.value("openWaypointMgr", def.openWaypointMgr);
+                    MapRenderState::g_hotkeys.toggleMinimap     = hk.value("toggleMinimap", def.toggleMinimap);
                     MapRenderState::g_hotkeys.toggleMinimapShape = hk.value("toggleMinimapShape", def.toggleMinimapShape);
                     MapRenderState::g_hotkeys.toggleMinimapRot = hk.value("toggleMinimapRot", def.toggleMinimapRot);
                 }
@@ -250,7 +282,8 @@ namespace LanguageManager {
         j["caveDepth"] = MapRenderState::g_caveDepth;
         j["legibleCaveMaps"] = MapRenderState::g_legibleCaveMaps;
 
-        // 保存快捷键绑定 (持久化保存; openBigMap 固定为默认 M 键, 不保存)
+        // 保存快捷键绑定 (持久化保存)
+        j["hotkeys"]["openBigMap"] = MapRenderState::g_hotkeys.openBigMap;
         j["hotkeys"]["openWaypointMgr"] = MapRenderState::g_hotkeys.openWaypointMgr;
         j["hotkeys"]["toggleMinimap"] = MapRenderState::g_hotkeys.toggleMinimap;
         j["hotkeys"]["toggleMinimapShape"] = MapRenderState::g_hotkeys.toggleMinimapShape;
@@ -271,6 +304,41 @@ namespace LanguageManager {
         }
 
         std::string_view sv = ll::i18n::getInstance().get(key, g_currentLanguage);
+        if (sv == key) {
+            // 1. 优先尝试直接从磁盘对应语言的 JSON 读取 (无需重启即可生效)
+            try {
+                auto p = g_langDir / (g_currentLanguage + ".json");
+                if (std::filesystem::exists(p)) {
+                    std::ifstream ifs(p);
+                    if (ifs.is_open()) {
+                        json j;
+                        ifs >> j;
+                        if (j.contains(key) && j[key].is_string()) {
+                            std::string val = j[key].get<std::string>();
+                            ll::i18n::getInstance().set(g_currentLanguage, key, val);
+                            g_translationCache[key] = val;
+                            return g_translationCache[key].c_str();
+                        }
+                    }
+                }
+            } catch (...) {}
+
+            // 2. 尝试从内置 16 种多语言兜底字典读取
+            auto fit = g_builtinTranslations.find(key);
+            if (fit != g_builtinTranslations.end()) {
+                auto langIt = fit->second.find(g_currentLanguage);
+                if (langIt != fit->second.end()) {
+                    g_translationCache[key] = langIt->second;
+                    return g_translationCache[key].c_str();
+                }
+                auto enIt = fit->second.find("en_US");
+                if (enIt != fit->second.end()) {
+                    g_translationCache[key] = enIt->second;
+                    return g_translationCache[key].c_str();
+                }
+            }
+        }
+
         g_translationCache[key] = std::string(sv);
         return g_translationCache[key].c_str();
     }

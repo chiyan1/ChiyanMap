@@ -549,3 +549,6 @@ fabric.properties
 # Project specific ignores
 /.idea/
 /bin/
+
+# Scratch directory
+scratch/

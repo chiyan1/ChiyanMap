@@ -33,6 +33,8 @@ namespace MapRenderState {
 
     // [新增] 路径点 UI 开启状态
     inline bool showWaypointUI = false;
+    inline int waypointSortMode = 0; // 0=时间(最近), 1=时间(最远), 2=名称A-Z, 3=名称Z-A, 4=距离近-远, 5=距离远-近, 6=手动排序
+    inline std::string waypointFolderFilter = ""; // ""=全部文件夹, "__ROOT__"=未分类, 其他=文件夹名
 
     // [新增] 小地图路径点显示开关 (独立于路径点 enabled 属性，控制是否在小地图上绘制)
     inline bool showWaypointsOnMinimap = true;
@@ -45,12 +47,11 @@ namespace MapRenderState {
     inline bool showCaveSettings = false; // [洞穴地图] 洞穴设置面板
 
     // [新增] 快捷键绑定结构 (虚拟键码，参考 Win32 VK_*)
-    // 默认值: U=0x55, N=0x4E, Y=0x59, J=0x4A
+    // 默认值: M=0x4D, U=0x55, N=0x4E, Y=0x59, J=0x4A
     // 0 表示已禁用 (清除设置)，不匹配任何 WM_KEYDOWN 的 wParam
-    // [防误操作] openBigMap (M=0x4D) 固定不可配置 (不展示/不可改/不可清除),
-    // 防止玩家误清除后无法打开操作面板; 不参与配置文件读写
+    // openBigMap 支持自定义按键，但不可清除 (严禁设为 0)，防止玩家因误清除导致无法呼出操作面板
     struct HotkeyBindings {
-        int openBigMap        = 0x4D; // M: 切换大地图 (固定键, 不可配置)
+        int openBigMap        = 0x4D; // M: 切换大地图 (可自定义，不可清除)
         int openWaypointMgr   = 0x55; // U: 切换路径点管理器
         int toggleMinimap     = 0x4E; // N: 切换小地图显示
         int toggleMinimapShape= 0x59; // Y: 切换小地图形状
@@ -100,6 +101,7 @@ namespace MapRenderState {
     inline float tpTargetX = 0.0f;
     inline float tpTargetY = 0.0f;
     inline float tpTargetZ = 0.0f;
+    inline int tpTargetDim = -1; // 目标维度: 0=主世界 1=下界 2=末地; -1=未指定(默认当前维度)
 
     // [两阶段地表探测] 未访问区域的分阶段传送状态
     // Phase 0: 已 tp 到 Y=320 触发服务器下发目标区块，等待客户端区块就绪
